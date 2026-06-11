@@ -1,0 +1,11 @@
+/*
+ * Thème du site « default ». Surcharge les design tokens du design system pour
+ * cette pharmacie. Décliner un autre look = un autre fichier de thème + assets,
+ * SANS toucher aux composants.
+ */
+:root {
+  --color-brand-50: #eff6ff;
+  --color-brand-500: #2563eb;
+  --color-brand-600: #1d4ed8;
+  --color-brand-700: #1e40af;
+}

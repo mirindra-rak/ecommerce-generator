@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+/* Design tokens par défaut du design system */
+@import "@pharmacie/ui/styles/tokens.css";
+
+/* Thème du site (surcharge les tokens) — voir apps/pharmacie-1/themes/ */
+@import "../../themes/default/theme.css";
+
+body {
+  background: var(--color-surface);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+}

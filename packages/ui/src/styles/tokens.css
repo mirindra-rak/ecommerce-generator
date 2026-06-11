@@ -1,0 +1,29 @@
+/*
+ * Design tokens du design system (valeurs PAR DÉFAUT).
+ * Tailwind v4 — config CSS-first via @theme.
+ *
+ * Theming par tenant : chaque app surcharge ces variables dans
+ * `apps/<app>/themes/<theme>/theme.css`. On ne forke JAMAIS les composants ;
+ * on change uniquement les tokens.
+ */
+
+@theme {
+  /* Couleurs de marque (surchargées par tenant) */
+  --color-brand-50: #f0fdf4;
+  --color-brand-500: #16a34a;
+  --color-brand-600: #15803d;
+  --color-brand-700: #166534;
+
+  /* Neutres */
+  --color-surface: #ffffff;
+  --color-foreground: #0f172a;
+  --color-muted: #64748b;
+
+  /* Rayons */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+
+  /* Typographie */
+  --font-sans: "Inter", system-ui, sans-serif;
+}
