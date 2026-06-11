@@ -1,7 +1,6 @@
 // Schéma Prisma — modèle Silo (1 base = 1 pharmacie).
 // ⛔ AUCUN tenant_id / table tenants : la séparation est au niveau du déploiement.
-// Ce fichier ne contient qu'une amorce du module `catalog` ; les autres modules
-// seront ajoutés via /spec + /plan + migrations dédiées.
+// Module `catalog` (story 01). Les autres modules seront ajoutés via migrations dédiées.
 
 generator client {
   provider = "prisma-client-js"
@@ -10,6 +9,13 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum ProductType {
+  COSMETIC
+  SUPPLEMENT
+  DEVICE
+  OTHER
 }
 
 model Brand {
@@ -22,45 +28,114 @@ model Brand {
 }
 
 model Category {
-  id        String     @id @default(cuid())
-  name      String
-  slug      String     @unique
-  parentId  String?
-  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id])
-  children  Category[] @relation("CategoryTree")
-  products  Product[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  position Int     @default(0)
+  // Arbre auto-référencé. onDelete: Restrict → on refuse de supprimer une catégorie
+  // qui a des enfants (la règle métier fine est affinée en story 04).
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
 }
 
 model Product {
-  id          String           @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
-  slug        String           @unique
+  slug        String      @unique
   description String?
-  brandId     String?
-  brand       Brand?           @relation(fields: [brandId], references: [id])
-  categoryId  String?
-  category    Category?        @relation(fields: [categoryId], references: [id])
-  variants    ProductVariant[]
-  active      Boolean          @default(true)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  // Attributs parapharmacie
+  ean         String?     @unique
+  inci        String?
+  productType ProductType @default(OTHER)
+  precautions String?
+
+  // Marque optionnelle : supprimer une marque détache ses produits (SetNull).
+  brandId String?
+  brand   Brand?  @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  // Catégorie optionnelle : Restrict → supprimer une catégorie ayant des produits est refusé.
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  options  ProductOption[]
+  variants ProductVariant[]
+  media    ProductMedia[]
+
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId])
   @@index([brandId])
 }
 
-model ProductVariant {
-  id        String   @id @default(cuid())
+model ProductOption {
+  id        String               @id @default(cuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  sku       String   @unique
-  // Prix HT en centimes (éviter les flottants pour la monnaie). TVA gérée par `pricing`.
+  product   Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  position  Int                  @default(0)
+  values    ProductOptionValue[]
+
+  @@unique([productId, name])
+  @@index([productId])
+}
+
+model ProductOptionValue {
+  id       String               @id @default(cuid())
+  optionId String
+  option   ProductOption        @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  value    String
+  position Int                  @default(0)
+  variants VariantOptionValue[]
+
+  @@unique([optionId, value])
+  @@index([optionId])
+}
+
+model ProductVariant {
+  id        String @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sku       String  @unique
+  // Prix HT en centimes (jamais de flottant pour la monnaie). TVA gérée par `pricing`.
   priceExclTax Int
-  stock     Int      @default(0)
+  volume       String?
+  stock        Int                  @default(0)
+  optionValues VariantOptionValue[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+// Liaison variante ↔ valeur d'option (une variante = une valeur par axe).
+model VariantOptionValue {
+  variantId     String
+  variant       ProductVariant     @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  optionValueId String
+  optionValue   ProductOptionValue @relation(fields: [optionValueId], references: [id], onDelete: Cascade)
+
+  @@id([variantId, optionValueId])
+  @@index([optionValueId])
+}
+
+model ProductMedia {
+  id         String   @id @default(cuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Clé objet S3/MinIO — AUCUN binaire en base.
+  storageKey String   @unique
+  alt        String?
+  position   Int      @default(0)
+  createdAt  DateTime @default(now())
 
   @@index([productId])
 }

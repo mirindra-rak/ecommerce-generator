@@ -8,6 +8,26 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    # Base PostgreSQL de test pour les tests d'intégration des repositories.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pharmacie
+          POSTGRES_PASSWORD: pharmacie
+          POSTGRES_DB: pharmacie_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pharmacie"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://pharmacie:pharmacie@localhost:5432/pharmacie_test?schema=public
+
     steps:
       - uses: actions/checkout@v4
 
