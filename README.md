@@ -12,7 +12,8 @@ docker compose up -d                           # PostgreSQL local
 cp apps/pharmacie-1/.env.example apps/pharmacie-1/.env
 pnpm --filter @pharmacie/core db:generate      # client Prisma
 pnpm --filter @pharmacie/core db:migrate       # schéma
-pnpm dev                                        # http://localhost:3000
+pnpm --filter @pharmacie/core db:seed          # données de démo (optionnel)
+pnpm dev                                        # http://localhost:4321
 ```
 
 ## Structure
