@@ -50,12 +50,13 @@ describe("category.service (intégration)", () => {
     expect(await categoryRepository.findById(leaf.id)).toBeNull();
   });
 
-  it("refuse la suppression d'une catégorie contenant un produit", async () => {
+  it("supprime une catégorie associée à des produits (détachés, non bloquant)", async () => {
     const category = await createCategory({ name: "Avec produit" });
     await prisma.product.create({
-      data: { name: "P", slug: "p-test", category: { connect: { id: category.id } } },
+      data: { name: "P", slug: "p-test", categories: { connect: { id: category.id } } },
     });
-    await expect(deleteCategory(category.id)).rejects.toBeInstanceOf(CategoryNotEmptyError);
+    await deleteCategory(category.id);
+    expect(await categoryRepository.findById(category.id)).toBeNull();
   });
 });
 

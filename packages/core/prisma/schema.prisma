@@ -15,6 +15,8 @@ model Brand {
   id        String    @id @default(cuid())
   name      String
   slug      String    @unique
+  // Identifiant d'origine (fabricant PrestaShop) pour ré-import idempotent.
+  externalId Int?     @unique
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -25,6 +27,8 @@ model Category {
   name     String
   slug     String  @unique // « URL simplifiée »
   position Int     @default(0)
+  // Identifiant d'origine (catégorie PrestaShop) pour ré-import idempotent.
+  externalId Int?  @unique
   // « Affichée » : visibilité côté boutique.
   active   Boolean @default(true)
 
@@ -52,7 +56,9 @@ model Category {
   parentId String?
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Restrict)
   children Category[] @relation("CategoryTree")
-  products Product[]
+  // Produits rattachés (M2M) + produits dont CETTE catégorie est la principale.
+  products  Product[] @relation("ProductCategories")
+  primaryOf Product[] @relation("ProductPrimaryCategory")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -65,8 +71,15 @@ model Product {
   name        String
   slug        String      @unique
   description String?
-  // Identifiant commerce (reste colonne : unique, indexé, clé d'import migration).
-  ean         String? @unique
+  // Résumé court (équiv. PrestaShop `description_short`) ; rendu échappé côté storefront.
+  shortDescription String?
+  // SEO produit (parité avec Category).
+  metaTitle       String?
+  metaDescription String?
+  // TVA en POINTS DE BASE (550 = 5,5 %, 2000 = 20 %). Entier — pas de float pour la monnaie.
+  vatRate     Int     @default(2000)
+  // Identifiant d'origine (produit PrestaShop) pour ré-import idempotent.
+  externalId  Int?    @unique
   // Type ouvert (String + union TS côté code) : ajouter un type ne demande pas de migration.
   productType String  @default("OTHER")
   // Attributs DESCRIPTIFS propres au vertical (parapharmacie : inci, precautions…).
@@ -76,19 +89,23 @@ model Product {
   // Marque optionnelle : supprimer une marque détache ses produits (SetNull).
   brandId String?
   brand   Brand?  @relation(fields: [brandId], references: [id], onDelete: SetNull)
-  // Catégorie optionnelle : Restrict → supprimer une catégorie ayant des produits est refusé.
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  // Catégories (M2M) : un produit peut appartenir à plusieurs catégories. Supprimer une
+  // catégorie détache simplement le produit (lignes de jointure en cascade).
+  categories Category[] @relation("ProductCategories")
+  // Catégorie principale (canonical / fil d'Ariane), optionnelle. SetNull à la suppression.
+  primaryCategoryId String?
+  primaryCategory   Category? @relation("ProductPrimaryCategory", fields: [primaryCategoryId], references: [id], onDelete: SetNull)
 
-  options  ProductOption[]
-  variants ProductVariant[]
-  media    ProductMedia[]
+  options     ProductOption[]
+  variants    ProductVariant[]
+  media       ProductMedia[]
+  facetValues ProductFacetValue[]
 
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([categoryId])
+  @@index([primaryCategoryId])
   @@index([brandId])
 }
 
@@ -120,7 +137,10 @@ model ProductVariant {
   id        String @id @default(cuid())
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  sku       String  @unique
+  // Référence interne optionnelle. Unique quand renseignée (PostgreSQL autorise plusieurs NULL).
+  sku       String? @unique
+  // Code-barres (EAN/CIP) : identifie LA déclinaison vendable, pas le produit regroupeur.
+  ean       String? @unique
   // Prix HT en centimes (jamais de flottant pour la monnaie). TVA gérée par `pricing`.
   priceExclTax Int
   volume       String?
@@ -155,6 +175,44 @@ model ProductMedia {
   createdAt  DateTime @default(now())
 
   @@index([productId])
+}
+
+// ───────────────────────── Facettes (filtres produit) ─────────────────────────
+// Taxonomie de facettes pilotée par la donnée (équiv. « Features » PrestaShop) : axes de
+// FILTRAGE descriptifs (Nature, Conditionnement, Spécificité, Indication/CI). À distinguer
+// des `ProductOption` (axes qui GÉNÈRENT des déclinaisons/SKU). Ajouter une facette ou une
+// valeur = INSERT, jamais de migration. Le texte libre non filtré reste dans `attributes`.
+
+model Facet {
+  id       String       @id @default(cuid())
+  code     String       @unique // "nature", "conditionnement", "specificite", "indication"
+  name     String // libellé affiché : "Nature de produit"
+  position Int          @default(0)
+  values   FacetValue[]
+}
+
+model FacetValue {
+  id       String              @id @default(cuid())
+  facetId  String
+  facet    Facet               @relation(fields: [facetId], references: [id], onDelete: Cascade)
+  code     String // "collutoire", "sans-conservateur"
+  label    String // "Collutoire", "Sans conservateur"
+  position Int                 @default(0)
+  products ProductFacetValue[]
+
+  @@unique([facetId, code])
+  @@index([facetId])
+}
+
+// Liaison M:N produit ↔ valeur de facette (un produit porte plusieurs valeurs).
+model ProductFacetValue {
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  facetValueId String
+  facetValue   FacetValue @relation(fields: [facetValueId], references: [id], onDelete: Cascade)
+
+  @@id([productId, facetValueId])
+  @@index([facetValueId]) // « tous les produits portant cette valeur » = le filtre
 }
 
 // ───────────────────────── Auth (Better Auth) ─────────────────────────

@@ -1,161 +1,122 @@
+import { readFileSync } from "node:fs";
 import { PrismaClient } from "@prisma/client";
-import type { ProductType } from "../src/modules/catalog/product-attributes";
 
-// Jeu de données de démonstration pour le catalogue. Idempotent : on vide les tables
-// du catalogue puis on recrée. Prix en CENTIMES HT.
+// Seed du catalogue. Idempotent : on vide les tables du catalogue puis on recrée. Le
+// catalogue (catégories, marques, produits) provient d'un dataset curé committé
+// (`seed-data/catalog.json`, généré depuis l'export laparaducoin). Prix en CENTIMES HT.
 const prisma = new PrismaClient();
 
-const BRANDS = [
-  { name: "Avène", slug: "avene" },
-  { name: "La Roche-Posay", slug: "la-roche-posay" },
-  { name: "Bioderma", slug: "bioderma" },
-  { name: "Nuxe", slug: "nuxe" },
-  { name: "Nutrisanté", slug: "nutrisante" },
-];
-
-const CATEGORIES = [
-  {
-    name: "Visage & Soin",
-    slug: "visage-soin",
-    position: 0,
-    description: "Crèmes, sérums et soins ciblés pour le visage, sélectionnés par nos pharmaciens.",
-    metaTitle: "Soins visage en parapharmacie",
-    metaDescription: "Crèmes hydratantes, sérums et soins visage des grandes marques.",
-    metaKeywords: ["visage", "soin", "crème"],
-  },
-  { name: "Corps & Bain", slug: "corps-bain", position: 1 },
-  { name: "Cheveux", slug: "cheveux", position: 2 },
-  { name: "Compléments alimentaires", slug: "complements-alimentaires", position: 3 },
-  { name: "Maman & Bébé", slug: "maman-bebe", position: 4 },
-  {
-    name: "Solaires",
-    slug: "solaires",
-    position: 5,
-    description: "Protections solaires haute tolérance pour toute la famille.",
-    metaTitle: "Solaires & protection UV",
-  },
-];
-
-interface VariantSpec {
-  sku: string;
-  priceExclTax: number;
-  volume?: string;
-  stock: number;
-  value?: string; // valeur de l'option « Contenance » associée
-}
-
-interface ProductSpec {
-  slug: string;
+interface CatalogCategory {
+  externalId: number;
   name: string;
-  description: string;
-  productType: ProductType;
-  brandSlug: string;
-  categorySlug: string;
-  ean?: string;
-  inci?: string;
-  precautions?: string;
-  optionValues?: string[]; // valeurs de l'axe « Contenance »
-  variants: VariantSpec[];
+  slug: string;
+  parentExternalId: number | null;
+  position: number;
+}
+interface CatalogBrand {
+  externalId: number;
+  name: string;
+  slug: string;
+}
+interface CatalogProduct {
+  externalId: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  shortDescription: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  vatRate: number;
+  productType: string;
+  brandExternalId: number;
+  categoryExternalId: number;
+  variant: { sku: string; ean?: string; priceExclTax: number; stock: number };
+}
+interface Catalog {
+  categories: CatalogCategory[];
+  brands: CatalogBrand[];
+  products: CatalogProduct[];
 }
 
-const PRODUCTS: ProductSpec[] = [
+const catalog = JSON.parse(
+  readFileSync(new URL("./seed-data/catalog.json", import.meta.url), "utf8"),
+) as Catalog;
+
+// Taxonomie de facettes (filtres produit) — domaine pharma + parapharma. Les `code` de
+// valeur sont uniques sur tout le seed (lookup simplifié à l'assignation).
+interface FacetSpec {
+  code: string;
+  name: string;
+  values: { code: string; label: string }[];
+}
+
+const FACETS: FacetSpec[] = [
   {
-    slug: "creme-hydratante-visage",
-    name: "Crème hydratante apaisante",
-    description:
-      "Soin hydratant pour peaux sensibles à l'eau thermale. Apaise et protège la barrière cutanée.",
-    productType: "COSMETIC",
-    brandSlug: "avene",
-    categorySlug: "visage-soin",
-    ean: "3401590001011",
-    inci: "Aqua, Glycerin, Cetearyl Alcohol",
-    precautions: "Usage externe. Éviter le contour des yeux.",
-    optionValues: ["50 ml", "100 ml"],
-    variants: [
-      { sku: "AVE-CREME-50", priceExclTax: 1490, volume: "50 ml", stock: 25, value: "50 ml" },
-      { sku: "AVE-CREME-100", priceExclTax: 2290, volume: "100 ml", stock: 12, value: "100 ml" },
+    code: "nature",
+    name: "Nature de produit",
+    values: [
+      { code: "comprime", label: "Comprimé" },
+      { code: "gelule", label: "Gélule" },
+      { code: "sirop", label: "Sirop" },
+      { code: "solution-buvable", label: "Solution buvable" },
+      { code: "collutoire", label: "Collutoire" },
+      { code: "spray", label: "Spray" },
+      { code: "collyre", label: "Collyre" },
+      { code: "pommade", label: "Pommade" },
+      { code: "creme", label: "Crème" },
+      { code: "gel", label: "Gel" },
+      { code: "serum", label: "Sérum" },
+      { code: "huile", label: "Huile" },
+      { code: "lotion", label: "Lotion" },
+      { code: "shampoing", label: "Shampoing" },
+      { code: "pastille", label: "Pastille" },
+      { code: "suppositoire", label: "Suppositoire" },
     ],
   },
   {
-    slug: "serum-vitamine-c",
-    name: "Sérum éclat vitamine C",
-    description: "Sérum antioxydant qui ravive l'éclat et lisse le grain de peau.",
-    productType: "COSMETIC",
-    brandSlug: "la-roche-posay",
-    categorySlug: "visage-soin",
-    ean: "3401590002022",
-    variants: [{ sku: "LRP-SERUM-30", priceExclTax: 2790, volume: "30 ml", stock: 18 }],
-  },
-  {
-    slug: "eau-micellaire",
-    name: "Eau micellaire démaquillante",
-    description: "Nettoie et démaquille en douceur, sans rinçage. Peaux normales à mixtes.",
-    productType: "COSMETIC",
-    brandSlug: "bioderma",
-    categorySlug: "visage-soin",
-    ean: "3401590003033",
-    optionValues: ["250 ml", "500 ml"],
-    variants: [
-      { sku: "BIO-MICEL-250", priceExclTax: 1090, volume: "250 ml", stock: 40, value: "250 ml" },
-      { sku: "BIO-MICEL-500", priceExclTax: 1590, volume: "500 ml", stock: 22, value: "500 ml" },
+    code: "conditionnement",
+    name: "Conditionnement",
+    values: [
+      { code: "flacon", label: "Flacon" },
+      { code: "flacon-pompe", label: "Flacon-pompe" },
+      { code: "tube", label: "Tube" },
+      { code: "boite", label: "Boîte" },
+      { code: "sachet", label: "Sachet" },
+      { code: "stick", label: "Stick" },
+      { code: "pot", label: "Pot" },
+      { code: "ampoule", label: "Ampoule" },
+      { code: "roll-on", label: "Roll-on" },
+      { code: "aerosol", label: "Aérosol" },
     ],
   },
   {
-    slug: "huile-prodigieuse",
-    name: "Huile sèche multi-fonctions",
-    description: "Huile sèche pour le visage, le corps et les cheveux. Nourrit et sublime.",
-    productType: "COSMETIC",
-    brandSlug: "nuxe",
-    categorySlug: "corps-bain",
-    ean: "3401590004044",
-    optionValues: ["50 ml", "100 ml"],
-    variants: [
-      { sku: "NUX-HUILE-50", priceExclTax: 1990, volume: "50 ml", stock: 15, value: "50 ml" },
-      { sku: "NUX-HUILE-100", priceExclTax: 2990, volume: "100 ml", stock: 9, value: "100 ml" },
+    code: "specificite",
+    name: "Spécificité",
+    values: [
+      { code: "sans-conservateur", label: "Sans conservateur" },
+      { code: "sans-gaz-propulseur", label: "Sans gaz propulseur" },
+      { code: "sans-sucre", label: "Sans sucre" },
+      { code: "sans-gluten", label: "Sans gluten" },
+      { code: "sans-paraben", label: "Sans paraben" },
+      { code: "sans-parfum", label: "Sans parfum" },
+      { code: "bio", label: "Bio" },
+      { code: "vegan", label: "Vegan" },
+      { code: "hypoallergenique", label: "Hypoallergénique" },
+      { code: "non-teste-animaux", label: "Non testé sur les animaux" },
     ],
   },
   {
-    slug: "shampoing-doux-usage-frequent",
-    name: "Shampoing doux usage fréquent",
-    description: "Formule douce adaptée à un usage quotidien, respecte le cuir chevelu.",
-    productType: "COSMETIC",
-    brandSlug: "avene",
-    categorySlug: "cheveux",
-    ean: "3401590005055",
-    variants: [{ sku: "AVE-SHP-200", priceExclTax: 990, volume: "200 ml", stock: 30 }],
-  },
-  {
-    slug: "complement-magnesium-b6",
-    name: "Magnésium B6 — 60 comprimés",
-    description: "Contribue à réduire la fatigue et au fonctionnement normal du système nerveux.",
-    productType: "SUPPLEMENT",
-    brandSlug: "nutrisante",
-    categorySlug: "complements-alimentaires",
-    ean: "3401590006066",
-    precautions:
-      "Complément alimentaire. Ne pas dépasser la dose journalière recommandée. Tenir hors de portée des enfants.",
-    variants: [{ sku: "NUT-MAG-60", priceExclTax: 890, stock: 50 }],
-  },
-  {
-    slug: "gel-lavant-bebe",
-    name: "Gel lavant surgras bébé",
-    description: "Nettoie le corps et les cheveux de bébé en douceur. Sans savon.",
-    productType: "COSMETIC",
-    brandSlug: "bioderma",
-    categorySlug: "maman-bebe",
-    ean: "3401590007077",
-    variants: [{ sku: "BIO-BB-500", priceExclTax: 1090, volume: "500 ml", stock: 28 }],
-  },
-  {
-    slug: "spf50-solaire-visage",
-    name: "Fluide solaire visage SPF 50+",
-    description: "Très haute protection UVA/UVB, fini invisible non gras. Peaux sensibles.",
-    productType: "COSMETIC",
-    brandSlug: "bioderma",
-    categorySlug: "solaires",
-    ean: "3401590008088",
-    precautions: "Ne pas s'exposer trop longtemps. Renouveler l'application fréquemment.",
-    variants: [{ sku: "BIO-SPF50-40", priceExclTax: 1690, volume: "40 ml", stock: 33 }],
+    code: "indication",
+    name: "Indication / Contre-indication",
+    values: [
+      { code: "femmes-enceintes", label: "Déconseillé aux femmes enceintes et allaitantes" },
+      { code: "hors-portee-enfants", label: "Tenir hors de portée des enfants" },
+      { code: "usage-externe", label: "Usage externe" },
+      { code: "des-3-ans", label: "À partir de 3 ans" },
+      { code: "des-6-ans", label: "À partir de 6 ans" },
+      { code: "adulte", label: "Réservé à l'adulte" },
+      { code: "sur-ordonnance", label: "Sur ordonnance" },
+    ],
   },
 ];
 
@@ -163,79 +124,100 @@ async function main(): Promise<void> {
   // Reset (ordre géré par CASCADE).
   await prisma.$executeRawUnsafe(
     `TRUNCATE TABLE
+      "ProductFacetValue","FacetValue","Facet",
       "ProductMedia","VariantOptionValue","ProductVariant","ProductOptionValue",
       "ProductOption","Product","Category","Brand"
      RESTART IDENTITY CASCADE`,
   );
 
-  for (const brand of BRANDS) {
-    await prisma.brand.create({ data: brand });
-  }
-  for (const category of CATEGORIES) {
-    await prisma.category.create({ data: category });
-  }
-
-  for (const spec of PRODUCTS) {
-    const brand = await prisma.brand.findUniqueOrThrow({ where: { slug: spec.brandSlug } });
-    const category = await prisma.category.findUniqueOrThrow({
-      where: { slug: spec.categorySlug },
+  // Marques — externalId conservé pour le ré-import idempotent.
+  const brandIdByExternal = new Map<number, string>();
+  for (const brand of catalog.brands) {
+    const created = await prisma.brand.create({
+      data: { name: brand.name, slug: brand.slug, externalId: brand.externalId },
     });
+    brandIdByExternal.set(brand.externalId, created.id);
+  }
 
-    const product = await prisma.product.create({
+  // Catégories — univers (racines) d'abord, puis sous-catégories (rattachées par externalId).
+  const categoryIdByExternal = new Map<number, string>();
+  const roots = catalog.categories.filter((c) => c.parentExternalId === null);
+  const children = catalog.categories.filter((c) => c.parentExternalId !== null);
+  for (const category of roots) {
+    const created = await prisma.category.create({
       data: {
-        name: spec.name,
-        slug: spec.slug,
-        description: spec.description,
-        productType: spec.productType,
-        ean: spec.ean ?? null,
-        // Attributs descriptifs dans le jsonb (couture niveau 3).
-        attributes: {
-          ...(spec.inci ? { inci: spec.inci } : {}),
-          ...(spec.precautions ? { precautions: spec.precautions } : {}),
-        },
-        brand: { connect: { id: brand.id } },
-        category: { connect: { id: category.id } },
-        options: spec.optionValues
-          ? {
-              create: [
-                {
-                  name: "Contenance",
-                  position: 0,
-                  values: {
-                    create: spec.optionValues.map((value, index) => ({ value, position: index })),
-                  },
-                },
-              ],
-            }
-          : undefined,
+        name: category.name,
+        slug: category.slug,
+        position: category.position,
+        externalId: category.externalId,
       },
     });
+    categoryIdByExternal.set(category.externalId, created.id);
+  }
+  for (const category of children) {
+    const parentId = categoryIdByExternal.get(category.parentExternalId as number);
+    const created = await prisma.category.create({
+      data: {
+        name: category.name,
+        slug: category.slug,
+        position: category.position,
+        externalId: category.externalId,
+        parent: parentId ? { connect: { id: parentId } } : undefined,
+      },
+    });
+    categoryIdByExternal.set(category.externalId, created.id);
+  }
 
-    const valueByLabel = new Map<string, string>();
-    if (spec.optionValues) {
-      const values = await prisma.productOptionValue.findMany({
-        where: { option: { productId: product.id } },
-      });
-      for (const v of values) valueByLabel.set(v.value, v.id);
-    }
-
-    for (const variantSpec of spec.variants) {
-      const variant = await prisma.productVariant.create({
-        data: {
-          productId: product.id,
-          sku: variantSpec.sku,
-          priceExclTax: variantSpec.priceExclTax,
-          volume: variantSpec.volume ?? null,
-          stock: variantSpec.stock,
+  // Facettes (filtres) + valeurs. Taxonomie seedée ; les produits importés ne portent
+  // pas encore de liaison facette (cf. non-objectif de la story).
+  for (const [position, facet] of FACETS.entries()) {
+    await prisma.facet.create({
+      data: {
+        code: facet.code,
+        name: facet.name,
+        position,
+        values: {
+          create: facet.values.map((value, index) => ({
+            code: value.code,
+            label: value.label,
+            position: index,
+          })),
         },
-      });
-      const valueId = variantSpec.value ? valueByLabel.get(variantSpec.value) : undefined;
-      if (valueId) {
-        await prisma.variantOptionValue.create({
-          data: { variantId: variant.id, optionValueId: valueId },
-        });
-      }
-    }
+      },
+    });
+  }
+
+  // Produits — 1 variante chacune (catalogue source plat). Connexions par externalId.
+  for (const product of catalog.products) {
+    const brandId = brandIdByExternal.get(product.brandExternalId);
+    const categoryId = categoryIdByExternal.get(product.categoryExternalId);
+    await prisma.product.create({
+      data: {
+        externalId: product.externalId,
+        name: product.name,
+        slug: product.slug,
+        description: product.description,
+        shortDescription: product.shortDescription,
+        metaTitle: product.metaTitle,
+        metaDescription: product.metaDescription,
+        vatRate: product.vatRate,
+        productType: product.productType,
+        brand: brandId ? { connect: { id: brandId } } : undefined,
+        // La source ne fournit qu'une catégorie : on la pose en M2M ET comme principale.
+        categories: categoryId ? { connect: [{ id: categoryId }] } : undefined,
+        primaryCategory: categoryId ? { connect: { id: categoryId } } : undefined,
+        variants: {
+          create: [
+            {
+              sku: product.variant.sku,
+              ean: product.variant.ean ?? null,
+              priceExclTax: product.variant.priceExclTax,
+              stock: product.variant.stock,
+            },
+          ],
+        },
+      },
+    });
   }
 
   const counts = {
@@ -243,6 +225,8 @@ async function main(): Promise<void> {
     categories: await prisma.category.count(),
     products: await prisma.product.count(),
     variants: await prisma.productVariant.count(),
+    facets: await prisma.facet.count(),
+    facetValues: await prisma.facetValue.count(),
   };
   console.warn("Seed terminé :", counts);
 }

@@ -1,5 +1,18 @@
-// Services de domaine du catalogue (story 02). Logique métier pure, sans accès
-// Prisma direct : les données sont fournies par l'appelant (via repository).
+// Services de domaine du catalogue. Deux familles :
+//  - fonctions pures de lecture (priceRange, isDisplayable, resolveVariant), alimentées
+//    par l'appelant ;
+//  - services d'écriture (createProduct…) qui orchestrent le repository, génèrent le slug,
+//    valident les attributs et traduisent les violations d'unicité Prisma.
+
+import { Prisma } from "@prisma/client";
+import { buildUniqueSlug } from "../../utils/slugify";
+import { productRepository, type ProductWithRelations } from "./product.repository";
+import { validateAttributes } from "./product-attributes";
+import {
+  DuplicateProductFieldError,
+  PrimaryCategoryNotAssignedError,
+  ProductRequiresVariantError,
+} from "./catalog-errors";
 
 export interface PriceRange {
   min: number;
@@ -19,7 +32,12 @@ export function priceRange(variants: ReadonlyArray<{ priceExclTax: number }>): P
   return { min, max };
 }
 
-/** Un produit est affichable s'il est actif ET possède au moins une variante. */
+/**
+ * Un produit est affichable s'il est actif ET possède au moins une variante.
+ * Garde **lecture** de l'invariant « tout est déclinaison » ; la garantie **écriture**
+ * (un produit naît toujours avec sa déclinaison par défaut) est portée par
+ * `productRepository.createWithDefaultVariant`.
+ */
 export function isDisplayable(product: { active: boolean }, variantCount: number): boolean {
   return product.active && variantCount > 0;
 }
@@ -47,4 +65,132 @@ export function resolveVariant<T extends SelectableVariant>(
       ),
   );
   return match ?? null;
+}
+
+// ───────────────────────── Services d'écriture ─────────────────────────
+
+const productSlugExists = (slug: string): Promise<boolean> =>
+  productRepository.findBySlug(slug).then((product) => product !== null);
+
+/** Traduit une violation d'unicité Prisma (P2002 sur SKU/EAN) en erreur métier. */
+function translateDuplicate(error: unknown): never {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+    const target = error.meta?.target;
+    const fields = Array.isArray(target) ? target.join(",") : String(target ?? "");
+    throw new DuplicateProductFieldError(fields.includes("ean") ? "code-barres (EAN)" : "SKU");
+  }
+  throw error;
+}
+
+// Une déclinaison : le vendable. Prix en CENTIMES HT. `id` présent = existante (réconciliation),
+// `volume` = étiquette libre (ex. « 50 ml », « Lavande »).
+export interface ProductVariantInput {
+  id?: string;
+  sku?: string | null;
+  ean?: string | null;
+  priceExclTax: number;
+  stock?: number;
+  volume?: string | null;
+}
+
+export interface CreateProductInput {
+  name: string;
+  productType: string;
+  description?: string | null;
+  active?: boolean;
+  brandId?: string | null;
+  /** Catégories du produit (M2M). Un produit peut être rattaché à plusieurs catégories. */
+  categoryIds?: string[];
+  /** Catégorie principale (canonical / fil d'Ariane) ; doit appartenir à `categoryIds`. */
+  primaryCategoryId?: string | null;
+  attributes?: unknown;
+  variants: ProductVariantInput[]; // ≥ 1 (invariant « tout est déclinaison »)
+  facetValueIds?: string[];
+}
+
+/**
+ * Construit les écritures imbriquées des catégories (M2M) et de la catégorie principale.
+ * `mode` distingue la création (`connect`) de la mise à jour (`set`, qui remplace la liste).
+ * Rejette une catégorie principale absente de la liste.
+ */
+function categoryWrite(
+  categoryIds: string[],
+  primaryCategoryId: string | null,
+  mode: "connect" | "set",
+) {
+  if (primaryCategoryId && !categoryIds.includes(primaryCategoryId)) {
+    throw new PrimaryCategoryNotAssignedError();
+  }
+  const refs = categoryIds.map((id) => ({ id }));
+  // À la création, `disconnect` n'a pas de sens (rien à détacher) → on omet la principale.
+  const primaryCategory = primaryCategoryId
+    ? { connect: { id: primaryCategoryId } }
+    : mode === "set"
+      ? { disconnect: true }
+      : undefined;
+  return {
+    categories: mode === "connect" ? { connect: refs } : { set: refs },
+    ...(primaryCategory ? { primaryCategory } : {}),
+  };
+}
+
+/**
+ * Crée un produit regroupeur + ses déclinaisons (≥ 1, invariant « tout est déclinaison »).
+ * Valide les attributs descriptifs selon le type, génère un slug unique.
+ */
+export async function createProduct(input: CreateProductInput): Promise<ProductWithRelations> {
+  if (input.variants.length === 0) throw new ProductRequiresVariantError();
+  const attributes = validateAttributes(input.productType, input.attributes ?? {});
+  const slug = await buildUniqueSlug(input.name, productSlugExists);
+  try {
+    const product = await productRepository.createWithVariants({
+      product: {
+        name: input.name,
+        slug,
+        productType: input.productType,
+        description: input.description ?? null,
+        active: input.active ?? true,
+        attributes: attributes as Prisma.InputJsonValue,
+        ...(input.brandId ? { brand: { connect: { id: input.brandId } } } : {}),
+        ...categoryWrite(input.categoryIds ?? [], input.primaryCategoryId ?? null, "connect"),
+      },
+      variants: input.variants,
+    });
+    await productRepository.setFacetValues(product.id, input.facetValueIds ?? []);
+    return product;
+  } catch (error) {
+    translateDuplicate(error);
+  }
+}
+
+export type UpdateProductInput = CreateProductInput;
+
+/**
+ * Met à jour un produit et réconcilie ses déclinaisons (≥ 1). Le slug n'est PAS régénéré
+ * (URL stable). Les déclinaisons sont réconciliées en premier : un SKU/EAN dupliqué est
+ * rejeté avant toute mutation des champs scalaires du produit.
+ */
+export async function updateProduct(id: string, input: UpdateProductInput): Promise<void> {
+  if (input.variants.length === 0) throw new ProductRequiresVariantError();
+  const attributes = validateAttributes(input.productType, input.attributes ?? {});
+  try {
+    await productRepository.reconcileVariants(id, input.variants);
+    await productRepository.update(id, {
+      name: input.name,
+      productType: input.productType,
+      description: input.description ?? null,
+      active: input.active ?? true,
+      attributes: attributes as Prisma.InputJsonValue,
+      brand: input.brandId ? { connect: { id: input.brandId } } : { disconnect: true },
+      ...categoryWrite(input.categoryIds ?? [], input.primaryCategoryId ?? null, "set"),
+    });
+    await productRepository.setFacetValues(id, input.facetValueIds ?? []);
+  } catch (error) {
+    translateDuplicate(error);
+  }
+}
+
+/** Supprime un produit (cascade : déclinaisons, options, médias, liaisons). */
+export async function deleteProduct(id: string): Promise<void> {
+  await productRepository.delete(id);
 }

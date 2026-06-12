@@ -102,7 +102,8 @@ export async function deleteCategory(id: string): Promise<void> {
   try {
     await categoryRepository.delete(id);
   } catch (error) {
-    // Violation de clé étrangère (onDelete: Restrict) → enfants/produits présents.
+    // Violation de clé étrangère (onDelete: Restrict) → SOUS-CATÉGORIES présentes. Les
+    // produits associés (M2M) sont détachés en cascade et n'empêchent pas la suppression.
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
       throw new CategoryNotEmptyError();
     }

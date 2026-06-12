@@ -23,6 +23,47 @@ describe("categoryRepository", () => {
     expect(descendants.map((c) => c.id).sort()).toEqual([child.id, grandChild.id].sort());
   });
 
+  it("findActiveMenuTree : racines actives triées + enfants actifs uniquement", async () => {
+    const visage = await categoryRepository.create({
+      name: "Visage",
+      slug: "visage",
+      position: 0,
+    });
+    const cheveux = await categoryRepository.create({
+      name: "Cheveux",
+      slug: "cheveux",
+      position: 1,
+    });
+    // Racine masquée : ne doit pas remonter.
+    await categoryRepository.create({ name: "Brouillon", slug: "brouillon", active: false });
+
+    await categoryRepository.create({
+      name: "Sérums",
+      slug: "serums",
+      position: 1,
+      parent: { connect: { id: visage.id } },
+    });
+    await categoryRepository.create({
+      name: "Crèmes",
+      slug: "cremes",
+      position: 0,
+      parent: { connect: { id: visage.id } },
+    });
+    // Enfant masqué : ne doit pas remonter.
+    await categoryRepository.create({
+      name: "Archive",
+      slug: "archive",
+      active: false,
+      parent: { connect: { id: visage.id } },
+    });
+
+    const tree = await categoryRepository.findActiveMenuTree();
+
+    expect(tree.map((c) => c.slug)).toEqual([visage.slug, cheveux.slug]);
+    expect(tree[0]?.children.map((c) => c.slug)).toEqual(["cremes", "serums"]);
+    expect(tree[1]?.children).toEqual([]);
+  });
+
   it("refuse un slug dupliqué", async () => {
     await categoryRepository.create({ name: "Cheveux", slug: "cheveux" });
     await expect(categoryRepository.create({ name: "Doublon", slug: "cheveux" })).rejects.toThrow();
@@ -39,13 +80,21 @@ describe("categoryRepository", () => {
     await expect(categoryRepository.delete(root.id)).rejects.toThrow();
   });
 
-  it("refuse la suppression d'une catégorie ayant des produits (Restrict)", async () => {
+  it("supprime une catégorie associée à des produits (M2M détachée, produit conservé)", async () => {
     const cat = await categoryRepository.create({ name: "Solaire", slug: "solaire" });
-    await prisma.product.create({
-      data: { name: "SPF50", slug: "spf50", category: { connect: { id: cat.id } } },
+    const product = await prisma.product.create({
+      data: { name: "SPF50", slug: "spf50", categories: { connect: { id: cat.id } } },
     });
+    expect(await categoryRepository.countProducts(cat.id)).toBe(1);
 
-    await expect(categoryRepository.delete(cat.id)).rejects.toThrow();
+    await categoryRepository.delete(cat.id);
+
+    expect(await categoryRepository.findById(cat.id)).toBeNull();
+    const survivor = await prisma.product.findUnique({
+      where: { id: product.id },
+      include: { categories: true },
+    });
+    expect(survivor?.categories).toEqual([]);
   });
 
   it("supprime une catégorie feuille sans erreur", async () => {
