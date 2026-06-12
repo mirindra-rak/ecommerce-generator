@@ -11,4 +11,7 @@ export { categoryRepository } from "./category.repository";
 export type { CategoryRepository } from "./category.repository";
 
 export { productRepository } from "./product.repository";
-export type { ProductRepository, ProductWithRelations } from "./product.repository";
+export type { ProductRepository, ProductWithRelations, ProductCard } from "./product.repository";
+
+export { priceRange, isDisplayable, resolveVariant } from "./product.service";
+export type { PriceRange, SelectableVariant } from "./product.service";

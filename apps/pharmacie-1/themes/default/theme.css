@@ -4,8 +4,15 @@
  * SANS toucher aux composants.
  */
 :root {
-  --color-brand-50: #eff6ff;
-  --color-brand-500: #2563eb;
-  --color-brand-600: #1d4ed8;
-  --color-brand-700: #1e40af;
+  /* Primaire — bleu marine « Pastille Vichy » */
+  --color-brand-50: #eef1fa;
+  --color-brand-500: #1f3c8c;
+  --color-brand-600: #18306e;
+  --color-brand-700: #112350;
+
+  /* Accent — vert frais « Vichy » */
+  --color-accent-50: #eef6f0;
+  --color-accent-500: #43a05a;
+  --color-accent-600: #368a4b;
+  --color-accent-700: #2a6e3c;
 }

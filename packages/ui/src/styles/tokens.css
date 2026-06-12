@@ -8,11 +8,17 @@
  */
 
 @theme {
-  /* Couleurs de marque (surchargées par tenant) */
+  /* Couleur primaire de marque (surchargée par tenant) */
   --color-brand-50: #f0fdf4;
   --color-brand-500: #16a34a;
   --color-brand-600: #15803d;
   --color-brand-700: #166534;
+
+  /* Couleur d'accent secondaire (surchargée par tenant) */
+  --color-accent-50: #ecfdf5;
+  --color-accent-500: #10b981;
+  --color-accent-600: #059669;
+  --color-accent-700: #047857;
 
   /* Neutres */
   --color-surface: #ffffff;

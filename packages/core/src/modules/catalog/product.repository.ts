@@ -21,6 +21,15 @@ const productInclude = {
 
 export type ProductWithRelations = Prisma.ProductGetPayload<{ include: typeof productInclude }>;
 
+// Include allégé pour les vignettes de liste : marque, prix des variantes, 1er média.
+const cardInclude = {
+  brand: true,
+  variants: { select: { priceExclTax: true } },
+  media: { orderBy: { position: "asc" }, take: 1 },
+} satisfies Prisma.ProductInclude;
+
+export type ProductCard = Prisma.ProductGetPayload<{ include: typeof cardInclude }>;
+
 export const productRepository = {
   findById(id: string): Promise<Product | null> {
     return prisma.product.findUnique({ where: { id } });
@@ -37,6 +46,25 @@ export const productRepository = {
   findActive(): Promise<Product[]> {
     return prisma.product.findMany({
       where: { active: true },
+      orderBy: { createdAt: "desc" },
+    });
+  },
+
+  /** Produits actifs en vue « carte » (marque + prix variantes + 1er média). */
+  findActiveCards(limit?: number): Promise<ProductCard[]> {
+    return prisma.product.findMany({
+      where: { active: true },
+      include: cardInclude,
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+  },
+
+  /** Produits actifs d'une catégorie (par slug), en vue « carte ». */
+  findCardsByCategorySlug(slug: string): Promise<ProductCard[]> {
+    return prisma.product.findMany({
+      where: { active: true, category: { slug } },
+      include: cardInclude,
       orderBy: { createdAt: "desc" },
     });
   },
