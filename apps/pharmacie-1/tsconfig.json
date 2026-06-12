@@ -4,6 +4,9 @@
     "jsx": "preserve",
     "noEmit": true,
     "allowJs": true,
+    // App Next.js : pas d'émission de déclarations (évite TS2742 sur les types
+    // inférés de librairies comme better-auth).
+    "declaration": false,
     "plugins": [{ "name": "next" }],
     "paths": {
       "@/*": ["./src/*"]

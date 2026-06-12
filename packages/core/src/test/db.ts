@@ -11,7 +11,11 @@ export async function resetDb(): Promise<void> {
       "ProductOption",
       "Product",
       "Category",
-      "Brand"
+      "Brand",
+      "Session",
+      "Account",
+      "Verification",
+      "User"
      RESTART IDENTITY CASCADE`,
   );
 }
