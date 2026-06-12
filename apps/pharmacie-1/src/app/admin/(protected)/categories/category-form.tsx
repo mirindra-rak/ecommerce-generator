@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@pharmacie/ui";
+import { Button, Card, Field, Input, Select, Textarea } from "@pharmacie/ui";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState, type ReactNode } from "react";
 import type { FormState } from "../_lib/form-state";
 
 export interface ParentOption {
@@ -27,145 +27,169 @@ interface CategoryFormProps {
   };
 }
 
-const fieldClass =
-  "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none";
+// Carte de section : titre + aide contextuelle + corps (aligné sur le formulaire produit).
+function FormSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Card as="section" className="p-6">
+      <header className="mb-5">
+        <h2 className="text-sm font-bold text-foreground">{title}</h2>
+        {description && <p className="mt-0.5 text-xs text-muted">{description}</p>}
+      </header>
+      {children}
+    </Card>
+  );
+}
+
+// Champ texte/zone avec compteur de caractères (utile pour les limites SEO).
+function CountedField({
+  label,
+  htmlFor,
+  hint,
+  max,
+  defaultValue,
+  multiline,
+  name,
+}: {
+  label: string;
+  htmlFor: string;
+  hint?: string;
+  max: number;
+  defaultValue: string;
+  multiline?: boolean;
+  name: string;
+}) {
+  const [count, setCount] = useState(defaultValue.length);
+  return (
+    <Field label={label} htmlFor={htmlFor} hint={hint}>
+      {multiline ? (
+        <Textarea
+          id={htmlFor}
+          name={name}
+          rows={2}
+          defaultValue={defaultValue}
+          onChange={(e) => setCount(e.target.value.length)}
+        />
+      ) : (
+        <Input
+          id={htmlFor}
+          name={name}
+          defaultValue={defaultValue}
+          onChange={(e) => setCount(e.target.value.length)}
+        />
+      )}
+      <p className={`text-right text-xs ${count > max ? "text-danger-text" : "text-muted"}`}>
+        {count}/{max}
+      </p>
+    </Field>
+  );
+}
 
 export function CategoryForm({ action, parentOptions, category }: CategoryFormProps) {
   const [state, formAction, pending] = useActionState(action, {});
 
   return (
-    <form action={formAction} className="max-w-2xl space-y-5">
+    <form action={formAction} className="max-w-3xl space-y-6">
       {category && <input type="hidden" name="id" value={category.id} />}
 
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-foreground">
-          Nom
-        </label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          required
-          defaultValue={category?.name}
-          className={fieldClass}
-        />
-      </div>
+      <FormSection title="Identité" description="Nom, visibilité et place dans l'arborescence.">
+        <div className="space-y-5">
+          <Field label="Nom" htmlFor="name">
+            <Input id="name" name="name" required defaultValue={category?.name} />
+          </Field>
 
-      <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-        <input
-          type="checkbox"
-          name="active"
-          defaultChecked={category?.active ?? true}
-          className="h-4 w-4"
-        />
-        Affichée (visible sur la boutique)
-      </label>
-
-      <div>
-        <label htmlFor="parentId" className="block text-sm font-medium text-foreground">
-          Catégorie parente
-        </label>
-        <select
-          id="parentId"
-          name="parentId"
-          defaultValue={category?.parentId ?? ""}
-          className={fieldClass}
-        >
-          <option value="">— Racine (aucune) —</option>
-          {parentOptions.map((option) => (
-            <option key={option.id} value={option.id}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label htmlFor="shortDescription" className="block text-sm font-medium text-foreground">
-          Description courte
-        </label>
-        <input
-          id="shortDescription"
-          name="shortDescription"
-          type="text"
-          defaultValue={category?.shortDescription ?? ""}
-          className={fieldClass}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-foreground">
-          Description
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          rows={4}
-          defaultValue={category?.description ?? ""}
-          className={fieldClass}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="additionalInfo" className="block text-sm font-medium text-foreground">
-          Informations complémentaires
-        </label>
-        <textarea
-          id="additionalInfo"
-          name="additionalInfo"
-          rows={3}
-          defaultValue={category?.additionalInfo ?? ""}
-          className={fieldClass}
-        />
-      </div>
-
-      <fieldset className="space-y-4 border-t border-slate-200 pt-4">
-        <legend className="text-sm font-bold text-foreground">SEO</legend>
-
-        <div>
-          <label htmlFor="metaTitle" className="block text-sm font-medium text-foreground">
-            Balise titre
+          <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <input
+              type="checkbox"
+              name="active"
+              defaultChecked={category?.active ?? true}
+              className="h-4 w-4"
+            />
+            Affichée (visible sur la boutique)
           </label>
-          <input
-            id="metaTitle"
+
+          <Field label="Catégorie parente" htmlFor="parentId">
+            <Select
+              id="parentId"
+              name="parentId"
+              defaultValue={category?.parentId ?? ""}
+              options={[
+                { value: "", label: "— Racine (aucune) —" },
+                ...parentOptions.map((option) => ({ value: option.id, label: option.label })),
+              ]}
+            />
+          </Field>
+        </div>
+      </FormSection>
+
+      <FormSection title="Contenu" description="Textes éditoriaux affichés sur la page catégorie.">
+        <div className="space-y-5">
+          <Field label="Description courte" htmlFor="shortDescription">
+            <Input
+              id="shortDescription"
+              name="shortDescription"
+              defaultValue={category?.shortDescription ?? ""}
+            />
+          </Field>
+          <Field label="Description" htmlFor="description">
+            <Textarea
+              id="description"
+              name="description"
+              rows={4}
+              defaultValue={category?.description ?? ""}
+            />
+          </Field>
+          <Field label="Informations complémentaires" htmlFor="additionalInfo">
+            <Textarea
+              id="additionalInfo"
+              name="additionalInfo"
+              rows={3}
+              defaultValue={category?.additionalInfo ?? ""}
+            />
+          </Field>
+        </div>
+      </FormSection>
+
+      <FormSection title="SEO" description="Métadonnées pour les moteurs de recherche.">
+        <div className="space-y-5">
+          <CountedField
+            label="Balise titre"
+            htmlFor="metaTitle"
             name="metaTitle"
-            type="text"
-            maxLength={70}
+            max={70}
+            hint="Idéalement 50–60 caractères."
             defaultValue={category?.metaTitle ?? ""}
-            className={fieldClass}
           />
-        </div>
-
-        <div>
-          <label htmlFor="metaDescription" className="block text-sm font-medium text-foreground">
-            Meta description
-          </label>
-          <textarea
-            id="metaDescription"
+          <CountedField
+            label="Meta description"
+            htmlFor="metaDescription"
             name="metaDescription"
-            rows={2}
-            maxLength={160}
+            max={160}
+            hint="Idéalement 150–160 caractères."
             defaultValue={category?.metaDescription ?? ""}
-            className={fieldClass}
+            multiline
           />
+          <Field label="Mots-clés" htmlFor="metaKeywords" hint="Séparés par des virgules.">
+            <Input
+              id="metaKeywords"
+              name="metaKeywords"
+              defaultValue={category?.metaKeywords?.join(", ") ?? ""}
+            />
+          </Field>
         </div>
-
-        <div>
-          <label htmlFor="metaKeywords" className="block text-sm font-medium text-foreground">
-            Mots-clés (séparés par des virgules)
-          </label>
-          <input
-            id="metaKeywords"
-            name="metaKeywords"
-            type="text"
-            defaultValue={category?.metaKeywords?.join(", ") ?? ""}
-            className={fieldClass}
-          />
-        </div>
-      </fieldset>
+      </FormSection>
 
       {state.error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{state.error}</p>
+        <p className="rounded-sm border border-danger-border bg-danger-bg px-3 py-2 text-sm text-danger-text">
+          {state.error}
+        </p>
       )}
 
       <div className="flex items-center gap-3">

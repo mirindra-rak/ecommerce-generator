@@ -4,6 +4,9 @@ import { prisma } from "../db/client";
 export async function resetDb(): Promise<void> {
   await prisma.$executeRawUnsafe(
     `TRUNCATE TABLE
+      "ProductFacetValue",
+      "FacetValue",
+      "Facet",
       "ProductMedia",
       "VariantOptionValue",
       "ProductVariant",

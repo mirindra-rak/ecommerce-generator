@@ -3,6 +3,7 @@
 // sérialisables, prêts pour les composants. Aucune requête Prisma dans les composants.
 import {
   categoryRepository,
+  facetRepository,
   parseAttributes,
   priceRange,
   productRepository,
@@ -56,6 +57,24 @@ export async function getRootCategories(): Promise<NavCategoryVM[]> {
   return categories.map((c) => ({ slug: c.slug, label: c.name }));
 }
 
+export interface MenuCategoryVM extends NavCategoryVM {
+  /** Sous-catégories actives, déjà triées (vides si l'univers est une feuille). */
+  children: NavCategoryVM[];
+}
+
+/**
+ * Arbre de navigation (mega menu) : racines actives + sous-catégories actives, en
+ * view-model plat et sérialisable (aucune entité Prisma exposée au client).
+ */
+export async function getMenuTree(): Promise<MenuCategoryVM[]> {
+  const roots = await categoryRepository.findActiveMenuTree();
+  return roots.map((root) => ({
+    slug: root.slug,
+    label: root.name,
+    children: root.children.map((child) => ({ slug: child.slug, label: child.name })),
+  }));
+}
+
 export interface CategoryPageVM {
   name: string;
   description: string | null;
@@ -65,11 +84,14 @@ export interface CategoryPageVM {
   products: ProductCardVM[];
 }
 
-export async function getCategoryWithProducts(slug: string): Promise<CategoryPageVM | null> {
+export async function getCategoryWithProducts(
+  slug: string,
+  filters: Record<string, string[]> = {},
+): Promise<CategoryPageVM | null> {
   const category = await categoryRepository.findBySlug(slug);
   // Catégorie inexistante OU masquée côté boutique → 404 storefront.
   if (!category || !category.active) return null;
-  const cards = await productRepository.findCardsByCategorySlug(slug);
+  const cards = await productRepository.findCardsByCategorySlug(slug, filters);
   return {
     name: category.name,
     description: category.description,
@@ -78,6 +100,32 @@ export async function getCategoryWithProducts(slug: string): Promise<CategoryPag
     coverImageKey: category.coverImageKey,
     products: cards.map(toCardVM),
   };
+}
+
+export interface FilterFacetVM {
+  code: string;
+  name: string;
+  values: { code: string; label: string; count: number }[];
+}
+
+/**
+ * Facettes disponibles pour la sidebar d'une catégorie, avec compteur drill-down par valeur
+ * (selon les filtres déjà actifs sur les AUTRES facettes).
+ */
+export async function getCategoryFilters(
+  slug: string,
+  filters: Record<string, string[]> = {},
+): Promise<FilterFacetVM[]> {
+  const facets = await facetRepository.findForCategoryWithCounts(slug, filters);
+  return facets.map((facet) => ({
+    code: facet.code,
+    name: facet.name,
+    values: facet.values.map((value) => ({
+      code: value.code,
+      label: value.label,
+      count: value.count,
+    })),
+  }));
 }
 
 export interface ProductDetailVM {
@@ -89,8 +137,11 @@ export interface ProductDetailVM {
   precautions: string | null;
   priceLabel: string | null;
   from: boolean;
+  /** Catégories du produit (M2M) + catégorie principale (canonical / fil d'Ariane). */
+  categories: NavCategoryVM[];
+  primaryCategory: NavCategoryVM | null;
   options: { name: string; values: string[] }[];
-  variants: { sku: string; volume: string | null; priceLabel: string; stock: number }[];
+  variants: { sku: string | null; volume: string | null; priceLabel: string; stock: number }[];
 }
 
 export async function getProductDetail(slug: string): Promise<ProductDetailVM | null> {
@@ -108,6 +159,10 @@ export async function getProductDetail(slug: string): Promise<ProductDetailVM | 
     precautions: attributes.precautions ?? null,
     priceLabel: range ? formatPrice(range.min) : null,
     from: range ? range.min !== range.max : false,
+    categories: product.categories.map((c) => ({ slug: c.slug, label: c.name })),
+    primaryCategory: product.primaryCategory
+      ? { slug: product.primaryCategory.slug, label: product.primaryCategory.name }
+      : null,
     options: product.options.map((o) => ({ name: o.name, values: o.values.map((v) => v.value) })),
     variants: product.variants.map((v) => ({
       sku: v.sku,

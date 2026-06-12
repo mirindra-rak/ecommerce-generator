@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCategoryWithProducts } from "@/lib/catalog";
+import { getCategoryFilters, getCategoryWithProducts } from "@/lib/catalog";
+import { CategoryFilters } from "../../_components/category-filters";
 import { ProductCard } from "../../_components/product-card";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -19,9 +21,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function CategoryPage({ params }: PageProps) {
+export default async function CategoryPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
-  const data = await getCategoryWithProducts(slug);
+  const sp = await searchParams;
+
+  // Filtres bruts depuis l'URL (toute clé = facette potentielle, valeurs en CSV).
+  const rawFilters: Record<string, string[]> = {};
+  for (const [key, val] of Object.entries(sp)) {
+    const value = Array.isArray(val) ? val.join(",") : val;
+    const codes = value ? value.split(",").filter(Boolean) : [];
+    if (codes.length) rawFilters[key] = codes;
+  }
+
+  // Facettes + compteurs drill-down (les filtres inconnus sont ignorés en interne).
+  const facets = await getCategoryFilters(slug, rawFilters);
+
+  // Filtres restreints aux facettes réellement présentes pour la requête produits.
+  const validCodes = new Set(facets.map((facet) => facet.code));
+  const filters = Object.fromEntries(
+    Object.entries(rawFilters).filter(([code]) => validCodes.has(code)),
+  );
+
+  const data = await getCategoryWithProducts(slug, filters);
   if (!data) notFound();
 
   return (
@@ -47,23 +68,33 @@ export default async function CategoryPage({ params }: PageProps) {
         </p>
       )}
 
-      <p className="mt-3 text-sm text-muted">
-        {data.products.length} produit{data.products.length > 1 ? "s" : ""}
-      </p>
+      <div className="mt-8 lg:flex lg:gap-8">
+        {facets.length > 0 && (
+          <aside className="mb-6 lg:mb-0 lg:w-64 lg:shrink-0">
+            <CategoryFilters facets={facets} />
+          </aside>
+        )}
 
-      {data.products.length === 0 ? (
-        <p className="mt-12 rounded-2xl border border-dashed border-slate-300 p-12 text-center text-muted">
-          Aucun produit dans cette catégorie pour le moment.
-        </p>
-      ) : (
-        <ul className="mt-8 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
-          {data.products.map((product) => (
-            <li key={product.slug}>
-              <ProductCard product={product} />
-            </li>
-          ))}
-        </ul>
-      )}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm text-muted">
+            {data.products.length} produit{data.products.length > 1 ? "s" : ""}
+          </p>
+
+          {data.products.length === 0 ? (
+            <p className="mt-6 rounded-2xl border border-dashed border-slate-300 p-12 text-center text-muted">
+              Aucun produit ne correspond à ces filtres.
+            </p>
+          ) : (
+            <ul className="mt-6 grid grid-cols-2 gap-5 sm:grid-cols-3">
+              {data.products.map((product) => (
+                <li key={product.slug}>
+                  <ProductCard product={product} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

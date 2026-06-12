@@ -12,7 +12,9 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@phosphor-icons/react": "^2.1.7"
+    "@phosphor-icons/react": "^2.1.7",
+    "@radix-ui/react-popover": "^1.1.16",
+    "@radix-ui/react-select": "^2.3.0"
   },
   "peerDependencies": {
     "react": "^19",

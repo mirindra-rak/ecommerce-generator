@@ -2,17 +2,42 @@
  * Thème du site « default ». Surcharge les design tokens du design system pour
  * cette pharmacie. Décliner un autre look = un autre fichier de thème + assets,
  * SANS toucher aux composants.
+ *
+ * Identité parapharmacie — le VERT domine (code métier : croix verte) :
+ *   primaire vert #078f33 · secondaire bleu #1e4691 · tertiaire teal #51c0a6
+ *   · encre navy · fond blanc pur.
  */
 :root {
-  /* Primaire — bleu marine « Pastille Vichy » */
-  --color-brand-50: #eef1fa;
-  --color-brand-500: #1f3c8c;
-  --color-brand-600: #18306e;
-  --color-brand-700: #112350;
+  /* Primaire (dominante) — vert #078f33 */
+  --color-brand-50: #e7f6ec;
+  --color-brand-500: #0a9e3a;
+  --color-brand-600: #078f33;
+  --color-brand-700: #05631f;
 
-  /* Accent — vert frais « Vichy » */
-  --color-accent-50: #eef6f0;
-  --color-accent-500: #43a05a;
-  --color-accent-600: #368a4b;
-  --color-accent-700: #2a6e3c;
+  /* Secondaire — bleu #1e4691 */
+  --color-accent-50: #e9eff9;
+  --color-accent-500: #2a54a3;
+  --color-accent-600: #1e4691;
+  --color-accent-700: #15336a;
+
+  /* Tertiaire — teal / vert-bleu #51c0a6 */
+  --color-teal-50: #eafaf5;
+  --color-teal-500: #51c0a6;
+  --color-teal-600: #36a78b;
+  --color-teal-700: #2a8470;
+
+  /* Neutres : encre navy, fond BLANC pur, filet bleu froid */
+  --color-foreground: #15244c;
+  --color-text-secondary: #34406b;
+  --color-muted: #5d6b85;
+  --color-surface: #ffffff;
+  --color-paper: #ffffff;
+  --color-bg-subtle: #f5f7fb;
+  --color-line: #e3e7f1;
+
+  /* État success calé sur le vert de marque (cohérence parapharmacie) */
+  --color-success-bg: #e7f6ec;
+  --color-success-border: #a9dcb8;
+  --color-success-solid: #078f33;
+  --color-success-text: #055e21;
 }

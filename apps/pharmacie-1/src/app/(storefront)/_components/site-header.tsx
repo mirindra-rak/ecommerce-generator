@@ -1,62 +1,49 @@
 import Link from "next/link";
+import { Container, Cross, IconButton } from "@pharmacie/ui";
 import { siteConfig } from "@/lib/site";
+import { getMenuTree } from "@/lib/catalog";
 import { CartIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "./icons";
+import { MegaMenu } from "./mega-menu";
 
-// En-tête vitrine partagé par toutes les pages du groupe (storefront).
-// Liens catégories en placeholder (`/categorie/<slug>`) : les routes réelles
-// arrivent avec le module catalog (lot 4.1, stories 05/06).
-const NAV = [
-  { label: "Tous les produits", slug: "tous-les-produits" },
-  { label: "Visage & Soin", slug: "visage-soin" },
-  { label: "Compléments", slug: "complements-alimentaires" },
-  { label: "Hygiène", slug: "hygiene" },
-  { label: "Maman & Bébé", slug: "maman-bebe" },
-  { label: "Cheveux", slug: "cheveux" },
-  { label: "Solaires", slug: "solaires" },
-];
+// En-tête vitrine partagé par le groupe (storefront). La navigation catégories est
+// data-driven : l'arbre racines + sous-catégories actives vient du module catalog et
+// alimente le mega menu (composant client).
+export async function SiteHeader() {
+  const menu = await getMenuTree();
 
-function IconButton({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <button
-      type="button"
-      aria-label={label}
-      className="relative rounded-full p-2 text-slate-600 transition-colors hover:bg-brand-50 hover:text-brand-700"
-    >
-      {children}
-    </button>
-  );
-}
-
-export function SiteHeader() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-surface/85 backdrop-blur">
-      {/* Bandeau de réassurance fin */}
-      <div className="bg-brand-700 text-center text-xs font-medium text-white">
-        <p className="px-4 py-1.5">
-          Livraison offerte dès 49&nbsp;€ · Conseil pharmacien 6j/7 · Paiement sécurisé
-        </p>
+    <header className="sticky top-0 z-40 border-b border-line bg-paper/90 backdrop-blur">
+      {/* Bandeau de réassurance */}
+      <div className="bg-brand-700 text-white">
+        <Container className="flex items-center justify-center gap-3 py-2 text-xs font-medium">
+          <span>Livraison offerte dès 49&nbsp;€</span>
+          <Cross className="h-2 w-2 text-white/50" />
+          <span>Conseil pharmacien 6j/7</span>
+          <Cross className="hidden h-2 w-2 text-white/50 sm:inline" />
+          <span className="hidden sm:inline">Paiement sécurisé</span>
+        </Container>
       </div>
 
-      <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-4">
+      <Container className="flex items-center gap-5 py-6">
         <button
           type="button"
           aria-label="Ouvrir le menu"
-          className="rounded-md p-1.5 text-slate-700 lg:hidden"
+          className="p-1.5 text-foreground lg:hidden"
         >
           <MenuIcon />
         </button>
 
         <Link href="/" className="flex items-center gap-2.5">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand-600 font-bold text-white">
-            {siteConfig.brand.name.charAt(0)}
+          <span className="grid h-9 w-9 place-items-center rounded-sm bg-brand-600 text-white">
+            <Cross className="h-4 w-4" />
           </span>
-          <span className="text-lg font-semibold tracking-tight text-foreground">
+          <span className="font-display text-lg font-semibold tracking-tight text-foreground">
             {siteConfig.brand.name}
           </span>
         </Link>
 
-        {/* Recherche (placeholder visuel — branchée au module `search`, lot 4.4) */}
-        <div className="ml-2 hidden flex-1 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-muted md:flex">
+        {/* Recherche (placeholder — branchée au module search, lot 4.4) */}
+        <div className="ml-2 hidden flex-1 items-center gap-2 rounded-sm border border-line bg-surface px-5 py-3 text-sm text-muted md:flex">
           <SearchIcon className="h-4 w-4 shrink-0" />
           <span>Rechercher un produit, une marque…</span>
         </div>
@@ -70,42 +57,15 @@ export function SiteHeader() {
           </IconButton>
           <IconButton label="Mon panier">
             <CartIcon className="h-5 w-5" />
-            <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand-600 px-1 text-[10px] font-semibold text-white">
+            <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-sm bg-accent-600 px-1 text-[10px] font-semibold text-white">
               0
             </span>
           </IconButton>
         </nav>
-      </div>
+      </Container>
 
-      {/* Navigation catégories */}
-      <nav className="border-t border-slate-200/70 bg-surface">
-        <ul className="mx-auto hidden max-w-6xl items-center gap-1 px-6 lg:flex">
-          {NAV.map((item) => (
-            <li key={item.slug}>
-              <Link
-                href={`/categorie/${item.slug}`}
-                className="inline-block px-3 py-3 text-sm font-medium text-slate-600 transition-colors hover:text-brand-700"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-          <li className="ml-auto flex items-center gap-2 py-2">
-            <Link
-              href="/categorie/bons-plans"
-              className="rounded-full bg-accent-600 px-3.5 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-accent-700"
-            >
-              Bons plans
-            </Link>
-            <Link
-              href="/premium"
-              className="rounded-full bg-foreground px-3.5 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-foreground/90"
-            >
-              Premium
-            </Link>
-          </li>
-        </ul>
-      </nav>
+      {/* Navigation catégories (mega menu, data-driven) */}
+      <MegaMenu categories={menu} />
     </header>
   );
 }

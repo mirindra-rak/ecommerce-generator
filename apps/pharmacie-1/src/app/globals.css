@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Tailwind v4 ignore node_modules : on déclare explicitement le design system
+   comme source pour que ses classes utilitaires soient générées. */
+@source "../../../../packages/ui/src";
+
 /* Design tokens par défaut du design system */
 @import "@pharmacie/ui/styles/tokens.css";
 

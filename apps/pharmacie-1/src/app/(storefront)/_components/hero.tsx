@@ -1,93 +1,212 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowIcon } from "./icons";
+import { ArrowRight, buttonClasses, Container, Eyebrow, Heading } from "@pharmacie/ui";
 
-// Hero pleine largeur, dans l'esprit des bannières promo parapharmacie : offre
-// mise en avant + CTA. Visuel décoratif en CSS (pas d'asset image à charger).
+type Slide = {
+  image: string;
+  alt: string;
+  eyebrow: string;
+  title: React.ReactNode;
+  text: string;
+  cta: { label: string; href: string };
+  offer?: boolean;
+};
+
+// Carrousel hero (attendu e-commerce). Contenu statique ; à terme alimentable par
+// le CMS (lot 4.16). Autoplay avec pause au survol/focus, navigation flèches + puces.
+const SLIDES: Slide[] = [
+  {
+    image: "/images/slide-1.jpg",
+    alt: "Sélection de soins de parapharmacie",
+    eyebrow: "Offre du moment",
+    title: (
+      <>
+        Vos essentiels beauté & santé,{" "}
+        <span className="italic text-brand-600">livrés chez vous</span>
+      </>
+    ),
+    text: "Plus de 1 000 marques, le conseil d'un pharmacien et la livraison offerte dès 49 €.",
+    cta: { label: "J'en profite", href: "/categorie/bons-plans" },
+    offer: true,
+  },
+  {
+    image: "/images/slide-2.jpg",
+    alt: "Soin du visage recommandé par un pharmacien",
+    eyebrow: "Conseil pharmacien",
+    title: (
+      <>
+        Le bon soin, <span className="italic text-brand-600">recommandé par un expert</span>
+      </>
+    ),
+    text: "Une équipe diplômée vous guide vers ce qui convient vraiment à votre peau.",
+    cta: { label: "Nos conseils", href: "/aide/conseil" },
+  },
+  {
+    image: "/images/slide-3.jpg",
+    alt: "Routine éclat à la vitamine C",
+    eyebrow: "Routine éclat",
+    title: (
+      <>
+        Vitamine C & actifs pour une <span className="italic text-brand-600">peau éclatante</span>
+      </>
+    ),
+    text: "Compléments et soins ciblés, sélectionnés par nos pharmaciens.",
+    cta: { label: "Découvrir", href: "/categorie/visage-soin" },
+  },
+];
+
 export function Hero() {
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const count = SLIDES.length;
+
+  const goTo = useCallback((i: number) => setIndex(((i % count) + count) % count), [count]);
+  const next = useCallback(() => goTo(index + 1), [goTo, index]);
+  const prev = useCallback(() => goTo(index - 1), [goTo, index]);
+
+  useEffect(() => {
+    if (paused) return;
+    const id = setTimeout(next, 6000);
+    return () => clearTimeout(id);
+  }, [next, paused]);
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-brand-50 via-surface to-brand-50">
-      {/* Halos décoratifs */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-500/10 blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-32 left-1/3 h-80 w-80 rounded-full bg-brand-600/10 blur-3xl"
-      />
+    <section className="bg-paper">
+      <Container className="py-10 lg:py-12">
+        <div
+          className="relative h-[30rem] overflow-hidden rounded-sm border border-line sm:h-[36rem]"
+          aria-roledescription="carrousel"
+          aria-label="Mises en avant"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+          onFocusCapture={() => setPaused(true)}
+          onBlurCapture={() => setPaused(false)}
+        >
+          {SLIDES.map((slide, i) => (
+            <div
+              key={slide.image}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                i === index ? "z-10 opacity-100" : "pointer-events-none opacity-0"
+              }`}
+              aria-hidden={i !== index}
+              role="group"
+              aria-roledescription="diapositive"
+              aria-label={`${i + 1} / ${count}`}
+            >
+              <Image
+                src={slide.image}
+                alt={slide.alt}
+                fill
+                priority={i === 0}
+                sizes="(min-width: 1152px) 1088px, 100vw"
+                className="object-cover"
+              />
+              {/* Lisibilité : dégradé papier depuis la gauche */}
+              <div className="absolute inset-0 bg-gradient-to-r from-paper via-paper/85 to-transparent sm:via-paper/70" />
+              {/* Filet d'accent */}
+              <span
+                aria-hidden
+                className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-brand-600 via-teal-500 to-accent-600"
+              />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-14 lg:grid-cols-2 lg:py-20">
-        <div className="relative">
-          <span className="inline-flex items-center gap-2 rounded-full border border-accent-500/30 bg-accent-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-accent-700">
-            Offre du moment
-          </span>
+              <div className="relative flex h-full items-center">
+                <div className="max-w-lg px-8 sm:px-12 lg:px-16">
+                  <Eyebrow>{slide.eyebrow}</Eyebrow>
+                  <Heading as="h1" className="mt-5">
+                    {slide.title}
+                  </Heading>
+                  <p className="mt-5 max-w-md text-base leading-relaxed text-muted">{slide.text}</p>
 
-          <h1 className="mt-5 text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl">
-            Vos essentiels beauté & santé, <span className="text-brand-600">livrés chez vous</span>
-          </h1>
+                  {slide.offer && (
+                    <div className="mt-7 inline-flex items-stretch rounded-sm border border-line bg-surface">
+                      <Stat value="4" label="achetés" />
+                      <span className="w-px bg-line" />
+                      <span className="grid place-items-center px-4 font-display text-xl text-muted">
+                        =
+                      </span>
+                      <span className="w-px bg-line" />
+                      <Stat value="1" label="offert" accent />
+                    </div>
+                  )}
 
-          <p className="mt-4 max-w-md text-base leading-relaxed text-muted">
-            Plus de 1&nbsp;000 marques de parapharmacie, le conseil d&apos;un pharmacien et la
-            livraison offerte dès 49&nbsp;€.
-          </p>
-
-          {/* Bloc offre type « X achetés = 1 offert » */}
-          <div className="mt-7 inline-flex items-center gap-4 rounded-2xl border border-brand-500/20 bg-surface/80 px-5 py-4 shadow-sm">
-            <div className="text-center leading-none">
-              <p className="text-3xl font-extrabold text-accent-600">4</p>
-              <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted">
-                achetés
-              </p>
+                  <div className="mt-8 flex flex-wrap items-center gap-5">
+                    <Link href={slide.cta.href} className={buttonClasses()}>
+                      {slide.cta.label}
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    <Link
+                      href="/categorie/tous-les-produits"
+                      className={buttonClasses({ variant: "link" })}
+                    >
+                      Voir le catalogue
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
-            <span className="text-2xl font-light text-slate-300">=</span>
-            <div className="text-center leading-none">
-              <p className="text-3xl font-extrabold text-accent-600">1</p>
-              <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted">
-                offert
-              </p>
-            </div>
+          ))}
+
+          {/* Puces */}
+          <div className="absolute bottom-6 left-8 z-20 flex items-center gap-2 sm:left-12 lg:left-16">
+            {SLIDES.map((slide, i) => (
+              <button
+                key={slide.image}
+                type="button"
+                aria-label={`Aller à la diapositive ${i + 1}`}
+                aria-current={i === index}
+                onClick={() => goTo(i)}
+                className={`h-1 rounded-sm transition-all ${
+                  i === index ? "w-8 bg-brand-600" : "w-4 bg-foreground/20 hover:bg-foreground/40"
+                }`}
+              />
+            ))}
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              href="/categorie/bons-plans"
-              className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
+          {/* Flèches */}
+          <div className="absolute bottom-5 right-6 z-20 flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="Diapositive précédente"
+              onClick={prev}
+              className="grid h-9 w-9 place-items-center rounded-sm border border-line bg-surface/90 text-foreground transition-colors hover:bg-brand-50 hover:text-brand-700"
             >
-              J&apos;en profite
-              <ArrowIcon className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/categorie/tous-les-produits"
-              className="inline-flex items-center rounded-full border border-slate-300 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-slate-50"
+              <ArrowRight className="h-4 w-4 rotate-180" />
+            </button>
+            <button
+              type="button"
+              aria-label="Diapositive suivante"
+              onClick={next}
+              className="grid h-9 w-9 place-items-center rounded-sm border border-line bg-surface/90 text-foreground transition-colors hover:bg-brand-50 hover:text-brand-700"
             >
-              Voir le catalogue
-            </Link>
+              <ArrowRight className="h-4 w-4" />
+            </button>
           </div>
         </div>
-
-        {/* Visuel décoratif : flacons stylisés en CSS */}
-        <div aria-hidden className="relative hidden h-80 lg:block">
-          <div className="absolute inset-0 grid grid-cols-3 items-end gap-5 px-6">
-            <Bottle className="h-56 bg-gradient-to-b from-brand-500 to-brand-700" />
-            <Bottle className="h-72 bg-gradient-to-b from-accent-500 to-accent-600" tall />
-            <Bottle className="h-48 bg-gradient-to-b from-brand-600 to-brand-700" />
-          </div>
-        </div>
-      </div>
+      </Container>
     </section>
   );
 }
 
-function Bottle({ className = "", tall = false }: { className?: string; tall?: boolean }) {
+function Stat({
+  value,
+  label,
+  accent = false,
+}: {
+  value: string;
+  label: string;
+  accent?: boolean;
+}) {
   return (
-    <div className="relative flex flex-col items-center">
-      <span className="h-6 w-4 rounded-t-sm bg-slate-300" />
-      <div
-        className={`w-full rounded-2xl shadow-lg ${className}`}
-        style={{ height: tall ? "100%" : undefined }}
+    <div className="px-5 py-3 text-center leading-none">
+      <p
+        className={`font-display text-3xl font-semibold ${accent ? "text-accent-600" : "text-brand-700"}`}
       >
-        <div className="mx-auto mt-8 h-14 w-3/4 rounded-md bg-surface/85" />
-      </div>
+        {value}
+      </p>
+      <p className="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-muted">{label}</p>
     </div>
   );
 }

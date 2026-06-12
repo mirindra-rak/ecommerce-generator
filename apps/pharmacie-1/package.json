@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev -p 4321",
+    "dev": "next dev -p 4000",
     "build": "next build",
-    "start": "next start -p 4321",
+    "start": "next start -p 4000",
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
@@ -19,7 +19,10 @@
     "better-auth": "^1.6.17",
     "next": "^15.3.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "recharts": "^2.15.0",
+    "@tanstack/react-query": "^5.80.6",
+    "@tanstack/react-table": "^8.21.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

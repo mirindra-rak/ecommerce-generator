@@ -89,7 +89,12 @@ export default async function ProductPage({ params }: PageProps) {
           <dl className="mt-10 space-y-4 border-t border-slate-200 pt-6 text-sm">
             <div>
               <dt className="font-semibold text-foreground">Références</dt>
-              <dd className="mt-1 text-muted">{product.variants.map((v) => v.sku).join(" · ")}</dd>
+              <dd className="mt-1 text-muted">
+                {product.variants
+                  .map((v) => v.sku)
+                  .filter((sku): sku is string => Boolean(sku))
+                  .join(" · ") || "—"}
+              </dd>
             </div>
             {product.inci && (
               <div>
