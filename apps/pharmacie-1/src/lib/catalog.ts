@@ -3,6 +3,7 @@
 // sérialisables, prêts pour les composants. Aucune requête Prisma dans les composants.
 import {
   categoryRepository,
+  parseAttributes,
   priceRange,
   productRepository,
   type ProductCard,
@@ -85,13 +86,14 @@ export async function getProductDetail(slug: string): Promise<ProductDetailVM | 
   if (!product || !product.active || product.variants.length === 0) return null;
 
   const range = priceRange(product.variants);
+  const attributes = parseAttributes(product.productType, product.attributes);
   return {
     name: product.name,
     brandName: product.brand?.name ?? null,
     description: product.description,
     productType: product.productType,
-    inci: product.inci,
-    precautions: product.precautions,
+    inci: attributes.inci ?? null,
+    precautions: attributes.precautions ?? null,
     priceLabel: range ? formatPrice(range.min) : null,
     from: range ? range.min !== range.max : false,
     options: product.options.map((o) => ({ name: o.name, values: o.values.map((v) => v.value) })),

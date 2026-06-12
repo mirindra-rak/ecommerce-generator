@@ -1,4 +1,5 @@
-import { PrismaClient, type ProductType } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import type { ProductType } from "../src/modules/catalog/product-attributes";
 
 // Jeu de données de démonstration pour le catalogue. Idempotent : on vide les tables
 // du catalogue puis on recrée. Prix en CENTIMES HT.
@@ -173,8 +174,11 @@ async function main(): Promise<void> {
         description: spec.description,
         productType: spec.productType,
         ean: spec.ean ?? null,
-        inci: spec.inci ?? null,
-        precautions: spec.precautions ?? null,
+        // Attributs descriptifs dans le jsonb (couture niveau 3).
+        attributes: {
+          ...(spec.inci ? { inci: spec.inci } : {}),
+          ...(spec.precautions ? { precautions: spec.precautions } : {}),
+        },
         brand: { connect: { id: brand.id } },
         category: { connect: { id: category.id } },
         options: spec.optionValues

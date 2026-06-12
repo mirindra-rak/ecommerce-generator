@@ -11,13 +11,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum ProductType {
-  COSMETIC
-  SUPPLEMENT
-  DEVICE
-  OTHER
-}
-
 model Brand {
   id        String    @id @default(cuid())
   name      String
@@ -50,11 +43,13 @@ model Product {
   name        String
   slug        String      @unique
   description String?
-  // Attributs parapharmacie
-  ean         String?     @unique
-  inci        String?
-  productType ProductType @default(OTHER)
-  precautions String?
+  // Identifiant commerce (reste colonne : unique, indexé, clé d'import migration).
+  ean         String? @unique
+  // Type ouvert (String + union TS côté code) : ajouter un type ne demande pas de migration.
+  productType String  @default("OTHER")
+  // Attributs DESCRIPTIFS propres au vertical (parapharmacie : inci, precautions…).
+  // Validés par attribute-set Zod selon productType. Les champs commerce restent en colonnes.
+  attributes  Json    @default("{}")
 
   // Marque optionnelle : supprimer une marque détache ses produits (SetNull).
   brandId String?

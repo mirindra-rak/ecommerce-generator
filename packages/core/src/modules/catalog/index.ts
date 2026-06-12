@@ -21,4 +21,16 @@ export type { CreateCategoryInput, UpdateCategoryInput } from "./category.servic
 
 export { createBrand, updateBrand, deleteBrand } from "./brand.service";
 
-export { ReparentCycleError, CategoryNotEmptyError } from "./catalog-errors";
+export {
+  ReparentCycleError,
+  CategoryNotEmptyError,
+  InvalidProductAttributesError,
+} from "./catalog-errors";
+
+export {
+  PRODUCT_TYPES,
+  getAttributeSchema,
+  validateAttributes,
+  parseAttributes,
+} from "./product-attributes";
+export type { ProductType, ProductAttributes } from "./product-attributes";

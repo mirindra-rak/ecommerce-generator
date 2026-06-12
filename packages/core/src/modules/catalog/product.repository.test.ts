@@ -8,7 +8,7 @@ async function createCremeWithRelations() {
     slug: "creme-hydratante",
     ean: "3401591234567",
     productType: "COSMETIC",
-    inci: "Aqua, Glycerin",
+    attributes: { inci: "Aqua, Glycerin" },
     options: {
       create: [
         {

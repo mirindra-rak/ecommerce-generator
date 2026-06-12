@@ -14,3 +14,10 @@ export class CategoryNotEmptyError extends Error {
     this.name = "CategoryNotEmptyError";
   }
 }
+
+export class InvalidProductAttributesError extends Error {
+  constructor(productType: string) {
+    super(`Attributs produit invalides pour le type « ${productType} ».`);
+    this.name = "InvalidProductAttributesError";
+  }
+}
