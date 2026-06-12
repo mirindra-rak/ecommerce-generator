@@ -1,5 +1,6 @@
 import { requireStaff } from "@/lib/auth-guard";
 import Link from "next/link";
+import { LogoutButton } from "./logout-button";
 
 // Layout du back-office PROTÉGÉ. La garde s'applique à toutes les pages de ce groupe.
 // Les routes /admin/login et /admin/forbidden sont hors de ce groupe (non gardées).
@@ -35,6 +36,7 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
             <span className="mt-1 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-700">
               {user.role}
             </span>
+            <LogoutButton />
           </div>
         </aside>
 
