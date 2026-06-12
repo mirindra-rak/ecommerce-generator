@@ -7,6 +7,7 @@ import {
   deleteCategory,
   updateCategory,
 } from "@pharmacie/core/modules/catalog";
+import { requireStaff } from "@/lib/auth-guard";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "../_lib/form-state";
@@ -20,6 +21,7 @@ export async function createCategoryAction(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  await requireStaff();
   const name = String(formData.get("name") ?? "").trim();
   const parentId = String(formData.get("parentId") ?? "") || null;
   if (!name) return { error: "Le nom est requis." };
@@ -38,6 +40,7 @@ export async function updateCategoryAction(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  await requireStaff();
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const parentId = String(formData.get("parentId") ?? "") || null;
@@ -55,6 +58,7 @@ export async function updateCategoryAction(
 }
 
 export async function deleteCategoryAction(formData: FormData): Promise<void> {
+  await requireStaff();
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 

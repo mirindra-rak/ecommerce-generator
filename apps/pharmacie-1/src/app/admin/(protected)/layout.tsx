@@ -1,23 +1,19 @@
+import { requireStaff } from "@/lib/auth-guard";
 import Link from "next/link";
 
-// Layout du back-office. ⚠️ Accès NON protégé à ce stade — l'authentification admin
-// et le RBAC arrivent avec le socle admin (lot 5.1).
+// Layout du back-office PROTÉGÉ. La garde s'applique à toutes les pages de ce groupe.
+// Les routes /admin/login et /admin/forbidden sont hors de ce groupe (non gardées).
 const NAV = [
   { href: "/admin", label: "Tableau de bord" },
   { href: "/admin/categories", label: "Catégories" },
   { href: "/admin/marques", label: "Marques" },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function ProtectedAdminLayout({ children }: { children: React.ReactNode }) {
+  const user = await requireStaff();
+
   return (
     <div className="min-h-screen bg-slate-50">
-      <div className="bg-amber-400 text-center text-xs font-semibold text-amber-950">
-        <p className="px-4 py-1.5">
-          ⚠️ Zone d’administration non sécurisée — authentification à venir (lot 5.1). Ne pas
-          exposer en production.
-        </p>
-      </div>
-
       <div className="mx-auto flex max-w-6xl gap-8 px-6 py-8">
         <aside className="w-56 shrink-0">
           <p className="px-3 text-xs font-bold uppercase tracking-wide text-muted">Back-office</p>
@@ -32,6 +28,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </Link>
             ))}
           </nav>
+
+          <div className="mt-8 rounded-lg border border-slate-200 bg-surface p-3">
+            <p className="text-xs text-muted">Connecté</p>
+            <p className="mt-0.5 truncate text-sm font-medium text-foreground">{user.email}</p>
+            <span className="mt-1 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-700">
+              {user.role}
+            </span>
+          </div>
         </aside>
 
         <main className="min-w-0 flex-1">{children}</main>
