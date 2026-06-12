@@ -50,22 +50,34 @@ export interface NavCategoryVM {
   label: string;
 }
 
-/** Catégories racines (univers) pour la home et la navigation. */
+/** Catégories racines ACTIVES (univers) pour la home et la navigation. */
 export async function getRootCategories(): Promise<NavCategoryVM[]> {
-  const categories = await categoryRepository.findChildren(null);
+  const categories = await categoryRepository.findActiveChildren(null);
   return categories.map((c) => ({ slug: c.slug, label: c.name }));
 }
 
 export interface CategoryPageVM {
   name: string;
+  description: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  coverImageKey: string | null;
   products: ProductCardVM[];
 }
 
 export async function getCategoryWithProducts(slug: string): Promise<CategoryPageVM | null> {
   const category = await categoryRepository.findBySlug(slug);
-  if (!category) return null;
+  // Catégorie inexistante OU masquée côté boutique → 404 storefront.
+  if (!category || !category.active) return null;
   const cards = await productRepository.findCardsByCategorySlug(slug);
-  return { name: category.name, products: cards.map(toCardVM) };
+  return {
+    name: category.name,
+    description: category.description,
+    metaTitle: category.metaTitle,
+    metaDescription: category.metaDescription,
+    coverImageKey: category.coverImageKey,
+    products: cards.map(toCardVM),
+  };
 }
 
 export interface ProductDetailVM {

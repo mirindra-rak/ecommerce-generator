@@ -12,7 +12,11 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const data = await getCategoryWithProducts(slug);
-  return { title: data?.name ?? "Catégorie introuvable" };
+  if (!data) return { title: "Catégorie introuvable" };
+  return {
+    title: data.metaTitle ?? data.name,
+    description: data.metaDescription ?? undefined,
+  };
 }
 
 export default async function CategoryPage({ params }: PageProps) {
@@ -26,8 +30,24 @@ export default async function CategoryPage({ params }: PageProps) {
         <span>Accueil</span> <span className="px-1">/</span>{" "}
         <span className="text-foreground">{data.name}</span>
       </nav>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground">{data.name}</h1>
-      <p className="mt-1 text-sm text-muted">
+      {/* Bandeau de couverture (placeholder CSS tant que l'upload d'images n'est pas branché) */}
+      <div className="relative mt-3 flex h-40 items-end overflow-hidden rounded-3xl bg-gradient-to-br from-brand-50 to-slate-100 p-6">
+        {data.coverImageKey && (
+          <span className="absolute right-4 top-4 rounded-full bg-surface/70 px-2 py-0.5 text-[10px] text-muted">
+            image : {data.coverImageKey}
+          </span>
+        )}
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">{data.name}</h1>
+      </div>
+
+      {data.description && (
+        // Rendu en texte échappé (pas de dangerouslySetInnerHTML) — sanitization riche = lot 9.4.
+        <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-slate-600">
+          {data.description}
+        </p>
+      )}
+
+      <p className="mt-3 text-sm text-muted">
         {data.products.length} produit{data.products.length > 1 ? "s" : ""}
       </p>
 

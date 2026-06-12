@@ -2,6 +2,8 @@
 
 import {
   CategoryNotEmptyError,
+  type CategoryContentInput,
+  InvalidCategoryFieldError,
   ReparentCycleError,
   createCategory,
   deleteCategory,
@@ -17,6 +19,28 @@ function revalidateCategories(): void {
   revalidatePath("/"); // la home (CategoryGrid) reflète les catégories
 }
 
+// Lit les champs de contenu/SEO du formulaire (images/douane = migration-only, absents ici).
+function readContentFields(formData: FormData): CategoryContentInput {
+  const text = (key: string): string | null => {
+    const value = String(formData.get(key) ?? "").trim();
+    return value === "" ? null : value;
+  };
+  const metaKeywords = String(formData.get("metaKeywords") ?? "")
+    .split(",")
+    .map((keyword) => keyword.trim())
+    .filter(Boolean);
+
+  return {
+    active: formData.get("active") === "on",
+    description: text("description"),
+    additionalInfo: text("additionalInfo"),
+    shortDescription: text("shortDescription"),
+    metaTitle: text("metaTitle"),
+    metaDescription: text("metaDescription"),
+    metaKeywords,
+  };
+}
+
 export async function createCategoryAction(
   _prev: FormState,
   formData: FormData,
@@ -27,9 +51,11 @@ export async function createCategoryAction(
   if (!name) return { error: "Le nom est requis." };
 
   try {
-    await createCategory({ name, parentId });
+    await createCategory({ name, parentId, ...readContentFields(formData) });
   } catch (error) {
-    if (error instanceof ReparentCycleError) return { error: error.message };
+    if (error instanceof ReparentCycleError || error instanceof InvalidCategoryFieldError) {
+      return { error: error.message };
+    }
     throw error;
   }
   revalidateCategories();
@@ -48,9 +74,11 @@ export async function updateCategoryAction(
   if (!name) return { error: "Le nom est requis." };
 
   try {
-    await updateCategory(id, { name, parentId });
+    await updateCategory(id, { name, parentId, ...readContentFields(formData) });
   } catch (error) {
-    if (error instanceof ReparentCycleError) return { error: error.message };
+    if (error instanceof ReparentCycleError || error instanceof InvalidCategoryFieldError) {
+      return { error: error.message };
+    }
     throw error;
   }
   revalidateCategories();

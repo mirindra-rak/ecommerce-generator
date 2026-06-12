@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { prisma } from "../../db/client";
 import { categoryRepository } from "./category.repository";
-import { CategoryNotEmptyError, ReparentCycleError } from "./catalog-errors";
+import {
+  CategoryNotEmptyError,
+  InvalidCategoryFieldError,
+  ReparentCycleError,
+} from "./catalog-errors";
 import { canReparent, createCategory, deleteCategory, updateCategory } from "./category.service";
 
 describe("canReparent", () => {
@@ -52,5 +56,46 @@ describe("category.service (intégration)", () => {
       data: { name: "P", slug: "p-test", category: { connect: { id: category.id } } },
     });
     await expect(deleteCategory(category.id)).rejects.toBeInstanceOf(CategoryNotEmptyError);
+  });
+});
+
+describe("category.service — champs enrichis (intégration)", () => {
+  it("persiste les champs de contenu/SEO", async () => {
+    const created = await createCategory({
+      name: "Bio & Naturel",
+      description: "Notre sélection bio.",
+      shortDescription: "Bio",
+      metaTitle: "Produits bio",
+      metaDescription: "La meilleure sélection bio.",
+      metaKeywords: ["bio", "naturel"],
+      active: false,
+    });
+    const found = await categoryRepository.findById(created.id);
+    expect(found?.description).toBe("Notre sélection bio.");
+    expect(found?.metaTitle).toBe("Produits bio");
+    expect(found?.metaKeywords).toEqual(["bio", "naturel"]);
+    expect(found?.active).toBe(false);
+  });
+
+  it("création minimale (name seul) → défauts active=true, metaKeywords=[]", async () => {
+    const created = await createCategory({ name: "Minimal" });
+    const found = await categoryRepository.findById(created.id);
+    expect(found?.active).toBe(true);
+    expect(found?.metaKeywords).toEqual([]);
+  });
+
+  it("rejette un caractère interdit dans le nom", async () => {
+    await expect(createCategory({ name: "Soins <b>" })).rejects.toBeInstanceOf(
+      InvalidCategoryFieldError,
+    );
+  });
+
+  it("findActiveChildren exclut les catégories inactives", async () => {
+    await createCategory({ name: "Visible", active: true });
+    await createCategory({ name: "Cachée", active: false });
+    const roots = await categoryRepository.findActiveChildren(null);
+    const names = roots.map((c) => c.name);
+    expect(names).toContain("Visible");
+    expect(names).not.toContain("Cachée");
   });
 });

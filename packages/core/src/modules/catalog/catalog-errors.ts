@@ -21,3 +21,10 @@ export class InvalidProductAttributesError extends Error {
     this.name = "InvalidProductAttributesError";
   }
 }
+
+export class InvalidCategoryFieldError extends Error {
+  constructor(field: string) {
+    super(`Le champ « ${field} » contient des caractères interdits (<>;=#{}).`);
+    this.name = "InvalidCategoryFieldError";
+  }
+}

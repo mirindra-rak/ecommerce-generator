@@ -23,8 +23,30 @@ model Brand {
 model Category {
   id       String  @id @default(cuid())
   name     String
-  slug     String  @unique
+  slug     String  @unique // « URL simplifiée »
   position Int     @default(0)
+  // « Affichée » : visibilité côté boutique.
+  active   Boolean @default(true)
+
+  // Contenu éditorial (peut contenir du HTML issu de la migration ; rendu échappé).
+  description      String?
+  additionalInfo   String?
+  shortDescription String?
+
+  // SEO.
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String[] @default([])
+
+  // Images (clés objet S3/MinIO ; remplies par la migration, upload différé).
+  coverImageKey    String?
+  thumbnailKey     String?
+  menuThumbnailKey String?
+
+  // Défauts douaniers (hérités par les produits côté PrestaShop).
+  countryOfOrigin String?
+  hsCode          String?
+
   // Arbre auto-référencé. onDelete: Restrict → on refuse de supprimer une catégorie
   // qui a des enfants (la règle métier fine est affinée en story 04).
   parentId String?

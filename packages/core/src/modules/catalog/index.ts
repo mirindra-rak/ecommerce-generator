@@ -17,7 +17,13 @@ export { priceRange, isDisplayable, resolveVariant } from "./product.service";
 export type { PriceRange, SelectableVariant } from "./product.service";
 
 export { canReparent, createCategory, updateCategory, deleteCategory } from "./category.service";
-export type { CreateCategoryInput, UpdateCategoryInput } from "./category.service";
+export type {
+  CreateCategoryInput,
+  UpdateCategoryInput,
+  CategoryContentInput,
+} from "./category.service";
+
+export { safeTextField, validateCategoryFields } from "./category-fields";
 
 export { createBrand, updateBrand, deleteBrand } from "./brand.service";
 
@@ -25,6 +31,7 @@ export {
   ReparentCycleError,
   CategoryNotEmptyError,
   InvalidProductAttributesError,
+  InvalidCategoryFieldError,
 } from "./catalog-errors";
 
 export {

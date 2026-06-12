@@ -2,6 +2,7 @@ import { Prisma, type Category } from "@prisma/client";
 import { buildUniqueSlug } from "../../utils/slugify";
 import { categoryRepository } from "./category.repository";
 import { CategoryNotEmptyError, ReparentCycleError } from "./catalog-errors";
+import { validateCategoryFields } from "./category-fields";
 
 // Services de domaine des catégories (story 04). Orchestrent les repositories,
 // génèrent les slugs, valident l'anti-cycle et traduisent les erreurs d'intégrité.
@@ -23,26 +24,63 @@ export function canReparent(
 const categorySlugExists = (slug: string): Promise<boolean> =>
   categoryRepository.findBySlug(slug).then((category) => category !== null);
 
-export interface CreateCategoryInput {
+// Champs de contenu/SEO/visibilité/douane (tous optionnels).
+export interface CategoryContentInput {
+  active?: boolean;
+  description?: string | null;
+  additionalInfo?: string | null;
+  shortDescription?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  metaKeywords?: string[];
+  coverImageKey?: string | null;
+  thumbnailKey?: string | null;
+  menuThumbnailKey?: string | null;
+  countryOfOrigin?: string | null;
+  hsCode?: string | null;
+}
+
+// Sous-ensemble persistable (Prisma ignore les `undefined`).
+function toContentData(input: CategoryContentInput) {
+  return {
+    active: input.active,
+    description: input.description,
+    additionalInfo: input.additionalInfo,
+    shortDescription: input.shortDescription,
+    metaTitle: input.metaTitle,
+    metaDescription: input.metaDescription,
+    metaKeywords: input.metaKeywords,
+    coverImageKey: input.coverImageKey,
+    thumbnailKey: input.thumbnailKey,
+    menuThumbnailKey: input.menuThumbnailKey,
+    countryOfOrigin: input.countryOfOrigin,
+    hsCode: input.hsCode,
+  };
+}
+
+export interface CreateCategoryInput extends CategoryContentInput {
   name: string;
   parentId?: string | null;
 }
 
 export async function createCategory(input: CreateCategoryInput): Promise<Category> {
+  validateCategoryFields(input);
   const slug = await buildUniqueSlug(input.name, categorySlugExists);
   return categoryRepository.create({
     name: input.name,
     slug,
+    ...toContentData(input),
     ...(input.parentId ? { parent: { connect: { id: input.parentId } } } : {}),
   });
 }
 
-export interface UpdateCategoryInput {
+export interface UpdateCategoryInput extends CategoryContentInput {
   name: string;
   parentId: string | null;
 }
 
 export async function updateCategory(id: string, input: UpdateCategoryInput): Promise<Category> {
+  validateCategoryFields(input);
   const descendants = await categoryRepository.findDescendants(id);
   if (
     !canReparent(
@@ -55,6 +93,7 @@ export async function updateCategory(id: string, input: UpdateCategoryInput): Pr
   }
   return categoryRepository.update(id, {
     name: input.name,
+    ...toContentData(input),
     parent: input.parentId ? { connect: { id: input.parentId } } : { disconnect: true },
   });
 }

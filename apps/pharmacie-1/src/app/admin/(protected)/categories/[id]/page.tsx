@@ -31,7 +31,18 @@ export default async function EditCategoryPage({ params }: PageProps) {
         <CategoryForm
           action={updateCategoryAction}
           parentOptions={parentOptions}
-          category={{ id: category.id, name: category.name, parentId: category.parentId }}
+          category={{
+            id: category.id,
+            name: category.name,
+            parentId: category.parentId,
+            active: category.active,
+            description: category.description,
+            additionalInfo: category.additionalInfo,
+            shortDescription: category.shortDescription,
+            metaTitle: category.metaTitle,
+            metaDescription: category.metaDescription,
+            metaKeywords: category.metaKeywords,
+          }}
         />
       </div>
     </div>

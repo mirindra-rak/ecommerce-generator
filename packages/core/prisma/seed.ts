@@ -14,12 +14,26 @@ const BRANDS = [
 ];
 
 const CATEGORIES = [
-  { name: "Visage & Soin", slug: "visage-soin", position: 0 },
+  {
+    name: "Visage & Soin",
+    slug: "visage-soin",
+    position: 0,
+    description: "Crèmes, sérums et soins ciblés pour le visage, sélectionnés par nos pharmaciens.",
+    metaTitle: "Soins visage en parapharmacie",
+    metaDescription: "Crèmes hydratantes, sérums et soins visage des grandes marques.",
+    metaKeywords: ["visage", "soin", "crème"],
+  },
   { name: "Corps & Bain", slug: "corps-bain", position: 1 },
   { name: "Cheveux", slug: "cheveux", position: 2 },
   { name: "Compléments alimentaires", slug: "complements-alimentaires", position: 3 },
   { name: "Maman & Bébé", slug: "maman-bebe", position: 4 },
-  { name: "Solaires", slug: "solaires", position: 5 },
+  {
+    name: "Solaires",
+    slug: "solaires",
+    position: 5,
+    description: "Protections solaires haute tolérance pour toute la famille.",
+    metaTitle: "Solaires & protection UV",
+  },
 ];
 
 interface VariantSpec {

@@ -26,6 +26,14 @@ export const categoryRepository = {
     });
   },
 
+  /** Enfants directs ACTIFS (visibles côté boutique). */
+  findActiveChildren(parentId: string | null): Promise<Category[]> {
+    return prisma.category.findMany({
+      where: { parentId, active: true },
+      orderBy: [{ position: "asc" }, { name: "asc" }],
+    });
+  },
+
   /** Tous les descendants (récursif) via CTE PostgreSQL. */
   findDescendants(id: string): Promise<Category[]> {
     return prisma.$queryRaw<Category[]>`
