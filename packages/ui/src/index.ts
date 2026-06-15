@@ -17,6 +17,8 @@ export { Input } from "./components/input";
 export { Select } from "./components/select";
 export type { SelectOption } from "./components/select";
 export { MultiSelect } from "./components/multi-select";
+export { LanguageSwitcher } from "./components/language-switcher";
+export type { LanguageOption } from "./components/language-switcher";
 export { Textarea } from "./components/textarea";
 export { Field } from "./components/field";
 export { Rule } from "./components/rule";

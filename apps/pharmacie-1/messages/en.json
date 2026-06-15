@@ -24,6 +24,9 @@
     "returnsTitle": "30-day returns",
     "returnsSubtitle": "Satisfied or refunded"
   },
+  "localeSwitcher": {
+    "ariaLabel": "Change language"
+  },
   "megaMenu": {
     "ariaLabel": "Categories",
     "allProducts": "All products",

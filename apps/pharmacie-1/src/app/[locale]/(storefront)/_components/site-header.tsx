@@ -4,6 +4,7 @@ import { Container, Cross, IconButton } from "@pharmacie/ui";
 import { siteConfig } from "@/lib/site";
 import { getMenuTree } from "@/lib/catalog";
 import { CartIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "./icons";
+import { LanguageSwitcher } from "./language-switcher";
 import { MegaMenu } from "./mega-menu";
 
 // En-tête vitrine partagé par le groupe (storefront). La navigation catégories est
@@ -54,6 +55,7 @@ export async function SiteHeader() {
         </div>
 
         <nav className="ml-auto flex items-center gap-1">
+          <LanguageSwitcher />
           <IconButton label={t("account")}>
             <UserIcon className="h-5 w-5" />
           </IconButton>

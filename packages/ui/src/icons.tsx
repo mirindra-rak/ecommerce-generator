@@ -27,6 +27,7 @@ export {
   Check as CheckIcon,
   CaretRight as ChevronRightIcon,
   CaretDown as ChevronDownIcon,
+  Globe as GlobeIcon,
   ArrowRight,
   InstagramLogo as InstagramIcon,
   FacebookLogo as FacebookIcon,
