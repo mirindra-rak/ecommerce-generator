@@ -22,10 +22,19 @@ export interface BrandConfig {
   theme: string;
 }
 
-/** Paramètres FR / conformité parapharmacie. */
+/** Paramètres régionaux / conformité parapharmacie. */
 export interface LocaleConfig {
+  /** Locale régionale de référence (formats monétaires, dates). */
   locale: "fr-FR";
   currency: "EUR";
+  /**
+   * Locales d'UI supportées par CE site (codes courts BCP-47 : "fr", "en"…).
+   * Pilote le routing par locale et la liste du sélecteur de langue. En modèle Silo,
+   * c'est une CONFIGURATION du site, jamais une donnée en base.
+   */
+  supportedLocales: string[];
+  /** Locale d'UI par défaut (doit figurer dans `supportedLocales`). */
+  defaultLocale: string;
   /** Mentions légales spécifiques parapharmacie (allégations, etc.). */
   legalMentions: string[];
 }

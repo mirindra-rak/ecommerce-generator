@@ -2,6 +2,7 @@
 // services de domaine de @pharmacie/core et renvoie des view-models plats,
 // sérialisables, prêts pour les composants. Aucune requête Prisma dans les composants.
 import {
+  brandRepository,
   categoryRepository,
   facetRepository,
   parseAttributes,
@@ -44,6 +45,17 @@ function toCardVM(product: ProductCard): ProductCardVM {
 export async function getFeaturedProducts(limit = 8): Promise<ProductCardVM[]> {
   const cards = await productRepository.findActiveCards(limit);
   return cards.map(toCardVM);
+}
+
+export interface BrandVM {
+  slug: string;
+  name: string;
+}
+
+/** Marques pour le bandeau « marques phares » (triées par nom, plafonnées). */
+export async function getBrands(limit = 14): Promise<BrandVM[]> {
+  const brands = await brandRepository.findMany();
+  return brands.slice(0, limit).map((b) => ({ slug: b.slug, name: b.name }));
 }
 
 export interface NavCategoryVM {

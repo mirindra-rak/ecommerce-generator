@@ -13,6 +13,8 @@ export default defineSiteConfig({
   locale: {
     locale: "fr-FR",
     currency: "EUR",
+    supportedLocales: ["fr", "en"],
+    defaultLocale: "fr",
     legalMentions: [
       "Les produits proposés sont des produits de parapharmacie et ne se substituent pas à un avis médical.",
     ],

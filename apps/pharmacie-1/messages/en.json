@@ -1,0 +1,156 @@
+{
+  "common": {
+    "skipToContent": "Skip to content",
+    "loading": "Loading…",
+    "priceFrom": "from",
+    "securePayment": "Secure payment"
+  },
+  "header": {
+    "barShipping": "Free delivery from €49",
+    "barAdvice": "Pharmacist advice 6 days a week",
+    "openMenu": "Open menu",
+    "searchPlaceholder": "Search for a product, a brand…",
+    "account": "My account",
+    "favorites": "My favourites",
+    "cart": "My basket"
+  },
+  "reassurance": {
+    "adviceTitle": "Pharmacist advice",
+    "adviceSubtitle": "Qualified team, 6 days a week",
+    "shippingTitle": "Free delivery",
+    "shippingSubtitle": "From €49, within 48 h",
+    "paymentTitle": "Secure payment",
+    "paymentSubtitle": "3D Secure · cards, PayPal",
+    "returnsTitle": "30-day returns",
+    "returnsSubtitle": "Satisfied or refunded"
+  },
+  "megaMenu": {
+    "ariaLabel": "Categories",
+    "allProducts": "All products",
+    "deals": "Deals",
+    "premium": "Premium",
+    "allOf": "All {category}"
+  },
+  "hero": {
+    "label": "Highlights",
+    "carousel": "carousel",
+    "slide": "slide",
+    "goToSlide": "Go to slide {number}",
+    "prevSlide": "Previous slide",
+    "nextSlide": "Next slide",
+    "seeCatalog": "Browse the catalogue",
+    "boughtLabel": "bought",
+    "freeLabel": "free",
+    "slide1Eyebrow": "Offer of the moment",
+    "slide1Title": "Your beauty & health essentials, <em>delivered to your door</em>",
+    "slide1Text": "Over 1,000 brands, a pharmacist's advice and free delivery from €49.",
+    "slide1Cta": "Shop the offer",
+    "slide1Alt": "A selection of pharmacy skincare products",
+    "slide2Eyebrow": "Pharmacist advice",
+    "slide2Title": "The right product, <em>recommended by an expert</em>",
+    "slide2Text": "A qualified team guides you towards what truly suits your skin.",
+    "slide2Cta": "Our advice",
+    "slide2Alt": "Facial care recommended by a pharmacist",
+    "slide3Eyebrow": "Radiance routine",
+    "slide3Title": "Vitamin C & active ingredients for <em>radiant skin</em>",
+    "slide3Text": "Targeted supplements and skincare, selected by our pharmacists.",
+    "slide3Cta": "Discover",
+    "slide3Alt": "Vitamin C radiance routine"
+  },
+  "promo": {
+    "visageEyebrow": "Face routine",
+    "visageTitle": "Skincare tailored to your skin",
+    "visageCta": "Discover",
+    "naturalEyebrow": "Natural wellness",
+    "naturalTitle": "Supplements & active ingredients of natural origin",
+    "naturalCta": "Explore"
+  },
+  "categoryGrid": {
+    "heading": "Our categories",
+    "subtitle": "Find the right product, by category."
+  },
+  "featuredProducts": {
+    "heading": "Beauty & Care Selection",
+    "subtitle": "Our pharmacists' favourites.",
+    "seeAll": "See the selection"
+  },
+  "expertise": {
+    "eyebrow": "Our commitment",
+    "heading": "The expertise of a pharmacy, the simplicity of e-commerce",
+    "intro": "Behind every product, a pharmacist's eye. We help you choose what truly suits your skin, your health and your daily life.",
+    "adviceTitle": "Pharmacist advice",
+    "adviceText": "A qualified team answers your health & beauty questions.",
+    "authenticTitle": "Authentic products",
+    "authenticText": "Official brands, traceability and compliance guaranteed.",
+    "responsibleTitle": "Responsible selection",
+    "responsibleText": "Safe active ingredients, with a focus on natural formulas.",
+    "badgeValue": "+30 years",
+    "badgeLabel": "of pharmacy expertise",
+    "link": "Learn more about our approach"
+  },
+  "brandStrip": {
+    "heading": "Your favourite brands",
+    "allBrands": "All brands"
+  },
+  "loyalty": {
+    "eyebrow": "Loyalty programme",
+    "heading": "Join the club & earn rewards",
+    "text": "Free, no commitment. Rewards from your very first order.",
+    "perkDiscount": "-10% on your first order",
+    "perkGifts": "Free gifts & samples",
+    "perkPrivateSales": "Early access to private sales",
+    "cta": "Create my account"
+  },
+  "newsletter": {
+    "eyebrow": "Newsletter",
+    "heading": "-10% on your first order",
+    "text": "Pharmacist tips, new arrivals and exclusive offers. Unsubscribe in one click.",
+    "emailLabel": "Your email address",
+    "emailPlaceholder": "your@email.com",
+    "submit": "Sign up"
+  },
+  "footer": {
+    "tagline": "Your online pharmacy: cosmetics, health, wellness and supplements, with a pharmacist's advice.",
+    "colBuy": "Shop",
+    "colBuyAllProducts": "All products",
+    "colBuyDeals": "Deals",
+    "colBuyBrands": "Our brands",
+    "colBuyNew": "New arrivals",
+    "colService": "Customer service",
+    "colServiceTrackOrder": "Track my order",
+    "colServiceShippingReturns": "Delivery & returns",
+    "colServiceAdvice": "Pharmacist advice",
+    "colServiceContact": "Contact us",
+    "colAbout": "About",
+    "colAboutUs": "Who we are",
+    "colAboutBlog": "The blog",
+    "colAboutLegal": "Legal notice",
+    "colAboutTerms": "Terms & conditions",
+    "copyright": "© {year} {company}. All rights reserved."
+  },
+  "productCard": {
+    "addToCart": "Add {name} to basket"
+  },
+  "categoryFilters": {
+    "title": "Filters",
+    "reset": "Reset filters"
+  },
+  "categoryPage": {
+    "breadcrumbHome": "Home",
+    "productCount": "{count, plural, one {# product} other {# products}}",
+    "empty": "No products match these filters.",
+    "notFound": "Category not found"
+  },
+  "productPage": {
+    "typeCosmetic": "Cosmetic",
+    "typeSupplement": "Food supplement",
+    "typeDevice": "Medical device",
+    "typeOther": "Product",
+    "priceSuffix": "excl. VAT",
+    "addToCart": "Add to basket",
+    "references": "References",
+    "inci": "Composition (INCI)",
+    "precautions": "Directions for use",
+    "notFound": "Product not found"
+  }
+}

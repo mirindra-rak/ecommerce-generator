@@ -1,0 +1,156 @@
+{
+  "common": {
+    "skipToContent": "Aller au contenu",
+    "loading": "Chargement…",
+    "priceFrom": "dès",
+    "securePayment": "Paiement sécurisé"
+  },
+  "header": {
+    "barShipping": "Livraison offerte dès 49 €",
+    "barAdvice": "Conseil pharmacien 6j/7",
+    "openMenu": "Ouvrir le menu",
+    "searchPlaceholder": "Rechercher un produit, une marque…",
+    "account": "Mon compte",
+    "favorites": "Mes favoris",
+    "cart": "Mon panier"
+  },
+  "reassurance": {
+    "adviceTitle": "Conseil pharmacien",
+    "adviceSubtitle": "Équipe diplômée, 6j/7",
+    "shippingTitle": "Livraison offerte",
+    "shippingSubtitle": "Dès 49 €, en 48 h",
+    "paymentTitle": "Paiement sécurisé",
+    "paymentSubtitle": "3D Secure · CB, PayPal",
+    "returnsTitle": "Retours 30 jours",
+    "returnsSubtitle": "Satisfait ou remboursé"
+  },
+  "megaMenu": {
+    "ariaLabel": "Catégories",
+    "allProducts": "Tous les produits",
+    "deals": "Bons plans",
+    "premium": "Premium",
+    "allOf": "Tout {category}"
+  },
+  "hero": {
+    "label": "Mises en avant",
+    "carousel": "carrousel",
+    "slide": "diapositive",
+    "goToSlide": "Aller à la diapositive {number}",
+    "prevSlide": "Diapositive précédente",
+    "nextSlide": "Diapositive suivante",
+    "seeCatalog": "Voir le catalogue",
+    "boughtLabel": "achetés",
+    "freeLabel": "offert",
+    "slide1Eyebrow": "Offre du moment",
+    "slide1Title": "Vos essentiels beauté & santé, <em>livrés chez vous</em>",
+    "slide1Text": "Plus de 1 000 marques, le conseil d'un pharmacien et la livraison offerte dès 49 €.",
+    "slide1Cta": "J'en profite",
+    "slide1Alt": "Sélection de soins de parapharmacie",
+    "slide2Eyebrow": "Conseil pharmacien",
+    "slide2Title": "Le bon soin, <em>recommandé par un expert</em>",
+    "slide2Text": "Une équipe diplômée vous guide vers ce qui convient vraiment à votre peau.",
+    "slide2Cta": "Nos conseils",
+    "slide2Alt": "Soin du visage recommandé par un pharmacien",
+    "slide3Eyebrow": "Routine éclat",
+    "slide3Title": "Vitamine C & actifs pour une <em>peau éclatante</em>",
+    "slide3Text": "Compléments et soins ciblés, sélectionnés par nos pharmaciens.",
+    "slide3Cta": "Découvrir",
+    "slide3Alt": "Routine éclat à la vitamine C"
+  },
+  "promo": {
+    "visageEyebrow": "Routine visage",
+    "visageTitle": "Le soin sur mesure pour votre peau",
+    "visageCta": "Découvrir",
+    "naturalEyebrow": "Bien-être naturel",
+    "naturalTitle": "Compléments & actifs d'origine naturelle",
+    "naturalCta": "Explorer"
+  },
+  "categoryGrid": {
+    "heading": "Nos univers",
+    "subtitle": "Trouvez le bon produit, par catégorie."
+  },
+  "featuredProducts": {
+    "heading": "Sélection Beauté & Soin",
+    "subtitle": "Les coups de cœur de nos pharmaciens.",
+    "seeAll": "Voir la sélection"
+  },
+  "expertise": {
+    "eyebrow": "Notre engagement",
+    "heading": "L'expertise d'une officine, la simplicité du e-commerce",
+    "intro": "Derrière chaque produit, le regard d'un pharmacien. On vous aide à choisir ce qui convient vraiment à votre peau, votre santé et votre quotidien.",
+    "adviceTitle": "Conseil de pharmacien",
+    "adviceText": "Une équipe diplômée répond à vos questions santé & beauté.",
+    "authenticTitle": "Produits authentiques",
+    "authenticText": "Marques officielles, traçabilité et conformité garanties.",
+    "responsibleTitle": "Sélection responsable",
+    "responsibleText": "Des actifs sûrs, une part belle aux formules naturelles.",
+    "badgeValue": "+30 ans",
+    "badgeLabel": "d'expertise en officine",
+    "link": "En savoir plus sur notre démarche"
+  },
+  "brandStrip": {
+    "heading": "Vos marques préférées",
+    "allBrands": "Toutes les marques"
+  },
+  "loyalty": {
+    "eyebrow": "Programme fidélité",
+    "heading": "Rejoignez le club & cumulez des avantages",
+    "text": "Gratuit, sans engagement. Des récompenses dès votre première commande.",
+    "perkDiscount": "-10 % dès la 1re commande",
+    "perkGifts": "Cadeaux & échantillons offerts",
+    "perkPrivateSales": "Ventes privées en avant-première",
+    "cta": "Créer mon compte"
+  },
+  "newsletter": {
+    "eyebrow": "Lettre d'information",
+    "heading": "-10 % sur votre première commande",
+    "text": "Conseils de pharmaciens, nouveautés et offres exclusives. Désinscription en un clic.",
+    "emailLabel": "Votre adresse e-mail",
+    "emailPlaceholder": "votre@email.fr",
+    "submit": "Je m'inscris"
+  },
+  "footer": {
+    "tagline": "Votre parapharmacie en ligne : cosmétiques, santé, bien-être et compléments, avec le conseil d'un pharmacien.",
+    "colBuy": "Acheter",
+    "colBuyAllProducts": "Tous les produits",
+    "colBuyDeals": "Bons plans",
+    "colBuyBrands": "Nos marques",
+    "colBuyNew": "Nouveautés",
+    "colService": "Service client",
+    "colServiceTrackOrder": "Suivre ma commande",
+    "colServiceShippingReturns": "Livraison & retours",
+    "colServiceAdvice": "Conseil pharmacien",
+    "colServiceContact": "Nous contacter",
+    "colAbout": "À propos",
+    "colAboutUs": "Qui sommes-nous",
+    "colAboutBlog": "Le blog",
+    "colAboutLegal": "Mentions légales",
+    "colAboutTerms": "CGV",
+    "copyright": "© {year} {company}. Tous droits réservés."
+  },
+  "productCard": {
+    "addToCart": "Ajouter {name} au panier"
+  },
+  "categoryFilters": {
+    "title": "Filtres",
+    "reset": "Réinitialiser les filtres"
+  },
+  "categoryPage": {
+    "breadcrumbHome": "Accueil",
+    "productCount": "{count, plural, one {# produit} other {# produits}}",
+    "empty": "Aucun produit ne correspond à ces filtres.",
+    "notFound": "Catégorie introuvable"
+  },
+  "productPage": {
+    "typeCosmetic": "Cosmétique",
+    "typeSupplement": "Complément alimentaire",
+    "typeDevice": "Dispositif médical",
+    "typeOther": "Produit",
+    "priceSuffix": "HT",
+    "addToCart": "Ajouter au panier",
+    "references": "Références",
+    "inci": "Composition (INCI)",
+    "precautions": "Précautions d'emploi",
+    "notFound": "Produit introuvable"
+  }
+}
