@@ -156,6 +156,22 @@ export interface ProductDetailVM {
   variants: { sku: string | null; volume: string | null; priceLabel: string; stock: number }[];
 }
 
+/** Entrée de sitemap : slug + dernière modification, pour `lastModified`. */
+export interface SitemapEntry {
+  slug: string;
+  updatedAt: Date;
+}
+
+/** Catégories actives (indexables) pour le sitemap. */
+export async function getSitemapCategories(): Promise<SitemapEntry[]> {
+  return categoryRepository.findActiveSlugs();
+}
+
+/** Produits actifs (indexables) pour le sitemap. */
+export async function getSitemapProducts(): Promise<SitemapEntry[]> {
+  return productRepository.findActiveSlugs();
+}
+
 export async function getProductDetail(slug: string): Promise<ProductDetailVM | null> {
   const product = await productRepository.findBySlugWithRelations(slug);
   if (!product || !product.active || product.variants.length === 0) return null;

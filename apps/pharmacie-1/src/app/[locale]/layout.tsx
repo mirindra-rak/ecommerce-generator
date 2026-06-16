@@ -5,7 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import { IconProvider } from "@pharmacie/ui";
 import { routing } from "@/i18n/routing";
 import { hanken } from "@/lib/fonts";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, siteUrl } from "@/lib/site";
 
 // Racine de rendu du storefront localisé. Émet le `<html lang>` dynamique et expose les
 // messages au sous-arbre client via NextIntlClientProvider. `generateStaticParams` +
@@ -15,6 +15,9 @@ export function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
+  // Base absolue des URLs de métadonnées (canoniques/alternates relatives résolues contre
+  // l'origin du site, dérivé de la config — story i18n 04).
+  metadataBase: new URL(siteUrl),
   title: {
     default: siteConfig.brand.name,
     template: `%s · ${siteConfig.brand.name}`,

@@ -64,6 +64,17 @@ describe("categoryRepository", () => {
     expect(tree[1]?.children).toEqual([]);
   });
 
+  it("findActiveSlugs : slugs des catégories actives uniquement (pour le sitemap)", async () => {
+    await categoryRepository.create({ name: "Visage", slug: "visage", position: 0 });
+    await categoryRepository.create({ name: "Cheveux", slug: "cheveux", position: 1 });
+    await categoryRepository.create({ name: "Brouillon", slug: "brouillon", active: false });
+
+    const slugs = await categoryRepository.findActiveSlugs();
+
+    expect(slugs.map((c) => c.slug)).toEqual(["visage", "cheveux"]);
+    expect(slugs[0]?.updatedAt).toBeInstanceOf(Date);
+  });
+
   it("refuse un slug dupliqué", async () => {
     await categoryRepository.create({ name: "Cheveux", slug: "cheveux" });
     await expect(categoryRepository.create({ name: "Doublon", slug: "cheveux" })).rejects.toThrow();

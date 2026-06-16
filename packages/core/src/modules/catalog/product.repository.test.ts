@@ -109,6 +109,27 @@ describe("productRepository", () => {
     expect(isDisplayable(created, created.variants.length)).toBe(true);
   });
 
+  it("findActiveSlugs : slugs des produits actifs uniquement (pour le sitemap)", async () => {
+    await productRepository.create({
+      name: "Sérum actif",
+      slug: "serum-actif",
+      productType: "COSMETIC",
+      variants: { create: [{ priceExclTax: 1990, stock: 1 }] },
+    });
+    await productRepository.create({
+      name: "Sérum masqué",
+      slug: "serum-masque",
+      productType: "COSMETIC",
+      active: false,
+      variants: { create: [{ priceExclTax: 1990, stock: 1 }] },
+    });
+
+    const slugs = await productRepository.findActiveSlugs();
+
+    expect(slugs.map((p) => p.slug)).toEqual(["serum-actif"]);
+    expect(slugs[0]?.updatedAt).toBeInstanceOf(Date);
+  });
+
   it("reconcileVariants : met à jour les existantes, ajoute les nouvelles, supprime les absentes", async () => {
     const product = await productRepository.createWithDefaultVariant({
       product: { name: "Recon", slug: "recon" },

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getCategoryFilters, getCategoryWithProducts } from "@/lib/catalog";
+import { alternatesFor } from "@/lib/seo";
 import { CategoryFilters } from "../../_components/category-filters";
 import { ProductCard } from "../../_components/product-card";
 
@@ -18,10 +19,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     getCategoryWithProducts(slug),
     getTranslations({ locale, namespace: "categoryPage" }),
   ]);
-  if (!data) return { title: t("notFound") };
+  const alternates = alternatesFor(`/categorie/${slug}`, locale);
+  if (!data) return { title: t("notFound"), alternates };
   return {
     title: data.metaTitle ?? data.name,
     description: data.metaDescription ?? undefined,
+    alternates,
   };
 }
 

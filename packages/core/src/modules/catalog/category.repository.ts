@@ -30,6 +30,15 @@ export const categoryRepository = {
     return rows.map(({ _count, ...category }) => ({ ...category, productCount: _count.products }));
   },
 
+  /** Slugs + date de mise à jour des catégories ACTIVES (visibles boutique), pour le sitemap. */
+  findActiveSlugs(): Promise<{ slug: string; updatedAt: Date }[]> {
+    return prisma.category.findMany({
+      where: { active: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: [{ position: "asc" }, { name: "asc" }],
+    });
+  },
+
   /** Enfants directs d'une catégorie (ou racines si `parentId` vaut `null`). */
   findChildren(parentId: string | null): Promise<Category[]> {
     return prisma.category.findMany({

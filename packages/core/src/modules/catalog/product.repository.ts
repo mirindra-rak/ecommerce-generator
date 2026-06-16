@@ -90,6 +90,15 @@ export const productRepository = {
     });
   },
 
+  /** Slugs + date de mise à jour des produits ACTIFS, pour le sitemap (URLs indexables). */
+  findActiveSlugs(): Promise<{ slug: string; updatedAt: Date }[]> {
+    return prisma.product.findMany({
+      where: { active: true },
+      select: { slug: true, updatedAt: true },
+      orderBy: { createdAt: "desc" },
+    });
+  },
+
   /** Tous les produits (actifs ET inactifs) pour le back-office : marque + nb déclinaisons. */
   findMany(): Promise<ProductListItem[]> {
     return prisma.product.findMany({

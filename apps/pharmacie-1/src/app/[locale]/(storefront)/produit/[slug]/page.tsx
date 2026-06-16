@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getProductDetail } from "@/lib/catalog";
+import { alternatesFor } from "@/lib/seo";
 import { CartIcon } from "../../_components/icons";
 
 export const dynamic = "force-dynamic";
@@ -24,7 +25,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     getProductDetail(slug),
     getTranslations({ locale, namespace: "productPage" }),
   ]);
-  return { title: product?.name ?? t("notFound") };
+  return {
+    title: product?.name ?? t("notFound"),
+    alternates: alternatesFor(`/produit/${slug}`, locale),
+  };
 }
 
 export default async function ProductPage({ params }: PageProps) {
