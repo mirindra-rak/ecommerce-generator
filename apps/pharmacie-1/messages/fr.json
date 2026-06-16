@@ -155,5 +155,286 @@
     "inci": "Composition (INCI)",
     "precautions": "Précautions d'emploi",
     "notFound": "Produit introuvable"
+  },
+  "admin": {
+    "nav": {
+      "backOffice": "Back-office",
+      "brandName": "Pharmacie",
+      "section": "Navigation",
+      "dashboard": "Tableau de bord",
+      "products": "Produits",
+      "categories": "Catégories",
+      "brands": "Marques",
+      "settings": "Paramètres"
+    },
+    "topbar": {
+      "notifications": "Notifications",
+      "fallbackTitle": "Administration"
+    },
+    "logout": {
+      "action": "Se déconnecter",
+      "pending": "Déconnexion…"
+    },
+    "common": {
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler",
+      "edit": "Éditer",
+      "delete": "Supprimer",
+      "add": "Ajouter",
+      "viewAll": "tout voir"
+    },
+    "status": {
+      "active": "Actif",
+      "hidden": "Masqué"
+    },
+    "pagination": {
+      "range": "{from}–{to} sur {total}",
+      "page": "{current} / {total}",
+      "pageLabeled": "Page {current} / {total}"
+    },
+    "dashboard": {
+      "kpi": {
+        "view": "voir",
+        "categories": "Catégories",
+        "categoriesDesc": "Arborescence catalogue",
+        "brands": "Marques",
+        "brandsDesc": "Fournisseurs référencés",
+        "products": "Produits actifs",
+        "productsDesc": "Visibles en boutique",
+        "orders": "Commandes",
+        "ordersDesc": "Bientôt disponible"
+      },
+      "chart": {
+        "title": "Chiffre d'affaires",
+        "subtitle": "7 derniers jours · données simulées",
+        "thisWeek": "Cette semaine",
+        "mon": "Lun",
+        "tue": "Mar",
+        "wed": "Mer",
+        "thu": "Jeu",
+        "fri": "Ven",
+        "sat": "Sam",
+        "sun": "Dim"
+      },
+      "activity": {
+        "title": "Activité récente",
+        "subtitle": "Derniers éléments ajoutés",
+        "empty": "Aucun contenu pour l'instant.",
+        "tagCategory": "cat.",
+        "tagBrand": "marque",
+        "addCategory": "+ Catégorie",
+        "addBrand": "+ Marque"
+      },
+      "categoriesCard": {
+        "title": "Catégories",
+        "add": "Ajouter",
+        "empty": "Aucune catégorie.",
+        "more": "+{count} autres →"
+      },
+      "brandsCard": {
+        "title": "Marques",
+        "add": "Ajouter",
+        "empty": "Aucune marque.",
+        "more": "+{count} autres →"
+      }
+    },
+    "categories": {
+      "pageTitle": "Catégories",
+      "total": "{count} au total",
+      "new": {
+        "title": "Nouvelle catégorie",
+        "subtitle": "Le slug est généré automatiquement depuis le nom."
+      },
+      "table": {
+        "search": "Rechercher une catégorie…",
+        "filterStatus": "Filtrer par statut",
+        "statusAll": "Tous les statuts",
+        "statusActive": "Actives",
+        "statusHidden": "Masquées",
+        "colName": "Nom",
+        "colSlug": "Slug",
+        "colStatus": "Statut",
+        "colProducts": "Produits",
+        "statusActiveBadge": "Actif",
+        "statusHiddenBadge": "Masqué",
+        "emptyTitle": "Aucune catégorie trouvée",
+        "emptyHint": "Modifiez vos filtres ou créez une catégorie.",
+        "edit": "Éditer",
+        "delete": "Supprimer",
+        "confirmDelete": "Supprimer « {name} » ?",
+        "confirmDeleteWithProducts": "« {name} » est associée à {count, plural, one {# produit} other {# produits}}. Ils seront détachés (mais pas supprimés). Supprimer la catégorie ?"
+      },
+      "form": {
+        "sectionIdentity": "Identité",
+        "sectionIdentityDesc": "Nom, visibilité et place dans l'arborescence.",
+        "name": "Nom",
+        "visible": "Affichée (visible sur la boutique)",
+        "parent": "Catégorie parente",
+        "parentRoot": "— Racine (aucune) —",
+        "sectionContent": "Contenu",
+        "sectionContentDesc": "Textes éditoriaux affichés sur la page catégorie.",
+        "shortDescription": "Description courte",
+        "description": "Description",
+        "additionalInfo": "Informations complémentaires",
+        "sectionSeo": "SEO",
+        "sectionSeoDesc": "Métadonnées pour les moteurs de recherche.",
+        "metaTitle": "Balise titre",
+        "metaTitleHint": "Idéalement 50–60 caractères.",
+        "metaDescription": "Meta description",
+        "metaDescriptionHint": "Idéalement 150–160 caractères.",
+        "metaKeywords": "Mots-clés",
+        "metaKeywordsHint": "Séparés par des virgules."
+      },
+      "edit": {
+        "title": "Éditer « {name} »"
+      },
+      "errors": {
+        "nameRequired": "Le nom est requis.",
+        "idMissing": "Identifiant manquant.",
+        "reparentCycle": "Impossible de déplacer une catégorie sous elle-même ou l'un de ses descendants.",
+        "invalidField": "Un champ contient des caractères interdits.",
+        "notEmpty": "Cette catégorie contient des sous-catégories : déplacez-les ou supprimez-les d'abord."
+      }
+    },
+    "brands": {
+      "pageTitle": "Marques",
+      "total": "{count} au total",
+      "new": {
+        "title": "Nouvelle marque",
+        "subtitle": "Le slug est généré automatiquement depuis le nom."
+      },
+      "table": {
+        "search": "Rechercher une marque…",
+        "colName": "Nom",
+        "colSlug": "Slug",
+        "emptyTitle": "Aucune marque trouvée",
+        "emptyHint": "Modifiez votre recherche ou créez une marque.",
+        "edit": "Éditer",
+        "delete": "Supprimer",
+        "confirmDelete": "Supprimer cette marque ?"
+      },
+      "form": {
+        "name": "Nom"
+      },
+      "edit": {
+        "title": "Éditer « {name} »"
+      },
+      "errors": {
+        "nameRequired": "Le nom est requis.",
+        "idMissing": "Identifiant manquant."
+      }
+    },
+    "products": {
+      "pageTitle": "Produits",
+      "total": "{count} au total",
+      "new": {
+        "title": "Nouveau produit",
+        "subtitle": "Le slug est généré automatiquement depuis le nom. Une déclinaison par défaut est créée."
+      },
+      "types": {
+        "COSMETIC": "Cosmétique",
+        "SUPPLEMENT": "Complément",
+        "DEVICE": "Dispositif",
+        "OTHER": "Autre"
+      },
+      "typesLong": {
+        "COSMETIC": "Cosmétique",
+        "SUPPLEMENT": "Complément alimentaire",
+        "DEVICE": "Dispositif médical",
+        "OTHER": "Autre"
+      },
+      "table": {
+        "search": "Rechercher un produit…",
+        "filterType": "Filtrer par type",
+        "typeAll": "Tous les types",
+        "filterStatus": "Filtrer par statut",
+        "statusAll": "Tous les statuts",
+        "statusActive": "Actifs",
+        "statusHidden": "Masqués",
+        "colName": "Nom",
+        "colBrand": "Marque",
+        "colType": "Type",
+        "colVariants": "Déclinaisons",
+        "colStatus": "Statut",
+        "statusActiveBadge": "Actif",
+        "statusHiddenBadge": "Masqué",
+        "simple": "Simple",
+        "variantCount": "{count} décl.",
+        "emptyTitle": "Aucun résultat",
+        "emptyHint": "Modifiez vos filtres ou ajoutez un produit.",
+        "edit": "Éditer",
+        "delete": "Supprimer",
+        "confirmDelete": "Supprimer ce produit ?",
+        "paginationCount": "{from}–{to} sur {total} {total, plural, one {produit} other {produits}}"
+      },
+      "form": {
+        "sectionIdentity": "Identité",
+        "sectionIdentityDesc": "Informations éditoriales affichées sur la fiche.",
+        "name": "Nom",
+        "active": "Actif (visible sur la boutique)",
+        "type": "Type",
+        "brand": "Marque",
+        "brandNone": "— Aucune —",
+        "categories": "Catégories",
+        "categoriesPlaceholder": "Sélectionner des catégories…",
+        "primaryCategory": "Catégorie principale",
+        "primaryCategoryHint": "URL canonique et fil d'Ariane. Doit faire partie des catégories sélectionnées.",
+        "primaryCategoryNone": "— Aucune —",
+        "description": "Description",
+        "sectionVariants": "Déclinaisons",
+        "sectionVariantsDesc": "Le vendable : chaque déclinaison a son code, son prix et son stock.",
+        "sectionAttributes": "Attributs descriptifs",
+        "sectionAttributesDesc": "Informations libres, non utilisées pour le filtrage.",
+        "inci": "INCI",
+        "precautions": "Précautions",
+        "sectionFacets": "Filtres / Caractéristiques",
+        "sectionFacetsDesc": "Critères de filtrage proposés sur la boutique."
+      },
+      "variants": {
+        "label": "Déclinaison",
+        "number": "Déclinaison {number}",
+        "remove": "Supprimer",
+        "volumePlaceholder": "50 ml",
+        "sku": "SKU",
+        "ean": "Code-barres (EAN)",
+        "price": "Prix HT (€)",
+        "pricePlaceholder": "14.90",
+        "stock": "Stock",
+        "add": "+ Ajouter une déclinaison"
+      },
+      "edit": {
+        "title": "Éditer « {name} »"
+      },
+      "errors": {
+        "nameRequired": "Le nom est requis.",
+        "idMissing": "Identifiant manquant.",
+        "variantsUnreadable": "Déclinaisons illisibles.",
+        "variantsRequired": "Au moins une déclinaison est requise.",
+        "variantInvalid": "Déclinaison invalide.",
+        "priceInvalid": "Prix invalide pour la déclinaison « {label} ».",
+        "stockInvalid": "Stock invalide pour la déclinaison « {label} ».",
+        "noReference": "sans référence",
+        "invalidAttributes": "Attributs produit invalides.",
+        "duplicateField": "Ce SKU ou EAN est déjà utilisé par une autre déclinaison.",
+        "requiresVariant": "Un produit doit avoir au moins une déclinaison.",
+        "primaryCategoryNotAssigned": "La catégorie principale doit faire partie des catégories du produit."
+      }
+    },
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Accès réservé au personnel.",
+      "email": "Email",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "pending": "Connexion…",
+      "invalid": "Identifiants invalides."
+    },
+    "forbidden": {
+      "code": "Erreur 403",
+      "title": "Accès refusé",
+      "message": "Votre compte n'a pas les droits nécessaires pour accéder au back-office.",
+      "backToShop": "Retour à la boutique"
+    }
   }
 }

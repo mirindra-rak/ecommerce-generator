@@ -1,10 +1,16 @@
+import type { Metadata } from "next";
 import { getCurrentUser } from "@/lib/auth-guard";
 import { type Role, isStaff } from "@pharmacie/core/modules/auth";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { LoginForm } from "./login-form";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Connexion" };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("admin.login");
+  return { title: t("title") };
+}
 
 export default async function AdminLoginPage() {
   // Déjà connecté avec un rôle suffisant → pas de double connexion.

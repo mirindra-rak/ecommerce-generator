@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Field, Input } from "@pharmacie/ui";
+import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 
 // Ligne de déclinaison côté formulaire. Prix/stock en chaînes (saisie) ; `id` présent = existante.
@@ -28,6 +29,7 @@ const emptyRow = (): Omit<VariantRow, "id"> => ({
 // Éditeur de déclinaisons : liste de lignes en état React, sérialisée dans un champ caché
 // `variants` (JSON). Rendu adaptatif : 1 déclinaison → vue simple ; ≥ 2 → blocs numérotés.
 export function VariantsEditor({ initial }: { initial: VariantRow[] }) {
+  const t = useTranslations("admin.products.variants");
   const keyRef = useRef(0);
   const [rows, setRows] = useState<Row[]>(() =>
     (initial.length > 0 ? initial : [emptyRow()]).map((row) => ({ ...row, key: keyRef.current++ })),
@@ -60,52 +62,52 @@ export function VariantsEditor({ initial }: { initial: VariantRow[] }) {
           {multi && (
             <div className="mb-3 flex items-center justify-between">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted">
-                Déclinaison {index + 1}
+                {t("number", { number: index + 1 })}
               </p>
               <button
                 type="button"
                 onClick={() => remove(row.key)}
                 className="text-xs font-medium text-danger-text hover:underline"
               >
-                Supprimer
+                {t("remove")}
               </button>
             </div>
           )}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Déclinaison" htmlFor={`volume-${row.key}`}>
+            <Field label={t("label")} htmlFor={`volume-${row.key}`}>
               <Input
                 id={`volume-${row.key}`}
                 value={row.volume}
-                placeholder="50 ml"
+                placeholder={t("volumePlaceholder")}
                 onChange={(e) => update(row.key, { volume: e.target.value })}
               />
             </Field>
-            <Field label="SKU" htmlFor={`sku-${row.key}`}>
+            <Field label={t("sku")} htmlFor={`sku-${row.key}`}>
               <Input
                 id={`sku-${row.key}`}
                 value={row.sku}
                 onChange={(e) => update(row.key, { sku: e.target.value })}
               />
             </Field>
-            <Field label="Code-barres (EAN)" htmlFor={`ean-${row.key}`}>
+            <Field label={t("ean")} htmlFor={`ean-${row.key}`}>
               <Input
                 id={`ean-${row.key}`}
                 value={row.ean}
                 onChange={(e) => update(row.key, { ean: e.target.value })}
               />
             </Field>
-            <Field label="Prix HT (€)" htmlFor={`price-${row.key}`}>
+            <Field label={t("price")} htmlFor={`price-${row.key}`}>
               <Input
                 id={`price-${row.key}`}
                 value={row.price}
                 inputMode="decimal"
                 required
-                placeholder="14.90"
+                placeholder={t("pricePlaceholder")}
                 onChange={(e) => update(row.key, { price: e.target.value })}
               />
             </Field>
-            <Field label="Stock" htmlFor={`stock-${row.key}`}>
+            <Field label={t("stock")} htmlFor={`stock-${row.key}`}>
               <Input
                 id={`stock-${row.key}`}
                 type="number"
@@ -119,7 +121,7 @@ export function VariantsEditor({ initial }: { initial: VariantRow[] }) {
       ))}
 
       <Button type="button" variant="secondary" size="sm" onClick={add}>
-        + Ajouter une déclinaison
+        {t("add")}
       </Button>
 
       <input type="hidden" name="variants" value={serialized} />

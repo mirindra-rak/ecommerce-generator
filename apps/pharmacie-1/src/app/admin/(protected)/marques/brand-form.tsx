@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@pharmacie/ui";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState } from "react";
 import type { FormState } from "../_lib/form-state";
@@ -11,6 +12,7 @@ interface BrandFormProps {
 }
 
 export function BrandForm({ action, brand }: BrandFormProps) {
+  const t = useTranslations("admin");
   const [state, formAction, pending] = useActionState(action, {});
 
   return (
@@ -19,7 +21,7 @@ export function BrandForm({ action, brand }: BrandFormProps) {
 
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-foreground">
-          Nom
+          {t("brands.form.name")}
         </label>
         <input
           id="name"
@@ -37,10 +39,10 @@ export function BrandForm({ action, brand }: BrandFormProps) {
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Enregistrement…" : "Enregistrer"}
+          {pending ? t("common.saving") : t("common.save")}
         </Button>
         <Link href="/admin/marques" className="text-sm text-muted hover:underline">
-          Annuler
+          {t("common.cancel")}
         </Link>
       </div>
     </form>

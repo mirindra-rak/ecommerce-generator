@@ -1,6 +1,7 @@
 "use client";
 
 import { PencilIcon, TrashIcon } from "@pharmacie/ui";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 interface RowActionsProps {
@@ -10,11 +11,12 @@ interface RowActionsProps {
 }
 
 export function RowActions({ editHref, deleteAction, itemId }: RowActionsProps) {
+  const t = useTranslations("admin.common");
   return (
     <div className="flex items-center gap-0.5">
       <Link
         href={editHref}
-        title="Éditer"
+        title={t("edit")}
         className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-bg-subtle hover:text-brand-700"
       >
         <PencilIcon className="h-3.5 w-3.5" />
@@ -23,7 +25,7 @@ export function RowActions({ editHref, deleteAction, itemId }: RowActionsProps) 
         <input type="hidden" name="id" value={itemId} />
         <button
           type="submit"
-          title="Supprimer"
+          title={t("delete")}
           className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-danger-bg hover:text-danger-solid"
         >
           <TrashIcon className="h-3.5 w-3.5" />

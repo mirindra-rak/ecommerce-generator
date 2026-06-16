@@ -3,6 +3,7 @@ import {
   categoryRepository,
   productRepository,
 } from "@pharmacie/core/modules/catalog";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { KpiCards } from "./_components/kpi-cards";
 import { WeeklyChart } from "./_components/weekly-chart";
@@ -10,6 +11,8 @@ import { WeeklyChart } from "./_components/weekly-chart";
 export const dynamic = "force-dynamic";
 
 export default async function AdminHomePage() {
+  const locale = await getLocale();
+  const t = await getTranslations("admin");
   const [categories, brands, products] = await Promise.all([
     categoryRepository.findMany(),
     brandRepository.findMany(),
@@ -24,7 +27,7 @@ export default async function AdminHomePage() {
       {/* Header */}
       <div className="mb-6">
         <p className="text-xs text-muted">
-          {new Date().toLocaleDateString("fr-FR", {
+          {new Date().toLocaleDateString(locale, {
             weekday: "long",
             day: "numeric",
             month: "long",
@@ -45,8 +48,8 @@ export default async function AdminHomePage() {
 
         {/* Recent activity */}
         <div className="rounded-sm border border-line bg-surface p-5">
-          <p className="text-sm font-semibold text-foreground">Activité récente</p>
-          <p className="mt-0.5 text-xs text-muted">Derniers éléments ajoutés</p>
+          <p className="text-sm font-semibold text-foreground">{t("dashboard.activity.title")}</p>
+          <p className="mt-0.5 text-xs text-muted">{t("dashboard.activity.subtitle")}</p>
 
           <div className="mt-4 space-y-1">
             {recentCategories.map((c) => (
@@ -57,7 +60,9 @@ export default async function AdminHomePage() {
               >
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />
                 <span className="flex-1 truncate text-sm text-foreground">{c.name}</span>
-                <span className="text-[10px] uppercase tracking-wide text-muted">cat.</span>
+                <span className="text-[10px] uppercase tracking-wide text-muted">
+                  {t("dashboard.activity.tagCategory")}
+                </span>
               </Link>
             ))}
 
@@ -73,14 +78,14 @@ export default async function AdminHomePage() {
               >
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
                 <span className="flex-1 truncate text-sm text-foreground">{b.name}</span>
-                <span className="text-[10px] uppercase tracking-wide text-muted">marque</span>
+                <span className="text-[10px] uppercase tracking-wide text-muted">
+                  {t("dashboard.activity.tagBrand")}
+                </span>
               </Link>
             ))}
 
             {recentCategories.length === 0 && recentBrands.length === 0 && (
-              <p className="py-4 text-center text-sm text-muted">
-                {"Aucun contenu pour l'instant."}
-              </p>
+              <p className="py-4 text-center text-sm text-muted">{t("dashboard.activity.empty")}</p>
             )}
           </div>
 
@@ -90,13 +95,13 @@ export default async function AdminHomePage() {
                 href="/admin/categories/new"
                 className="text-xs font-medium text-brand-700 hover:underline"
               >
-                + Catégorie
+                {t("dashboard.activity.addCategory")}
               </Link>
               <Link
                 href="/admin/marques/new"
                 className="text-xs font-medium text-accent-600 hover:underline"
               >
-                + Marque
+                {t("dashboard.activity.addBrand")}
               </Link>
             </div>
           </div>
@@ -108,16 +113,20 @@ export default async function AdminHomePage() {
         {/* Categories summary */}
         <div className="rounded-sm border border-line bg-surface p-5">
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm font-semibold text-foreground">Catégories</p>
+            <p className="text-sm font-semibold text-foreground">
+              {t("dashboard.categoriesCard.title")}
+            </p>
             <Link
               href="/admin/categories/new"
               className="rounded-sm bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-brand-700"
             >
-              Ajouter
+              {t("dashboard.categoriesCard.add")}
             </Link>
           </div>
           {categories.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted">Aucune catégorie.</p>
+            <p className="py-6 text-center text-sm text-muted">
+              {t("dashboard.categoriesCard.empty")}
+            </p>
           ) : (
             <ul className="space-y-1">
               {categories.slice(0, 6).map((c) => (
@@ -133,12 +142,12 @@ export default async function AdminHomePage() {
               ))}
               {categories.length > 6 && (
                 <li className="px-2 py-1.5 text-xs text-muted">
-                  +{categories.length - 6} autres →{" "}
+                  {t("dashboard.categoriesCard.more", { count: categories.length - 6 })}{" "}
                   <Link
                     href="/admin/categories"
                     className="font-medium text-brand-700 hover:underline"
                   >
-                    tout voir
+                    {t("common.viewAll")}
                   </Link>
                 </li>
               )}
@@ -149,16 +158,18 @@ export default async function AdminHomePage() {
         {/* Brands summary */}
         <div className="rounded-sm border border-line bg-surface p-5">
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm font-semibold text-foreground">Marques</p>
+            <p className="text-sm font-semibold text-foreground">
+              {t("dashboard.brandsCard.title")}
+            </p>
             <Link
               href="/admin/marques/new"
               className="rounded-sm bg-accent-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-accent-700"
             >
-              Ajouter
+              {t("dashboard.brandsCard.add")}
             </Link>
           </div>
           {brands.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted">Aucune marque.</p>
+            <p className="py-6 text-center text-sm text-muted">{t("dashboard.brandsCard.empty")}</p>
           ) : (
             <ul className="space-y-1">
               {brands.slice(0, 6).map((b) => (
@@ -174,12 +185,12 @@ export default async function AdminHomePage() {
               ))}
               {brands.length > 6 && (
                 <li className="px-2 py-1.5 text-xs text-muted">
-                  +{brands.length - 6} autres →{" "}
+                  {t("dashboard.brandsCard.more", { count: brands.length - 6 })}{" "}
                   <Link
                     href="/admin/marques"
                     className="font-medium text-accent-600 hover:underline"
                   >
-                    tout voir
+                    {t("common.viewAll")}
                   </Link>
                 </li>
               )}

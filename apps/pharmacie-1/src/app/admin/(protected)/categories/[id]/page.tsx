@@ -1,4 +1,5 @@
 import { categoryRepository } from "@pharmacie/core/modules/catalog";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { updateCategoryAction } from "../_actions";
 import { CategoryForm } from "../category-form";
@@ -14,6 +15,8 @@ export default async function EditCategoryPage({ params }: PageProps) {
   const category = await categoryRepository.findById(id);
   if (!category) notFound();
 
+  const t = await getTranslations("admin.categories");
+
   // Exclure la catégorie elle-même et ses descendants des parents possibles (anti-cycle).
   const [all, descendants] = await Promise.all([
     categoryRepository.findMany(),
@@ -26,7 +29,9 @@ export default async function EditCategoryPage({ params }: PageProps) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-foreground">Éditer « {category.name} »</h1>
+      <h1 className="text-2xl font-bold text-foreground">
+        {t("edit.title", { name: category.name })}
+      </h1>
       <div className="mt-6">
         <CategoryForm
           action={updateCategoryAction}

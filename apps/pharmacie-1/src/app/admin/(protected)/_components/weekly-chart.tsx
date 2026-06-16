@@ -1,5 +1,6 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import {
   Area,
   AreaChart,
@@ -11,23 +12,21 @@ import {
   YAxis,
 } from "recharts";
 
-const DATA = [
-  { day: "Lun", ca: 847 },
-  { day: "Mar", ca: 1243 },
-  { day: "Mer", ca: 621 },
-  { day: "Jeu", ca: 1876 },
-  { day: "Ven", ca: 2341 },
-  { day: "Sam", ca: 2150 },
-  { day: "Dim", ca: 1023 },
-];
+const VALUES = [847, 1243, 621, 1876, 2341, 2150, 1023];
+const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 
-function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
+function CustomTooltip({
+  active,
+  payload,
+  label,
+  locale,
+}: TooltipProps<number, string> & { locale: string }) {
   if (!active || !payload?.length) return null;
   const entry = payload[0];
   if (!entry) return null;
   const val =
     typeof entry.value === "number"
-      ? entry.value.toLocaleString("fr-FR")
+      ? entry.value.toLocaleString(locale)
       : String(entry.value ?? "");
   return (
     <div
@@ -47,20 +46,25 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
 }
 
 export function WeeklyChart() {
+  const t = useTranslations("admin.dashboard.chart");
+  const locale = useLocale();
+
+  const data = DAY_KEYS.map((key, i) => ({ day: t(key), ca: VALUES[i] }));
+
   return (
     <div className="rounded-sm border border-line bg-surface p-6">
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <p className="text-sm font-semibold text-foreground">{"Chiffre d'affaires"}</p>
-          <p className="mt-0.5 text-xs text-muted">7 derniers jours · données simulées</p>
+          <p className="text-sm font-semibold text-foreground">{t("title")}</p>
+          <p className="mt-0.5 text-xs text-muted">{t("subtitle")}</p>
         </div>
         <span className="rounded-full bg-brand-50 px-2.5 py-1 text-[11px] font-semibold text-brand-700">
-          Cette semaine
+          {t("thisWeek")}
         </span>
       </div>
 
       <ResponsiveContainer width="100%" height={200}>
-        <AreaChart data={DATA} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
+        <AreaChart data={data} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
           <defs>
             <linearGradient id="caGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="var(--color-brand-600)" stopOpacity={0.18} />
@@ -81,7 +85,10 @@ export function WeeklyChart() {
             tickFormatter={(v: number) => `${v}€`}
             width={52}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ stroke: "var(--color-line)" }} />
+          <Tooltip
+            content={<CustomTooltip locale={locale} />}
+            cursor={{ stroke: "var(--color-line)" }}
+          />
           <Area
             type="monotone"
             dataKey="ca"

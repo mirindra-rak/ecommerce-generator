@@ -155,5 +155,286 @@
     "inci": "Composition (INCI)",
     "precautions": "Directions for use",
     "notFound": "Product not found"
+  },
+  "admin": {
+    "nav": {
+      "backOffice": "Back office",
+      "brandName": "Pharmacy",
+      "section": "Navigation",
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "categories": "Categories",
+      "brands": "Brands",
+      "settings": "Settings"
+    },
+    "topbar": {
+      "notifications": "Notifications",
+      "fallbackTitle": "Administration"
+    },
+    "logout": {
+      "action": "Sign out",
+      "pending": "Signing out…"
+    },
+    "common": {
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "delete": "Delete",
+      "add": "Add",
+      "viewAll": "view all"
+    },
+    "status": {
+      "active": "Active",
+      "hidden": "Hidden"
+    },
+    "pagination": {
+      "range": "{from}–{to} of {total}",
+      "page": "{current} / {total}",
+      "pageLabeled": "Page {current} / {total}"
+    },
+    "dashboard": {
+      "kpi": {
+        "view": "view",
+        "categories": "Categories",
+        "categoriesDesc": "Catalogue tree",
+        "brands": "Brands",
+        "brandsDesc": "Listed suppliers",
+        "products": "Active products",
+        "productsDesc": "Visible in store",
+        "orders": "Orders",
+        "ordersDesc": "Coming soon"
+      },
+      "chart": {
+        "title": "Revenue",
+        "subtitle": "Last 7 days · simulated data",
+        "thisWeek": "This week",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "activity": {
+        "title": "Recent activity",
+        "subtitle": "Latest items added",
+        "empty": "Nothing yet.",
+        "tagCategory": "cat.",
+        "tagBrand": "brand",
+        "addCategory": "+ Category",
+        "addBrand": "+ Brand"
+      },
+      "categoriesCard": {
+        "title": "Categories",
+        "add": "Add",
+        "empty": "No categories.",
+        "more": "+{count} more →"
+      },
+      "brandsCard": {
+        "title": "Brands",
+        "add": "Add",
+        "empty": "No brands.",
+        "more": "+{count} more →"
+      }
+    },
+    "categories": {
+      "pageTitle": "Categories",
+      "total": "{count} total",
+      "new": {
+        "title": "New category",
+        "subtitle": "The slug is generated automatically from the name."
+      },
+      "table": {
+        "search": "Search a category…",
+        "filterStatus": "Filter by status",
+        "statusAll": "All statuses",
+        "statusActive": "Active",
+        "statusHidden": "Hidden",
+        "colName": "Name",
+        "colSlug": "Slug",
+        "colStatus": "Status",
+        "colProducts": "Products",
+        "statusActiveBadge": "Active",
+        "statusHiddenBadge": "Hidden",
+        "emptyTitle": "No category found",
+        "emptyHint": "Adjust your filters or create a category.",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirmDelete": "Delete “{name}”?",
+        "confirmDeleteWithProducts": "“{name}” is linked to {count, plural, one {# product} other {# products}}. They will be detached (but not deleted). Delete the category?"
+      },
+      "form": {
+        "sectionIdentity": "Identity",
+        "sectionIdentityDesc": "Name, visibility and place in the tree.",
+        "name": "Name",
+        "visible": "Visible (shown in the store)",
+        "parent": "Parent category",
+        "parentRoot": "— Root (none) —",
+        "sectionContent": "Content",
+        "sectionContentDesc": "Editorial text shown on the category page.",
+        "shortDescription": "Short description",
+        "description": "Description",
+        "additionalInfo": "Additional information",
+        "sectionSeo": "SEO",
+        "sectionSeoDesc": "Metadata for search engines.",
+        "metaTitle": "Title tag",
+        "metaTitleHint": "Ideally 50–60 characters.",
+        "metaDescription": "Meta description",
+        "metaDescriptionHint": "Ideally 150–160 characters.",
+        "metaKeywords": "Keywords",
+        "metaKeywordsHint": "Comma-separated."
+      },
+      "edit": {
+        "title": "Edit “{name}”"
+      },
+      "errors": {
+        "nameRequired": "Name is required.",
+        "idMissing": "Missing identifier.",
+        "reparentCycle": "A category cannot be moved under itself or one of its descendants.",
+        "invalidField": "A field contains forbidden characters.",
+        "notEmpty": "This category has subcategories: move or delete them first."
+      }
+    },
+    "brands": {
+      "pageTitle": "Brands",
+      "total": "{count} total",
+      "new": {
+        "title": "New brand",
+        "subtitle": "The slug is generated automatically from the name."
+      },
+      "table": {
+        "search": "Search a brand…",
+        "colName": "Name",
+        "colSlug": "Slug",
+        "emptyTitle": "No brand found",
+        "emptyHint": "Adjust your search or create a brand.",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirmDelete": "Delete this brand?"
+      },
+      "form": {
+        "name": "Name"
+      },
+      "edit": {
+        "title": "Edit “{name}”"
+      },
+      "errors": {
+        "nameRequired": "Name is required.",
+        "idMissing": "Missing identifier."
+      }
+    },
+    "products": {
+      "pageTitle": "Products",
+      "total": "{count} total",
+      "new": {
+        "title": "New product",
+        "subtitle": "The slug is generated automatically from the name. A default variant is created."
+      },
+      "types": {
+        "COSMETIC": "Cosmetic",
+        "SUPPLEMENT": "Supplement",
+        "DEVICE": "Device",
+        "OTHER": "Other"
+      },
+      "typesLong": {
+        "COSMETIC": "Cosmetic",
+        "SUPPLEMENT": "Food supplement",
+        "DEVICE": "Medical device",
+        "OTHER": "Other"
+      },
+      "table": {
+        "search": "Search a product…",
+        "filterType": "Filter by type",
+        "typeAll": "All types",
+        "filterStatus": "Filter by status",
+        "statusAll": "All statuses",
+        "statusActive": "Active",
+        "statusHidden": "Hidden",
+        "colName": "Name",
+        "colBrand": "Brand",
+        "colType": "Type",
+        "colVariants": "Variants",
+        "colStatus": "Status",
+        "statusActiveBadge": "Active",
+        "statusHiddenBadge": "Hidden",
+        "simple": "Simple",
+        "variantCount": "{count} var.",
+        "emptyTitle": "No results",
+        "emptyHint": "Adjust your filters or add a product.",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirmDelete": "Delete this product?",
+        "paginationCount": "{from}–{to} of {total} {total, plural, one {product} other {products}}"
+      },
+      "form": {
+        "sectionIdentity": "Identity",
+        "sectionIdentityDesc": "Editorial information shown on the product page.",
+        "name": "Name",
+        "active": "Active (shown in the store)",
+        "type": "Type",
+        "brand": "Brand",
+        "brandNone": "— None —",
+        "categories": "Categories",
+        "categoriesPlaceholder": "Select categories…",
+        "primaryCategory": "Primary category",
+        "primaryCategoryHint": "Canonical URL and breadcrumb. Must be one of the selected categories.",
+        "primaryCategoryNone": "— None —",
+        "description": "Description",
+        "sectionVariants": "Variants",
+        "sectionVariantsDesc": "The sellable unit: each variant has its code, price and stock.",
+        "sectionAttributes": "Descriptive attributes",
+        "sectionAttributesDesc": "Free-form information, not used for filtering.",
+        "inci": "INCI",
+        "precautions": "Precautions",
+        "sectionFacets": "Filters / Characteristics",
+        "sectionFacetsDesc": "Filtering criteria offered in the store."
+      },
+      "variants": {
+        "label": "Variant",
+        "number": "Variant {number}",
+        "remove": "Remove",
+        "volumePlaceholder": "50 ml",
+        "sku": "SKU",
+        "ean": "Barcode (EAN)",
+        "price": "Price excl. tax (€)",
+        "pricePlaceholder": "14.90",
+        "stock": "Stock",
+        "add": "+ Add a variant"
+      },
+      "edit": {
+        "title": "Edit “{name}”"
+      },
+      "errors": {
+        "nameRequired": "Name is required.",
+        "idMissing": "Missing identifier.",
+        "variantsUnreadable": "Variants could not be read.",
+        "variantsRequired": "At least one variant is required.",
+        "variantInvalid": "Invalid variant.",
+        "priceInvalid": "Invalid price for variant “{label}”.",
+        "stockInvalid": "Invalid stock for variant “{label}”.",
+        "noReference": "no reference",
+        "invalidAttributes": "Invalid product attributes.",
+        "duplicateField": "This SKU or EAN is already used by another variant.",
+        "requiresVariant": "A product must have at least one variant.",
+        "primaryCategoryNotAssigned": "The primary category must be one of the product's categories."
+      }
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Staff access only.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "pending": "Signing in…",
+      "invalid": "Invalid credentials."
+    },
+    "forbidden": {
+      "code": "Error 403",
+      "title": "Access denied",
+      "message": "Your account does not have the required permissions to access the back office.",
+      "backToShop": "Back to the store"
+    }
   }
 }

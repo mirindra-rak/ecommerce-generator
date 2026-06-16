@@ -16,6 +16,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
@@ -29,12 +30,7 @@ type ProductRow = {
   _count: { variants: number };
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  COSMETIC: "Cosmétique",
-  SUPPLEMENT: "Complément",
-  DEVICE: "Dispositif",
-  OTHER: "Autre",
-};
+const TYPE_CODES = ["COSMETIC", "SUPPLEMENT", "DEVICE", "OTHER"] as const;
 
 const TYPE_COLORS: Record<string, string> = {
   COSMETIC: "bg-brand-50 text-brand-700",
@@ -44,6 +40,8 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
+  const t = useTranslations("admin.products");
+  const tp = useTranslations("admin.pagination");
   const queryClient = useQueryClient();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -68,16 +66,16 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
 
   const handleDelete = useCallback(
     (id: string) => {
-      if (confirm("Supprimer ce produit ?")) deleteMutation.mutate(id);
+      if (confirm(t("table.confirmDelete"))) deleteMutation.mutate(id);
     },
-    [deleteMutation],
+    [deleteMutation, t],
   );
 
   const columns = useMemo<ColumnDef<ProductRow>[]>(
     () => [
       {
         accessorKey: "name",
-        header: "Nom",
+        header: t("table.colName"),
         cell: ({ row }) => (
           <span className="font-medium text-foreground">{row.getValue("name")}</span>
         ),
@@ -85,7 +83,7 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
       {
         id: "brand",
         accessorFn: (row) => row.brand?.name ?? "",
-        header: "Marque",
+        header: t("table.colBrand"),
         cell: ({ getValue }) => {
           const v = getValue<string>();
           return v ? (
@@ -98,15 +96,15 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
       },
       {
         accessorKey: "productType",
-        header: "Type",
+        header: t("table.colType"),
         filterFn: "equals",
         cell: ({ getValue }) => {
-          const t = getValue<string>();
+          const code = getValue<string>();
           return (
             <span
-              className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${TYPE_COLORS[t] ?? TYPE_COLORS.OTHER}`}
+              className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${TYPE_COLORS[code] ?? TYPE_COLORS.OTHER}`}
             >
-              {TYPE_LABELS[t] ?? t}
+              {t(`types.${code}` as "types.COSMETIC")}
             </span>
           );
         },
@@ -114,31 +112,31 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
       {
         id: "variants",
         accessorFn: (row) => row._count.variants,
-        header: "Déclinaisons",
+        header: t("table.colVariants"),
         enableGlobalFilter: false,
         cell: ({ getValue }) => {
           const n = getValue<number>();
           return (
             <span className="rounded-full border border-line px-2.5 py-0.5 text-[11px] font-semibold text-muted">
-              {n <= 1 ? "Simple" : `${n} décl.`}
+              {n <= 1 ? t("table.simple") : t("table.variantCount", { count: n })}
             </span>
           );
         },
       },
       {
         accessorKey: "active",
-        header: "Statut",
+        header: t("table.colStatus"),
         filterFn: "equals",
         cell: ({ getValue }) =>
           getValue<boolean>() ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-success-bg px-2.5 py-0.5 text-[11px] font-semibold text-success-text">
               <span className="h-1.5 w-1.5 rounded-full bg-success-solid" />
-              Actif
+              {t("table.statusActiveBadge")}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-subtle px-2.5 py-0.5 text-[11px] font-semibold text-muted">
               <span className="h-1.5 w-1.5 rounded-full bg-muted" />
-              Masqué
+              {t("table.statusHiddenBadge")}
             </span>
           ),
       },
@@ -151,14 +149,14 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
           <div className="flex items-center justify-end gap-0.5">
             <Link
               href={`/admin/produits/${row.original.id}`}
-              title="Éditer"
+              title={t("table.edit")}
               className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-bg-subtle hover:text-brand-700"
             >
               <PencilIcon className="h-3.5 w-3.5" />
             </Link>
             <button
               type="button"
-              title="Supprimer"
+              title={t("table.delete")}
               onClick={() => handleDelete(row.original.id)}
               className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-danger-bg hover:text-danger-solid"
             >
@@ -168,7 +166,7 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
         ),
       },
     ],
-    [handleDelete],
+    [handleDelete, t],
   );
 
   const table = useReactTable({
@@ -201,26 +199,29 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
           <Input
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Rechercher un produit…"
+            placeholder={t("table.search")}
             className="pl-9"
           />
         </div>
 
         <Select
           size="sm"
-          aria-label="Filtrer par type"
+          aria-label={t("table.filterType")}
           className="min-w-[160px]"
           value={(table.getColumn("productType")?.getFilterValue() as string | undefined) ?? ""}
           onValueChange={(v) => table.getColumn("productType")?.setFilterValue(v || undefined)}
           options={[
-            { value: "", label: "Tous les types" },
-            ...Object.entries(TYPE_LABELS).map(([value, label]) => ({ value, label })),
+            { value: "", label: t("table.typeAll") },
+            ...TYPE_CODES.map((value) => ({
+              value,
+              label: t(`types.${value}` as "types.COSMETIC"),
+            })),
           ]}
         />
 
         <Select
           size="sm"
-          aria-label="Filtrer par statut"
+          aria-label={t("table.filterStatus")}
           className="min-w-[150px]"
           value={
             table.getColumn("active")?.getFilterValue() === true
@@ -235,9 +236,9 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
               ?.setFilterValue(v === "active" ? true : v === "inactive" ? false : undefined)
           }
           options={[
-            { value: "", label: "Tous les statuts" },
-            { value: "active", label: "Actifs" },
-            { value: "inactive", label: "Masqués" },
+            { value: "", label: t("table.statusAll") },
+            { value: "active", label: t("table.statusActive") },
+            { value: "inactive", label: t("table.statusHidden") },
           ]}
         />
       </div>
@@ -246,8 +247,8 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
       <div className="overflow-x-auto rounded-sm border border-line bg-surface">
         {total === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm font-medium text-foreground">Aucun résultat</p>
-            <p className="mt-1 text-xs text-muted">Modifiez vos filtres ou ajoutez un produit.</p>
+            <p className="text-sm font-medium text-foreground">{t("table.emptyTitle")}</p>
+            <p className="mt-1 text-xs text-muted">{t("table.emptyHint")}</p>
           </div>
         ) : (
           <table className="w-full min-w-[700px] text-left text-sm">
@@ -297,8 +298,11 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
       {total > 0 && (
         <div className="mt-4 flex items-center justify-between text-sm">
           <p className="text-muted">
-            {pageIndex * pageSize + 1}–{Math.min((pageIndex + 1) * pageSize, total)} sur {total}{" "}
-            produit{total > 1 ? "s" : ""}
+            {t("table.paginationCount", {
+              from: pageIndex * pageSize + 1,
+              to: Math.min((pageIndex + 1) * pageSize, total),
+              total,
+            })}
           </p>
           <div className="flex items-center gap-1">
             <button
@@ -318,7 +322,7 @@ export function ProduitsTable({ initialData }: { initialData: ProductRow[] }) {
               ‹
             </button>
             <span className="px-3 text-xs font-medium text-foreground">
-              Page {pageIndex + 1} / {table.getPageCount()}
+              {tp("pageLabeled", { current: pageIndex + 1, total: table.getPageCount() })}
             </span>
             <button
               type="button"

@@ -2,10 +2,12 @@
 
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@pharmacie/ui";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function LogoutButton() {
+  const t = useTranslations("admin.logout");
   const router = useRouter();
   const [pending, setPending] = useState(false);
 
@@ -29,7 +31,7 @@ export function LogoutButton() {
       disabled={pending}
       className="mt-3 w-full"
     >
-      {pending ? "Déconnexion…" : "Se déconnecter"}
+      {pending ? t("pending") : t("action")}
     </Button>
   );
 }

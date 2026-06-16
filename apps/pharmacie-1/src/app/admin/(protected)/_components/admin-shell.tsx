@@ -11,10 +11,12 @@ import {
   TagIcon,
   cx,
 } from "@pharmacie/ui";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { AdminLanguageSwitcher } from "./admin-language-switcher";
 
 interface AdminUser {
   email: string;
@@ -22,25 +24,26 @@ interface AdminUser {
 }
 
 const NAV = [
-  { href: "/admin", label: "Tableau de bord", Icon: HouseIcon, exact: true },
-  { href: "/admin/produits", label: "Produits", Icon: PackageIcon },
-  { href: "/admin/categories", label: "Catégories", Icon: TagIcon },
-  { href: "/admin/marques", label: "Marques", Icon: StorefrontIcon },
-];
+  { href: "/admin", labelKey: "nav.dashboard", Icon: HouseIcon, exact: true },
+  { href: "/admin/produits", labelKey: "nav.products", Icon: PackageIcon, exact: false },
+  { href: "/admin/categories", labelKey: "nav.categories", Icon: TagIcon, exact: false },
+  { href: "/admin/marques", labelKey: "nav.brands", Icon: StorefrontIcon, exact: false },
+] as const;
 
 function isActive(pathname: string, href: string, exact?: boolean) {
   return exact ? pathname === href : pathname.startsWith(href);
 }
 
-function getPageTitle(pathname: string): string {
-  if (pathname === "/admin") return "Tableau de bord";
-  if (pathname.startsWith("/admin/produits")) return "Produits";
-  if (pathname.startsWith("/admin/categories")) return "Catégories";
-  if (pathname.startsWith("/admin/marques")) return "Marques";
-  return "Administration";
+function getPageTitleKey(pathname: string) {
+  if (pathname === "/admin") return "nav.dashboard" as const;
+  if (pathname.startsWith("/admin/produits")) return "nav.products" as const;
+  if (pathname.startsWith("/admin/categories")) return "nav.categories" as const;
+  if (pathname.startsWith("/admin/marques")) return "nav.brands" as const;
+  return "topbar.fallbackTitle" as const;
 }
 
 export function AdminShell({ user, children }: { user: AdminUser; children: ReactNode }) {
+  const t = useTranslations("admin");
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -69,19 +72,19 @@ export function AdminShell({ user, children }: { user: AdminUser; children: Reac
           <Cross className="h-7 w-7 text-brand-500" />
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-white/40">
-              Back-office
+              {t("nav.backOffice")}
             </p>
-            <p className="text-sm font-semibold leading-none text-white">Pharmacie</p>
+            <p className="text-sm font-semibold leading-none text-white">{t("nav.brandName")}</p>
           </div>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto px-3 py-5">
           <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-white/30">
-            Navigation
+            {t("nav.section")}
           </p>
           <ul className="space-y-0.5">
-            {NAV.map(({ href, label, Icon, exact }) => {
+            {NAV.map(({ href, labelKey, Icon, exact }) => {
               const active = isActive(pathname, href, exact);
               return (
                 <li key={href}>
@@ -95,7 +98,7 @@ export function AdminShell({ user, children }: { user: AdminUser; children: Reac
                     )}
                   >
                     <Icon className="h-5 w-5 shrink-0" />
-                    <span className="flex-1">{label}</span>
+                    <span className="flex-1">{t(labelKey)}</span>
                     {active && <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />}
                   </Link>
                 </li>
@@ -111,7 +114,7 @@ export function AdminShell({ user, children }: { user: AdminUser; children: Reac
               className="flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm font-medium text-white/35 transition-colors hover:bg-white/8 hover:text-white/70"
             >
               <GearIcon className="h-5 w-5 shrink-0" />
-              Paramètres
+              {t("nav.settings")}
             </Link>
           </div>
         </nav>
@@ -133,7 +136,7 @@ export function AdminShell({ user, children }: { user: AdminUser; children: Reac
             disabled={loggingOut}
             className="w-full rounded-sm border border-white/15 py-1.5 text-xs font-medium text-white/60 transition-colors hover:border-white/25 hover:bg-white/8 hover:text-white/85 disabled:opacity-40"
           >
-            {loggingOut ? "Déconnexion…" : "Se déconnecter"}
+            {loggingOut ? t("logout.pending") : t("logout.action")}
           </button>
         </div>
       </aside>
@@ -142,13 +145,17 @@ export function AdminShell({ user, children }: { user: AdminUser; children: Reac
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         {/* Top bar */}
         <header className="flex h-16 shrink-0 items-center justify-between border-b border-line bg-surface px-6">
-          <h1 className="text-base font-semibold text-foreground">{getPageTitle(pathname)}</h1>
+          <h1 className="text-base font-semibold text-foreground">
+            {t(getPageTitleKey(pathname))}
+          </h1>
 
           <div className="flex items-center gap-2">
+            <AdminLanguageSwitcher />
+
             {/* Bell */}
             <button
               type="button"
-              aria-label="Notifications"
+              aria-label={t("topbar.notifications")}
               className="relative flex h-9 w-9 items-center justify-center rounded-sm border border-line text-muted transition-colors hover:bg-bg-subtle hover:text-foreground"
             >
               <BellIcon className="h-4 w-4" />

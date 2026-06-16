@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Card, Field, Input, MultiSelect, Select, Textarea } from "@pharmacie/ui";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState, type ReactNode } from "react";
 import type { FormState } from "../_lib/form-state";
@@ -41,13 +42,6 @@ interface ProductFormProps {
   product?: ProductFormValue;
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  COSMETIC: "Cosmétique",
-  SUPPLEMENT: "Complément alimentaire",
-  DEVICE: "Dispositif médical",
-  OTHER: "Autre",
-};
-
 // Carte de section : titre + aide contextuelle + corps.
 function FormSection({
   title,
@@ -78,6 +72,8 @@ export function ProductForm({
   selectedFacetValueIds = [],
   product,
 }: ProductFormProps) {
+  const t = useTranslations("admin.products");
+  const tc = useTranslations("admin.common");
   const [state, formAction, pending] = useActionState(action, {});
   const selected = new Set(selectedFacetValueIds);
 
@@ -85,9 +81,9 @@ export function ProductForm({
     <form action={formAction} className="max-w-3xl space-y-6">
       {product && <input type="hidden" name="id" value={product.id} />}
 
-      <FormSection title="Identité" description="Informations éditoriales affichées sur la fiche.">
+      <FormSection title={t("form.sectionIdentity")} description={t("form.sectionIdentityDesc")}>
         <div className="space-y-5">
-          <Field label="Nom" htmlFor="name">
+          <Field label={t("form.name")} htmlFor="name">
             <Input id="name" name="name" required defaultValue={product?.name} />
           </Field>
 
@@ -98,62 +94,62 @@ export function ProductForm({
               defaultChecked={product?.active ?? true}
               className="h-4 w-4"
             />
-            Actif (visible sur la boutique)
+            {t("form.active")}
           </label>
 
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Type" htmlFor="productType">
+            <Field label={t("form.type")} htmlFor="productType">
               <Select
                 id="productType"
                 name="productType"
                 defaultValue={product?.productType ?? "OTHER"}
                 options={productTypes.map((type) => ({
                   value: type,
-                  label: TYPE_LABELS[type] ?? type,
+                  label: t(`typesLong.${type}` as "typesLong.COSMETIC"),
                 }))}
               />
             </Field>
 
-            <Field label="Marque" htmlFor="brandId">
+            <Field label={t("form.brand")} htmlFor="brandId">
               <Select
                 id="brandId"
                 name="brandId"
                 defaultValue={product?.brandId ?? ""}
                 options={[
-                  { value: "", label: "— Aucune —" },
+                  { value: "", label: t("form.brandNone") },
                   ...brandOptions.map((option) => ({ value: option.id, label: option.label })),
                 ]}
               />
             </Field>
           </div>
 
-          <Field label="Catégories" htmlFor="categoryIds">
+          <Field label={t("form.categories")} htmlFor="categoryIds">
             <MultiSelect
               id="categoryIds"
               name="categoryIds"
               defaultValue={product?.categoryIds ?? []}
-              placeholder="Sélectionner des catégories…"
+              placeholder={t("form.categoriesPlaceholder")}
               options={categoryOptions.map((option) => ({ value: option.id, label: option.label }))}
             />
           </Field>
 
           <Field
-            label="Catégorie principale"
+            label={t("form.primaryCategory")}
             htmlFor="primaryCategoryId"
-            hint="URL canonique et fil d'Ariane. Doit faire partie des catégories sélectionnées."
+            hint={t("form.primaryCategoryHint")}
           >
             <Select
               id="primaryCategoryId"
               name="primaryCategoryId"
               defaultValue={product?.primaryCategoryId ?? ""}
               options={[
-                { value: "", label: "— Aucune —" },
+                { value: "", label: t("form.primaryCategoryNone") },
                 ...categoryOptions.map((option) => ({ value: option.id, label: option.label })),
               ]}
             />
           </Field>
 
-          <Field label="Description" htmlFor="description">
+          <Field label={t("form.description")} htmlFor="description">
             <Textarea
               id="description"
               name="description"
@@ -164,22 +160,19 @@ export function ProductForm({
         </div>
       </FormSection>
 
-      <FormSection
-        title="Déclinaisons"
-        description="Le vendable : chaque déclinaison a son code, son prix et son stock."
-      >
+      <FormSection title={t("form.sectionVariants")} description={t("form.sectionVariantsDesc")}>
         <VariantsEditor initial={product?.variants ?? []} />
       </FormSection>
 
       <FormSection
-        title="Attributs descriptifs"
-        description="Informations libres, non utilisées pour le filtrage."
+        title={t("form.sectionAttributes")}
+        description={t("form.sectionAttributesDesc")}
       >
         <div className="space-y-5">
-          <Field label="INCI" htmlFor="inci">
+          <Field label={t("form.inci")} htmlFor="inci">
             <Input id="inci" name="inci" defaultValue={product?.inci ?? ""} />
           </Field>
-          <Field label="Précautions" htmlFor="precautions">
+          <Field label={t("form.precautions")} htmlFor="precautions">
             <Textarea
               id="precautions"
               name="precautions"
@@ -191,10 +184,7 @@ export function ProductForm({
       </FormSection>
 
       {facets.length > 0 && (
-        <FormSection
-          title="Filtres / Caractéristiques"
-          description="Critères de filtrage proposés sur la boutique."
-        >
+        <FormSection title={t("form.sectionFacets")} description={t("form.sectionFacetsDesc")}>
           <div className="space-y-4">
             {facets.map((facet) => (
               <div key={facet.id}>
@@ -227,10 +217,10 @@ export function ProductForm({
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Enregistrement…" : "Enregistrer"}
+          {pending ? tc("saving") : tc("save")}
         </Button>
         <Link href="/admin/produits" className="text-sm text-muted hover:underline">
-          Annuler
+          {tc("cancel")}
         </Link>
       </div>
     </form>

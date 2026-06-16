@@ -6,6 +6,7 @@ import {
   productRepository,
   PRODUCT_TYPES,
 } from "@pharmacie/core/modules/catalog";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { updateProductAction } from "../_actions";
 import { ProductForm } from "../produit-form";
@@ -29,10 +30,11 @@ export default async function EditProductPage({ params }: PageProps) {
     facetRepository.findAllWithValues(),
   ]);
   const attributes = parseAttributes(product.productType, product.attributes);
+  const t = await getTranslations("admin.products.edit");
 
   return (
     <div className="p-6">
-      <h1 className="text-xl font-bold text-foreground">Éditer « {product.name} »</h1>
+      <h1 className="text-xl font-bold text-foreground">{t("title", { name: product.name })}</h1>
       <div className="mt-6">
         <ProductForm
           action={updateProductAction}

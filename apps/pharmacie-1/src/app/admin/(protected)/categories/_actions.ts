@@ -10,6 +10,7 @@ import {
   updateCategory,
 } from "@pharmacie/core/modules/catalog";
 import { requireStaff } from "@/lib/auth-guard";
+import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "../_lib/form-state";
@@ -46,15 +47,19 @@ export async function createCategoryAction(
   formData: FormData,
 ): Promise<FormState> {
   await requireStaff();
+  const t = await getTranslations("admin.categories.errors");
   const name = String(formData.get("name") ?? "").trim();
   const parentId = String(formData.get("parentId") ?? "") || null;
-  if (!name) return { error: "Le nom est requis." };
+  if (!name) return { error: t("nameRequired") };
 
   try {
     await createCategory({ name, parentId, ...readContentFields(formData) });
   } catch (error) {
-    if (error instanceof ReparentCycleError || error instanceof InvalidCategoryFieldError) {
-      return { error: error.message };
+    if (error instanceof ReparentCycleError) {
+      return { error: t("reparentCycle") };
+    }
+    if (error instanceof InvalidCategoryFieldError) {
+      return { error: t("invalidField") };
     }
     throw error;
   }
@@ -67,17 +72,21 @@ export async function updateCategoryAction(
   formData: FormData,
 ): Promise<FormState> {
   await requireStaff();
+  const t = await getTranslations("admin.categories.errors");
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
   const parentId = String(formData.get("parentId") ?? "") || null;
-  if (!id) return { error: "Identifiant manquant." };
-  if (!name) return { error: "Le nom est requis." };
+  if (!id) return { error: t("idMissing") };
+  if (!name) return { error: t("nameRequired") };
 
   try {
     await updateCategory(id, { name, parentId, ...readContentFields(formData) });
   } catch (error) {
-    if (error instanceof ReparentCycleError || error instanceof InvalidCategoryFieldError) {
-      return { error: error.message };
+    if (error instanceof ReparentCycleError) {
+      return { error: t("reparentCycle") };
+    }
+    if (error instanceof InvalidCategoryFieldError) {
+      return { error: t("invalidField") };
     }
     throw error;
   }
@@ -94,7 +103,8 @@ export async function deleteCategoryAction(formData: FormData): Promise<void> {
     await deleteCategory(id);
   } catch (error) {
     if (error instanceof CategoryNotEmptyError) {
-      redirect(`/admin/categories?error=${encodeURIComponent(error.message)}`);
+      const t = await getTranslations("admin.categories.errors");
+      redirect(`/admin/categories?error=${encodeURIComponent(t("notEmpty"))}`);
     }
     throw error;
   }

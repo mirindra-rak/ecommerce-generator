@@ -4,13 +4,15 @@ import {
   facetRepository,
   PRODUCT_TYPES,
 } from "@pharmacie/core/modules/catalog";
+import { getTranslations } from "next-intl/server";
 import { createProductAction } from "../_actions";
 import { ProductForm } from "../produit-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewProductPage() {
-  const [brands, categories, facets] = await Promise.all([
+  const [t, brands, categories, facets] = await Promise.all([
+    getTranslations("admin.products.new"),
     brandRepository.findMany(),
     categoryRepository.findMany(),
     facetRepository.findAllWithValues(),
@@ -18,10 +20,8 @@ export default async function NewProductPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-xl font-bold text-foreground">Nouveau produit</h1>
-      <p className="mt-0.5 text-sm text-muted">
-        Le slug est généré automatiquement depuis le nom. Une déclinaison par défaut est créée.
-      </p>
+      <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>
+      <p className="mt-0.5 text-sm text-muted">{t("subtitle")}</p>
       <div className="mt-6">
         <ProductForm
           action={createProductAction}

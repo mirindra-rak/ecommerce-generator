@@ -15,6 +15,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
@@ -25,6 +26,8 @@ type BrandRow = {
 };
 
 export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
+  const t = useTranslations("admin.brands");
+  const tPagination = useTranslations("admin.pagination");
   const queryClient = useQueryClient();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -48,16 +51,16 @@ export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
 
   const handleDelete = useCallback(
     (id: string) => {
-      if (confirm("Supprimer cette marque ?")) deleteMutation.mutate(id);
+      if (confirm(t("table.confirmDelete"))) deleteMutation.mutate(id);
     },
-    [deleteMutation],
+    [deleteMutation, t],
   );
 
   const columns = useMemo<ColumnDef<BrandRow>[]>(
     () => [
       {
         accessorKey: "name",
-        header: "Nom",
+        header: t("table.colName"),
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-50 text-[11px] font-bold text-accent-600">
@@ -69,7 +72,7 @@ export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
       },
       {
         accessorKey: "slug",
-        header: "Slug",
+        header: t("table.colSlug"),
         cell: ({ getValue }) => (
           <span className="font-mono text-xs text-muted">/{getValue<string>()}</span>
         ),
@@ -83,14 +86,14 @@ export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
           <div className="flex items-center justify-end gap-0.5">
             <Link
               href={`/admin/marques/${row.original.id}`}
-              title="Éditer"
+              title={t("table.edit")}
               className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-bg-subtle hover:text-brand-700"
             >
               <PencilIcon className="h-3.5 w-3.5" />
             </Link>
             <button
               type="button"
-              title="Supprimer"
+              title={t("table.delete")}
               onClick={() => handleDelete(row.original.id)}
               className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-danger-bg hover:text-danger-solid"
             >
@@ -100,7 +103,7 @@ export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
         ),
       },
     ],
-    [handleDelete],
+    [handleDelete, t],
   );
 
   const table = useReactTable({
@@ -132,7 +135,7 @@ export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
           <Input
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Rechercher une marque…"
+            placeholder={t("table.search")}
             className="pl-9"
           />
         </div>
@@ -142,8 +145,8 @@ export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
       <div className="overflow-x-auto rounded-sm border border-line bg-surface">
         {total === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm font-medium text-foreground">Aucune marque trouvée</p>
-            <p className="mt-1 text-xs text-muted">Modifiez votre recherche ou créez une marque.</p>
+            <p className="text-sm font-medium text-foreground">{t("table.emptyTitle")}</p>
+            <p className="mt-1 text-xs text-muted">{t("table.emptyHint")}</p>
           </div>
         ) : (
           <table className="w-full text-left text-sm">
@@ -193,7 +196,11 @@ export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
       {total > pageSize && (
         <div className="mt-4 flex items-center justify-between text-sm">
           <p className="text-muted">
-            {pageIndex * pageSize + 1}–{Math.min((pageIndex + 1) * pageSize, total)} sur {total}
+            {tPagination("range", {
+              from: pageIndex * pageSize + 1,
+              to: Math.min((pageIndex + 1) * pageSize, total),
+              total,
+            })}
           </p>
           <div className="flex items-center gap-1">
             <button
@@ -205,7 +212,7 @@ export function MarquesTable({ initialData }: { initialData: BrandRow[] }) {
               ‹
             </button>
             <span className="px-3 text-xs font-medium text-foreground">
-              {pageIndex + 1} / {table.getPageCount()}
+              {tPagination("page", { current: pageIndex + 1, total: table.getPageCount() })}
             </span>
             <button
               type="button"

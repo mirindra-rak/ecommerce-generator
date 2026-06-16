@@ -1,13 +1,13 @@
 "use client";
 
 import { BagIcon, PackageIcon, StorefrontIcon, TagIcon } from "@pharmacie/ui";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import type { ComponentType, SVGProps } from "react";
 
 interface Kpi {
-  label: string;
+  key: "categories" | "brands" | "products" | "orders";
   value: number;
-  description: string;
   href: string;
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
   colorClass: string;
@@ -15,33 +15,29 @@ interface Kpi {
 
 const KPIS: Kpi[] = [
   {
-    label: "Catégories",
+    key: "categories",
     value: 0,
-    description: "Arborescence catalogue",
     href: "/admin/categories",
     Icon: TagIcon,
     colorClass: "bg-brand-600",
   },
   {
-    label: "Marques",
+    key: "brands",
     value: 0,
-    description: "Fournisseurs référencés",
     href: "/admin/marques",
     Icon: StorefrontIcon,
     colorClass: "bg-accent-600",
   },
   {
-    label: "Produits actifs",
+    key: "products",
     value: 0,
-    description: "Visibles en boutique",
     href: "/admin",
     Icon: PackageIcon,
     colorClass: "bg-teal-600",
   },
   {
-    label: "Commandes",
+    key: "orders",
     value: 0,
-    description: "Bientôt disponible",
     href: "/admin",
     Icon: BagIcon,
     colorClass: "bg-info-solid",
@@ -55,6 +51,7 @@ interface KpiCardsProps {
 }
 
 export function KpiCards({ categories, brands, products }: KpiCardsProps) {
+  const t = useTranslations("admin.dashboard");
   const kpis = KPIS.map((k, i) => ({
     ...k,
     value: [categories, brands, products, 0][i],
@@ -66,19 +63,19 @@ export function KpiCards({ categories, brands, products }: KpiCardsProps) {
         const Icon = kpi.Icon;
         return (
           <Link
-            key={kpi.label}
+            key={kpi.key}
             href={kpi.href}
             className={`group flex flex-col rounded-sm p-5 text-white transition-opacity hover:opacity-90 ${kpi.colorClass}`}
           >
             <div className="flex items-center justify-between">
               <Icon className="h-6 w-6 opacity-75" />
               <span className="rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">
-                voir
+                {t("kpi.view")}
               </span>
             </div>
             <p className="mt-5 text-3xl font-bold tabular-nums leading-none">{kpi.value}</p>
-            <p className="mt-1.5 text-sm font-semibold">{kpi.label}</p>
-            <p className="mt-0.5 text-[11px] opacity-65">{kpi.description}</p>
+            <p className="mt-1.5 text-sm font-semibold">{t(`kpi.${kpi.key}`)}</p>
+            <p className="mt-0.5 text-[11px] opacity-65">{t(`kpi.${kpi.key}Desc`)}</p>
           </Link>
         );
       })}

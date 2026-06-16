@@ -1,13 +1,18 @@
-import { hasLocale } from "next-intl";
+import { cookies } from "next/headers";
 import { getRequestConfig } from "next-intl/server";
-import { routing } from "./routing";
+import { resolveLocale } from "./locale";
 
 // Configuration par requête : résout la locale active et charge le catalogue de messages
-// correspondant. Une locale hors `supportedLocales` retombe sur la locale par défaut
-// (fallback déterministe, jamais de rendu d'une locale non supportée).
+// correspondant.
+// - Storefront : la locale vient du segment `[locale]` (`requestLocale`).
+// - Back-office `/admin` (hors arbre `[locale]`) : `requestLocale` est absent → on lit le
+//   cookie de préférence `NEXT_LOCALE`.
+// `cookies()` n'est appelé QUE pour l'admin (requestLocale absent) afin de préserver le
+// rendu statique du storefront (l'accès aux cookies rendrait les routes `[locale]` dynamiques).
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
-  const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
+  const cookieLocale = requested ? null : (await cookies()).get("NEXT_LOCALE")?.value;
+  const locale = resolveLocale(requested, cookieLocale);
 
   return {
     locale,

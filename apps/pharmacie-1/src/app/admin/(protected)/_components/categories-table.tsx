@@ -16,6 +16,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
@@ -60,6 +61,8 @@ function flattenWithDepth(
 }
 
 export function CategoriesTable({ initialData }: { initialData: RawCategory[] }) {
+  const t = useTranslations("admin.categories");
+  const tPagination = useTranslations("admin.pagination");
   const queryClient = useQueryClient();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -96,19 +99,18 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
       const n = row.productCount;
       const message =
         n > 0
-          ? `« ${row.name} » est associée à ${n} produit${n > 1 ? "s" : ""}. ` +
-            `Ils seront détachés (mais pas supprimés). Supprimer la catégorie ?`
-          : `Supprimer « ${row.name} » ?`;
+          ? t("table.confirmDeleteWithProducts", { name: row.name, count: n })
+          : t("table.confirmDelete", { name: row.name });
       if (confirm(message)) deleteMutation.mutate(row.id);
     },
-    [deleteMutation],
+    [deleteMutation, t],
   );
 
   const columns = useMemo<ColumnDef<CategoryRow>[]>(
     () => [
       {
         accessorKey: "name",
-        header: "Nom",
+        header: t("table.colName"),
         cell: ({ row }) => (
           <div
             className="flex items-center gap-1.5"
@@ -123,31 +125,31 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
       },
       {
         accessorKey: "slug",
-        header: "Slug",
+        header: t("table.colSlug"),
         cell: ({ getValue }) => (
           <span className="font-mono text-xs text-muted">/{getValue<string>()}</span>
         ),
       },
       {
         accessorKey: "active",
-        header: "Statut",
+        header: t("table.colStatus"),
         filterFn: "equals",
         cell: ({ getValue }) =>
           getValue<boolean>() ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-success-bg px-2.5 py-0.5 text-[11px] font-semibold text-success-text">
               <span className="h-1.5 w-1.5 rounded-full bg-success-solid" />
-              Actif
+              {t("table.statusActiveBadge")}
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-bg-subtle px-2.5 py-0.5 text-[11px] font-semibold text-muted">
               <span className="h-1.5 w-1.5 rounded-full bg-muted" />
-              Masqué
+              {t("table.statusHiddenBadge")}
             </span>
           ),
       },
       {
         accessorKey: "productCount",
-        header: "Produits",
+        header: t("table.colProducts"),
         enableGlobalFilter: false,
         cell: ({ getValue }) => <span className="text-xs text-muted">{getValue<number>()}</span>,
       },
@@ -160,14 +162,14 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
           <div className="flex items-center justify-end gap-0.5">
             <Link
               href={`/admin/categories/${row.original.id}`}
-              title="Éditer"
+              title={t("table.edit")}
               className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-bg-subtle hover:text-brand-700"
             >
               <PencilIcon className="h-3.5 w-3.5" />
             </Link>
             <button
               type="button"
-              title="Supprimer"
+              title={t("table.delete")}
               onClick={() => handleDelete(row.original)}
               className="flex h-7 w-7 items-center justify-center rounded-sm text-muted transition-colors hover:bg-danger-bg hover:text-danger-solid"
             >
@@ -177,7 +179,7 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
         ),
       },
     ],
-    [handleDelete],
+    [handleDelete, t],
   );
 
   const table = useReactTable({
@@ -210,13 +212,13 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
           <Input
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Rechercher une catégorie…"
+            placeholder={t("table.search")}
             className="pl-9"
           />
         </div>
         <Select
           size="sm"
-          aria-label="Filtrer par statut"
+          aria-label={t("table.filterStatus")}
           className="min-w-[150px]"
           value={
             table.getColumn("active")?.getFilterValue() === true
@@ -231,9 +233,9 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
               ?.setFilterValue(v === "active" ? true : v === "inactive" ? false : undefined)
           }
           options={[
-            { value: "", label: "Tous les statuts" },
-            { value: "active", label: "Actives" },
-            { value: "inactive", label: "Masquées" },
+            { value: "", label: t("table.statusAll") },
+            { value: "active", label: t("table.statusActive") },
+            { value: "inactive", label: t("table.statusHidden") },
           ]}
         />
       </div>
@@ -242,8 +244,8 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
       <div className="overflow-x-auto rounded-sm border border-line bg-surface">
         {total === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <p className="text-sm font-medium text-foreground">Aucune catégorie trouvée</p>
-            <p className="mt-1 text-xs text-muted">Modifiez vos filtres ou créez une catégorie.</p>
+            <p className="text-sm font-medium text-foreground">{t("table.emptyTitle")}</p>
+            <p className="mt-1 text-xs text-muted">{t("table.emptyHint")}</p>
           </div>
         ) : (
           <table className="w-full text-left text-sm">
@@ -293,7 +295,11 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
       {total > pageSize && (
         <div className="mt-4 flex items-center justify-between text-sm">
           <p className="text-muted">
-            {pageIndex * pageSize + 1}–{Math.min((pageIndex + 1) * pageSize, total)} sur {total}
+            {tPagination("range", {
+              from: pageIndex * pageSize + 1,
+              to: Math.min((pageIndex + 1) * pageSize, total),
+              total,
+            })}
           </p>
           <div className="flex items-center gap-1">
             <button
@@ -305,7 +311,7 @@ export function CategoriesTable({ initialData }: { initialData: RawCategory[] })
               ‹
             </button>
             <span className="px-3 text-xs font-medium text-foreground">
-              {pageIndex + 1} / {table.getPageCount()}
+              {tPagination("page", { current: pageIndex + 1, total: table.getPageCount() })}
             </span>
             <button
               type="button"

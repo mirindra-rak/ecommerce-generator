@@ -1,6 +1,7 @@
 "use client";
 
 import { Button, Card, Field, Input, Select, Textarea } from "@pharmacie/ui";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState, useState, type ReactNode } from "react";
 import type { FormState } from "../_lib/form-state";
@@ -94,14 +95,16 @@ function CountedField({
 
 export function CategoryForm({ action, parentOptions, category }: CategoryFormProps) {
   const [state, formAction, pending] = useActionState(action, {});
+  const t = useTranslations("admin.categories.form");
+  const tCommon = useTranslations("admin.common");
 
   return (
     <form action={formAction} className="max-w-3xl space-y-6">
       {category && <input type="hidden" name="id" value={category.id} />}
 
-      <FormSection title="Identité" description="Nom, visibilité et place dans l'arborescence.">
+      <FormSection title={t("sectionIdentity")} description={t("sectionIdentityDesc")}>
         <div className="space-y-5">
-          <Field label="Nom" htmlFor="name">
+          <Field label={t("name")} htmlFor="name">
             <Input id="name" name="name" required defaultValue={category?.name} />
           </Field>
 
@@ -112,16 +115,16 @@ export function CategoryForm({ action, parentOptions, category }: CategoryFormPr
               defaultChecked={category?.active ?? true}
               className="h-4 w-4"
             />
-            Affichée (visible sur la boutique)
+            {t("visible")}
           </label>
 
-          <Field label="Catégorie parente" htmlFor="parentId">
+          <Field label={t("parent")} htmlFor="parentId">
             <Select
               id="parentId"
               name="parentId"
               defaultValue={category?.parentId ?? ""}
               options={[
-                { value: "", label: "— Racine (aucune) —" },
+                { value: "", label: t("parentRoot") },
                 ...parentOptions.map((option) => ({ value: option.id, label: option.label })),
               ]}
             />
@@ -129,16 +132,16 @@ export function CategoryForm({ action, parentOptions, category }: CategoryFormPr
         </div>
       </FormSection>
 
-      <FormSection title="Contenu" description="Textes éditoriaux affichés sur la page catégorie.">
+      <FormSection title={t("sectionContent")} description={t("sectionContentDesc")}>
         <div className="space-y-5">
-          <Field label="Description courte" htmlFor="shortDescription">
+          <Field label={t("shortDescription")} htmlFor="shortDescription">
             <Input
               id="shortDescription"
               name="shortDescription"
               defaultValue={category?.shortDescription ?? ""}
             />
           </Field>
-          <Field label="Description" htmlFor="description">
+          <Field label={t("description")} htmlFor="description">
             <Textarea
               id="description"
               name="description"
@@ -146,7 +149,7 @@ export function CategoryForm({ action, parentOptions, category }: CategoryFormPr
               defaultValue={category?.description ?? ""}
             />
           </Field>
-          <Field label="Informations complémentaires" htmlFor="additionalInfo">
+          <Field label={t("additionalInfo")} htmlFor="additionalInfo">
             <Textarea
               id="additionalInfo"
               name="additionalInfo"
@@ -157,26 +160,26 @@ export function CategoryForm({ action, parentOptions, category }: CategoryFormPr
         </div>
       </FormSection>
 
-      <FormSection title="SEO" description="Métadonnées pour les moteurs de recherche.">
+      <FormSection title={t("sectionSeo")} description={t("sectionSeoDesc")}>
         <div className="space-y-5">
           <CountedField
-            label="Balise titre"
+            label={t("metaTitle")}
             htmlFor="metaTitle"
             name="metaTitle"
             max={70}
-            hint="Idéalement 50–60 caractères."
+            hint={t("metaTitleHint")}
             defaultValue={category?.metaTitle ?? ""}
           />
           <CountedField
-            label="Meta description"
+            label={t("metaDescription")}
             htmlFor="metaDescription"
             name="metaDescription"
             max={160}
-            hint="Idéalement 150–160 caractères."
+            hint={t("metaDescriptionHint")}
             defaultValue={category?.metaDescription ?? ""}
             multiline
           />
-          <Field label="Mots-clés" htmlFor="metaKeywords" hint="Séparés par des virgules.">
+          <Field label={t("metaKeywords")} htmlFor="metaKeywords" hint={t("metaKeywordsHint")}>
             <Input
               id="metaKeywords"
               name="metaKeywords"
@@ -194,10 +197,10 @@ export function CategoryForm({ action, parentOptions, category }: CategoryFormPr
 
       <div className="flex items-center gap-3">
         <Button type="submit" disabled={pending}>
-          {pending ? "Enregistrement…" : "Enregistrer"}
+          {pending ? tCommon("saving") : tCommon("save")}
         </Button>
         <Link href="/admin/categories" className="text-sm text-muted hover:underline">
-          Annuler
+          {tCommon("cancel")}
         </Link>
       </div>
     </form>
