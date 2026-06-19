@@ -21,7 +21,19 @@ export default async function EditBrandPage({ params }: PageProps) {
     <div>
       <h1 className="text-2xl font-bold text-foreground">{t("title", { name: brand.name })}</h1>
       <div className="mt-6">
-        <BrandForm action={updateBrandAction} brand={{ id: brand.id, name: brand.name }} />
+        <BrandForm
+          action={updateBrandAction}
+          brand={{
+            id: brand.id,
+            name: brand.name,
+            active: brand.active,
+            shortDescription: brand.shortDescription,
+            description: brand.description,
+            logoKey: brand.logoKey,
+            metaTitle: brand.metaTitle,
+            metaDescription: brand.metaDescription,
+          }}
+        />
       </div>
     </div>
   );

@@ -1,10 +1,21 @@
 "use client";
 
-import { Button, Card, Field, Input, Select, Textarea } from "@pharmacie/ui";
+import { slugify } from "@pharmacie/core";
+import {
+  Button,
+  Card,
+  Field,
+  ImageUpload,
+  Input,
+  ResetIcon,
+  Select,
+  Textarea,
+} from "@pharmacie/ui";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useActionState, useState, type ReactNode } from "react";
+import { useActionState, useCallback, useRef, useState, type ReactNode } from "react";
 import type { FormState } from "../_lib/form-state";
+import { useUnsavedChanges } from "../_lib/use-unsaved-changes";
 
 export interface ParentOption {
   id: string;
@@ -17,6 +28,7 @@ interface CategoryFormProps {
   category?: {
     id: string;
     name: string;
+    slug: string;
     parentId: string | null;
     active?: boolean;
     description?: string | null;
@@ -25,10 +37,11 @@ interface CategoryFormProps {
     metaTitle?: string | null;
     metaDescription?: string | null;
     metaKeywords?: string[];
+    coverImageKey?: string | null;
+    thumbnailKey?: string | null;
   };
 }
 
-// Carte de section : titre + aide contextuelle + corps (aligné sur le formulaire produit).
 function FormSection({
   title,
   description,
@@ -49,7 +62,6 @@ function FormSection({
   );
 }
 
-// Champ texte/zone avec compteur de caractères (utile pour les limites SEO).
 function CountedField({
   label,
   htmlFor,
@@ -93,19 +105,87 @@ function CountedField({
   );
 }
 
+async function uploadFile(file: File): Promise<{ key: string; url: string }> {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await fetch("/api/upload", { method: "POST", body });
+  if (!res.ok) throw new Error("Upload failed");
+  return res.json();
+}
+
+function imageUrl(key: string | null | undefined): string | null {
+  if (!key) return null;
+  return `/uploads/${key}`;
+}
+
 export function CategoryForm({ action, parentOptions, category }: CategoryFormProps) {
   const [state, formAction, pending] = useActionState(action, {});
   const t = useTranslations("admin.categories.form");
   const tCommon = useTranslations("admin.common");
+  const formRef = useRef<HTMLFormElement>(null);
+  useUnsavedChanges(formRef);
+
+  // Slug auto-sync state
+  const isEditing = !!category;
+  const [slugValue, setSlugValue] = useState(category?.slug ?? "");
+  const [slugManual, setSlugManual] = useState(isEditing);
+  const nameRef = useRef<HTMLInputElement>(null);
+
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!slugManual) {
+        setSlugValue(slugify(e.target.value));
+      }
+    },
+    [slugManual],
+  );
+
+  const handleSlugChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSlugManual(true);
+    setSlugValue(slugify(e.target.value));
+  }, []);
+
+  const handleSlugSync = useCallback(() => {
+    const name = nameRef.current?.value ?? "";
+    setSlugValue(slugify(name));
+    setSlugManual(false);
+  }, []);
+
+  // Image state
+  const [coverKey, setCoverKey] = useState(category?.coverImageKey ?? "");
+  const [thumbKey, setThumbKey] = useState(category?.thumbnailKey ?? "");
 
   return (
-    <form action={formAction} className="max-w-3xl space-y-6">
+    <form ref={formRef} action={formAction} className="max-w-3xl space-y-6">
       {category && <input type="hidden" name="id" value={category.id} />}
+      <input type="hidden" name="coverImageKey" value={coverKey} />
+      <input type="hidden" name="thumbnailKey" value={thumbKey} />
 
       <FormSection title={t("sectionIdentity")} description={t("sectionIdentityDesc")}>
         <div className="space-y-5">
           <Field label={t("name")} htmlFor="name">
-            <Input id="name" name="name" required defaultValue={category?.name} />
+            <Input
+              ref={nameRef}
+              id="name"
+              name="name"
+              required
+              defaultValue={category?.name}
+              onChange={handleNameChange}
+            />
+          </Field>
+
+          <Field label={t("slug")} htmlFor="slug" hint={t("slugHint")}>
+            <div className="flex gap-2">
+              <Input id="slug" name="slug" value={slugValue} onChange={handleSlugChange} />
+              <button
+                type="button"
+                onClick={handleSlugSync}
+                title={t("slugSync")}
+                className="flex shrink-0 items-center justify-center rounded-sm border border-line px-2.5 text-muted transition-colors hover:bg-bg-subtle hover:text-foreground"
+              >
+                <ResetIcon className="h-4 w-4" />
+              </button>
+            </div>
           </Field>
 
           <label className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -125,10 +205,40 @@ export function CategoryForm({ action, parentOptions, category }: CategoryFormPr
               defaultValue={category?.parentId ?? ""}
               options={[
                 { value: "", label: t("parentRoot") },
-                ...parentOptions.map((option) => ({ value: option.id, label: option.label })),
+                ...parentOptions.map((option) => ({
+                  value: option.id,
+                  label: option.label,
+                })),
               ]}
             />
           </Field>
+        </div>
+      </FormSection>
+
+      <FormSection title={t("sectionImages")} description={t("sectionImagesDesc")}>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <ImageUpload
+            label={t("coverImage")}
+            hint={t("coverImageHint")}
+            currentUrl={imageUrl(category?.coverImageKey)}
+            uploadLabel={t("imageUpload")}
+            uploadingLabel={t("imageUploading")}
+            removeLabel={t("imageRemove")}
+            errorLabel={t("imageError")}
+            onUpload={uploadFile}
+            onChange={(result) => setCoverKey(result?.key ?? "")}
+          />
+          <ImageUpload
+            label={t("thumbnail")}
+            hint={t("thumbnailHint")}
+            currentUrl={imageUrl(category?.thumbnailKey)}
+            uploadLabel={t("imageUpload")}
+            uploadingLabel={t("imageUploading")}
+            removeLabel={t("imageRemove")}
+            errorLabel={t("imageError")}
+            onUpload={uploadFile}
+            onChange={(result) => setThumbKey(result?.key ?? "")}
+          />
         </div>
       </FormSection>
 

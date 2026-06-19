@@ -39,6 +39,8 @@ function readContentFields(formData: FormData): CategoryContentInput {
     metaTitle: text("metaTitle"),
     metaDescription: text("metaDescription"),
     metaKeywords,
+    coverImageKey: text("coverImageKey"),
+    thumbnailKey: text("thumbnailKey"),
   };
 }
 
@@ -49,11 +51,12 @@ export async function createCategoryAction(
   await requireStaff();
   const t = await getTranslations("admin.categories.errors");
   const name = String(formData.get("name") ?? "").trim();
+  const slug = String(formData.get("slug") ?? "").trim() || undefined;
   const parentId = String(formData.get("parentId") ?? "") || null;
   if (!name) return { error: t("nameRequired") };
 
   try {
-    await createCategory({ name, parentId, ...readContentFields(formData) });
+    await createCategory({ name, slug, parentId, ...readContentFields(formData) });
   } catch (error) {
     if (error instanceof ReparentCycleError) {
       return { error: t("reparentCycle") };
@@ -75,12 +78,13 @@ export async function updateCategoryAction(
   const t = await getTranslations("admin.categories.errors");
   const id = String(formData.get("id") ?? "");
   const name = String(formData.get("name") ?? "").trim();
+  const slug = String(formData.get("slug") ?? "").trim() || undefined;
   const parentId = String(formData.get("parentId") ?? "") || null;
   if (!id) return { error: t("idMissing") };
   if (!name) return { error: t("nameRequired") };
 
   try {
-    await updateCategory(id, { name, parentId, ...readContentFields(formData) });
+    await updateCategory(id, { name, slug, parentId, ...readContentFields(formData) });
   } catch (error) {
     if (error instanceof ReparentCycleError) {
       return { error: t("reparentCycle") };

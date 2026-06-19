@@ -66,6 +66,11 @@ export default async function EditProductPage({ params }: PageProps) {
               price: (v.priceExclTax / 100).toFixed(2),
               stock: String(v.stock),
             })),
+            media: product.media.map((m) => ({
+              key: m.storageKey,
+              url: `/uploads/${m.storageKey}`,
+              alt: m.alt ?? undefined,
+            })),
           }}
         />
       </div>

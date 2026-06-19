@@ -15,8 +15,21 @@ model Brand {
   id        String    @id @default(cuid())
   name      String
   slug      String    @unique
+  active    Boolean   @default(true)
   // Identifiant d'origine (fabricant PrestaShop) pour ré-import idempotent.
   externalId Int?     @unique
+
+  // Contenu éditorial.
+  shortDescription String?
+  description      String?
+
+  // Image (clé objet S3/MinIO).
+  logoKey String?
+
+  // SEO.
+  metaTitle       String?
+  metaDescription String?
+
   products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

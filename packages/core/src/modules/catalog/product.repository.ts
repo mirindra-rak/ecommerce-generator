@@ -255,6 +255,44 @@ export const productRepository = {
     ]);
   },
 
+  async reconcileMedia(
+    productId: string,
+    media: ReadonlyArray<{ storageKey: string; alt?: string | null; position: number }>,
+  ): Promise<void> {
+    const existing = await prisma.productMedia.findMany({
+      where: { productId },
+      select: { id: true, storageKey: true },
+    });
+    const incomingKeys = new Set(media.map((m) => m.storageKey));
+    const toDelete = existing
+      .filter((row) => !incomingKeys.has(row.storageKey))
+      .map((row) => row.id);
+    const existingByKey = new Map(existing.map((row) => [row.storageKey, row.id]));
+
+    const ops: Prisma.PrismaPromise<unknown>[] = [];
+    if (toDelete.length > 0) {
+      ops.push(prisma.productMedia.deleteMany({ where: { id: { in: toDelete } } }));
+    }
+    for (const m of media) {
+      const existingId = existingByKey.get(m.storageKey);
+      if (existingId) {
+        ops.push(
+          prisma.productMedia.update({
+            where: { id: existingId },
+            data: { alt: m.alt ?? null, position: m.position },
+          }),
+        );
+      } else {
+        ops.push(
+          prisma.productMedia.create({
+            data: { productId, storageKey: m.storageKey, alt: m.alt ?? null, position: m.position },
+          }),
+        );
+      }
+    }
+    await prisma.$transaction(ops);
+  },
+
   async delete(id: string): Promise<void> {
     await prisma.product.delete({ where: { id } });
   },

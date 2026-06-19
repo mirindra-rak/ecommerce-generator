@@ -11,7 +11,7 @@ export default async function NewCategoryPage() {
   const t = await getTranslations("admin.categories");
 
   return (
-    <div>
+    <div className="p-6">
       <h1 className="text-2xl font-bold text-foreground">{t("new.title")}</h1>
       <p className="mt-1 text-sm text-muted">{t("new.subtitle")}</p>
       <div className="mt-6">

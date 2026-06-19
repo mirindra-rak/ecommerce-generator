@@ -4,6 +4,7 @@ import {
   createProduct,
   deleteProduct,
   updateProduct,
+  productRepository,
   DuplicateProductFieldError,
   InvalidProductAttributesError,
   PrimaryCategoryNotAssignedError,
@@ -34,6 +35,30 @@ function readAttributes(formData: FormData): Record<string, string> {
   if (inci) attributes.inci = inci;
   if (precautions) attributes.precautions = precautions;
   return attributes;
+}
+
+interface MediaInput {
+  storageKey: string;
+  alt?: string | null;
+  position: number;
+}
+
+function readMedia(formData: FormData): MediaInput[] {
+  let items: unknown[];
+  try {
+    items = JSON.parse(String(formData.get("media") ?? "[]"));
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(items)) return [];
+  return items
+    .filter((item): item is Record<string, unknown> => typeof item === "object" && item !== null)
+    .map((item, index) => ({
+      storageKey: String(item.key ?? ""),
+      alt: typeof item.alt === "string" ? item.alt || null : null,
+      position: index,
+    }))
+    .filter((m) => m.storageKey !== "");
 }
 
 function readBase(formData: FormData) {
@@ -135,8 +160,12 @@ export async function createProductAction(
     return { error: t(variants.errorKey as "priceInvalid", { label: variants.label ?? "" }) };
   }
 
+  const media = readMedia(formData);
   try {
-    await createProduct({ ...base, variants });
+    const created = await createProduct({ ...base, variants });
+    if (media.length > 0) {
+      await productRepository.reconcileMedia(created.id, media);
+    }
   } catch (error) {
     const key = domainErrorKey(error);
     if (key) return { error: t(key as "invalidAttributes") };
@@ -161,8 +190,10 @@ export async function updateProductAction(
     return { error: t(variants.errorKey as "priceInvalid", { label: variants.label ?? "" }) };
   }
 
+  const media = readMedia(formData);
   try {
     await updateProduct(id, { ...base, variants });
+    await productRepository.reconcileMedia(id, media);
   } catch (error) {
     const key = domainErrorKey(error);
     if (key) return { error: t(key as "invalidAttributes") };

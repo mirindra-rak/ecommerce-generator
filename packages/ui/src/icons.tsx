@@ -46,6 +46,11 @@ export {
   ArrowUpRight as TrendUpIcon,
   PencilSimple as PencilIcon,
   Trash as TrashIcon,
+  UploadSimple as UploadIcon,
+  Image as ImageIcon,
+  ArrowCounterClockwise as ResetIcon,
+  X as XIcon,
+  CircleNotch as SpinnerIcon,
 } from "@phosphor-icons/react";
 
 // Étoile pleine (notation) — variante « fill ».

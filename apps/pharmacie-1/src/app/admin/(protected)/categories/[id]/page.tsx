@@ -28,7 +28,7 @@ export default async function EditCategoryPage({ params }: PageProps) {
     .map((c) => ({ id: c.id, label: c.name }));
 
   return (
-    <div>
+    <div className="p-6">
       <h1 className="text-2xl font-bold text-foreground">
         {t("edit.title", { name: category.name })}
       </h1>
@@ -39,6 +39,7 @@ export default async function EditCategoryPage({ params }: PageProps) {
           category={{
             id: category.id,
             name: category.name,
+            slug: category.slug,
             parentId: category.parentId,
             active: category.active,
             description: category.description,
@@ -47,6 +48,8 @@ export default async function EditCategoryPage({ params }: PageProps) {
             metaTitle: category.metaTitle,
             metaDescription: category.metaDescription,
             metaKeywords: category.metaKeywords,
+            coverImageKey: category.coverImageKey,
+            thumbnailKey: category.thumbnailKey,
           }}
         />
       </div>

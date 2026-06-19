@@ -1,10 +1,21 @@
 "use client";
 
-import { Button, Card, Field, Input, MultiSelect, Select, Textarea } from "@pharmacie/ui";
+import {
+  Button,
+  Card,
+  Field,
+  Input,
+  MultiImageUpload,
+  MultiSelect,
+  Select,
+  Textarea,
+  type MediaItem,
+} from "@pharmacie/ui";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useActionState, type ReactNode } from "react";
+import { useActionState, useCallback, useMemo, useRef, useState, type ReactNode } from "react";
 import type { FormState } from "../_lib/form-state";
+import { useUnsavedChanges } from "../_lib/use-unsaved-changes";
 import { VariantsEditor, type VariantRow } from "./variants-editor";
 
 export interface Option {
@@ -30,6 +41,7 @@ export interface ProductFormValue {
   inci: string | null;
   precautions: string | null;
   variants: VariantRow[];
+  media: MediaItem[];
 }
 
 interface ProductFormProps {
@@ -63,6 +75,18 @@ function FormSection({
   );
 }
 
+async function uploadFile(file: File): Promise<{ key: string; url: string }> {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await fetch("/api/upload", { method: "POST", body });
+  if (!res.ok) throw new Error("Upload failed");
+  return res.json();
+}
+
+function imageUrl(key: string): string {
+  return `/uploads/${key}`;
+}
+
 export function ProductForm({
   action,
   productTypes,
@@ -75,11 +99,37 @@ export function ProductForm({
   const t = useTranslations("admin.products");
   const tc = useTranslations("admin.common");
   const [state, formAction, pending] = useActionState(action, {});
-  const selected = new Set(selectedFacetValueIds);
+  const formRef = useRef<HTMLFormElement>(null);
+  useUnsavedChanges(formRef);
+
+  const initialMedia: MediaItem[] = useMemo(
+    () =>
+      (product?.media ?? []).map((m) => ({
+        key: m.key,
+        url: m.url ?? imageUrl(m.key),
+        alt: m.alt,
+      })),
+    [product?.media],
+  );
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>(initialMedia);
+  const handleMediaChange = useCallback((items: MediaItem[]) => {
+    setMediaItems(items);
+  }, []);
+
+  const selectedByFacet = useMemo(() => {
+    const selected = new Set(selectedFacetValueIds);
+    return new Map(
+      facets.map((facet) => [
+        facet.id,
+        facet.values.filter((value) => selected.has(value.id)).map((value) => value.id),
+      ]),
+    );
+  }, [facets, selectedFacetValueIds]);
 
   return (
-    <form action={formAction} className="max-w-3xl space-y-6">
+    <form ref={formRef} action={formAction} className="max-w-3xl space-y-6">
       {product && <input type="hidden" name="id" value={product.id} />}
+      <input type="hidden" name="media" value={JSON.stringify(mediaItems)} />
 
       <FormSection title={t("form.sectionIdentity")} description={t("form.sectionIdentityDesc")}>
         <div className="space-y-5">
@@ -160,6 +210,22 @@ export function ProductForm({
         </div>
       </FormSection>
 
+      <FormSection title={t("form.sectionImages")} description={t("form.sectionImagesDesc")}>
+        <MultiImageUpload
+          label={t("form.imagesLabel")}
+          hint={t("form.imagesHint")}
+          primaryLabel={t("form.imagePrimary")}
+          uploadLabel={t("form.imageUpload")}
+          uploadingLabel={t("form.imageUploading")}
+          removeLabel={t("form.imageRemove")}
+          errorLabel={t("form.imageError")}
+          altLabel={t("form.imageAlt")}
+          items={mediaItems}
+          onUpload={uploadFile}
+          onChange={handleMediaChange}
+        />
+      </FormSection>
+
       <FormSection title={t("form.sectionVariants")} description={t("form.sectionVariantsDesc")}>
         <VariantsEditor initial={product?.variants ?? []} />
       </FormSection>
@@ -170,7 +236,7 @@ export function ProductForm({
       >
         <div className="space-y-5">
           <Field label={t("form.inci")} htmlFor="inci">
-            <Input id="inci" name="inci" defaultValue={product?.inci ?? ""} />
+            <Textarea id="inci" name="inci" rows={4} defaultValue={product?.inci ?? ""} />
           </Field>
           <Field label={t("form.precautions")} htmlFor="precautions">
             <Textarea
@@ -187,23 +253,14 @@ export function ProductForm({
         <FormSection title={t("form.sectionFacets")} description={t("form.sectionFacetsDesc")}>
           <div className="space-y-4">
             {facets.map((facet) => (
-              <div key={facet.id}>
-                <p className="text-sm font-medium text-foreground">{facet.name}</p>
-                <div className="mt-2 flex flex-wrap gap-x-5 gap-y-2">
-                  {facet.values.map((value) => (
-                    <label key={value.id} className="flex items-center gap-2 text-sm text-muted">
-                      <input
-                        type="checkbox"
-                        name="facetValueIds"
-                        value={value.id}
-                        defaultChecked={selected.has(value.id)}
-                        className="h-4 w-4"
-                      />
-                      {value.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
+              <Field key={facet.id} label={facet.name} htmlFor={`facet-${facet.id}`}>
+                <MultiSelect
+                  id={`facet-${facet.id}`}
+                  name="facetValueIds"
+                  defaultValue={selectedByFacet.get(facet.id) ?? []}
+                  options={facet.values.map((value) => ({ value: value.id, label: value.label }))}
+                />
+              </Field>
             ))}
           </div>
         </FormSection>
