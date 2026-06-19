@@ -8,6 +8,7 @@ import { prisma } from "../../db/client";
 // valeurs d'options triés par `position`.
 const productInclude = {
   brand: true,
+  taxRate: true,
   categories: true,
   primaryCategory: true,
   options: {
@@ -26,6 +27,7 @@ export type ProductWithRelations = Prisma.ProductGetPayload<{ include: typeof pr
 // Include allégé pour les vignettes de liste : marque, prix des variantes, 1er média.
 const cardInclude = {
   brand: true,
+  taxRate: true,
   variants: { select: { priceExclTax: true } },
   media: { orderBy: { position: "asc" }, take: 1 },
 } satisfies Prisma.ProductInclude;
@@ -36,6 +38,7 @@ export type ProductCard = Prisma.ProductGetPayload<{ include: typeof cardInclude
 // « N décl. »).
 const listInclude = {
   brand: true,
+  taxRate: true,
   _count: { select: { variants: true } },
 } satisfies Prisma.ProductInclude;
 

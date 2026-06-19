@@ -60,12 +60,13 @@ function toContentData(input: CategoryContentInput) {
 
 export interface CreateCategoryInput extends CategoryContentInput {
   name: string;
+  slug?: string;
   parentId?: string | null;
 }
 
 export async function createCategory(input: CreateCategoryInput): Promise<Category> {
   validateCategoryFields(input);
-  const slug = await buildUniqueSlug(input.name, categorySlugExists);
+  const slug = await buildUniqueSlug(input.slug || input.name, categorySlugExists);
   return categoryRepository.create({
     name: input.name,
     slug,
@@ -76,6 +77,7 @@ export async function createCategory(input: CreateCategoryInput): Promise<Catego
 
 export interface UpdateCategoryInput extends CategoryContentInput {
   name: string;
+  slug?: string;
   parentId: string | null;
 }
 
@@ -91,8 +93,15 @@ export async function updateCategory(id: string, input: UpdateCategoryInput): Pr
   ) {
     throw new ReparentCycleError();
   }
+
+  const slugSource = input.slug || input.name;
+  const slug = await buildUniqueSlug(slugSource, (candidate) =>
+    categoryRepository.findBySlug(candidate, id).then((existing) => existing !== null),
+  );
+
   return categoryRepository.update(id, {
     name: input.name,
+    slug,
     ...toContentData(input),
     parent: input.parentId ? { connect: { id: input.parentId } } : { disconnect: true },
   });

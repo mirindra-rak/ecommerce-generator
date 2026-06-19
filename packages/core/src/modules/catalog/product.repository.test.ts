@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { prisma } from "../../db/client";
+import { DEFAULT_TAX_RATE_ID } from "../pricing";
 import { productRepository } from "./product.repository";
 import { isDisplayable } from "./product.service";
 
@@ -8,6 +9,7 @@ async function createCremeWithRelations() {
     name: "Crème hydratante",
     slug: "creme-hydratante",
     productType: "COSMETIC",
+    taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
     attributes: { inci: "Aqua, Glycerin" },
     options: {
       create: [
@@ -71,7 +73,11 @@ describe("productRepository", () => {
     await createCremeWithRelations();
 
     await expect(
-      productRepository.create({ name: "Doublon slug", slug: "creme-hydratante" }),
+      productRepository.create({
+        name: "Doublon slug",
+        slug: "creme-hydratante",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
+      }),
     ).rejects.toThrow();
 
     // EAN et SKU vivent désormais sur la déclinaison : le doublon est rejeté à ce niveau.
@@ -79,6 +85,7 @@ describe("productRepository", () => {
       productRepository.create({
         name: "Doublon ean",
         slug: "autre",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
         variants: { create: [{ sku: "AUTRE-50", ean: "3401591234567", priceExclTax: 999 }] },
       }),
     ).rejects.toThrow();
@@ -87,6 +94,7 @@ describe("productRepository", () => {
       productRepository.create({
         name: "Doublon sku",
         slug: "encore-autre",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
         variants: { create: [{ sku: "CREME-50", priceExclTax: 999 }] },
       }),
     ).rejects.toThrow();
@@ -94,7 +102,12 @@ describe("productRepository", () => {
 
   it("createWithDefaultVariant : crée un produit avec exactement 1 déclinaison vendable", async () => {
     const created = await productRepository.createWithDefaultVariant({
-      product: { name: "Sérum simple", slug: "serum-simple", productType: "COSMETIC" },
+      product: {
+        name: "Sérum simple",
+        slug: "serum-simple",
+        productType: "COSMETIC",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
+      },
       defaultVariant: { sku: "SERUM-DEF", ean: "3401599999999", priceExclTax: 1990, stock: 7 },
     });
 
@@ -114,6 +127,7 @@ describe("productRepository", () => {
       name: "Sérum actif",
       slug: "serum-actif",
       productType: "COSMETIC",
+      taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
       variants: { create: [{ priceExclTax: 1990, stock: 1 }] },
     });
     await productRepository.create({
@@ -121,6 +135,7 @@ describe("productRepository", () => {
       slug: "serum-masque",
       productType: "COSMETIC",
       active: false,
+      taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
       variants: { create: [{ priceExclTax: 1990, stock: 1 }] },
     });
 
@@ -132,7 +147,7 @@ describe("productRepository", () => {
 
   it("reconcileVariants : met à jour les existantes, ajoute les nouvelles, supprime les absentes", async () => {
     const product = await productRepository.createWithDefaultVariant({
-      product: { name: "Recon", slug: "recon" },
+      product: { name: "Recon", slug: "recon", taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } } },
       defaultVariant: { sku: "RC-A", priceExclTax: 100, volume: "A" },
     });
     const a = product.variants[0];
@@ -203,6 +218,7 @@ describe("productRepository", () => {
       data: {
         name: "Crème bio",
         slug: "creme-bio",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
         categories: { connect: { id: category.id } },
         facetValues: {
           create: [
@@ -216,6 +232,7 @@ describe("productRepository", () => {
       data: {
         name: "Sérum",
         slug: "serum-x",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
         categories: { connect: { id: category.id } },
         facetValues: { create: [{ facetValueId: valueId(nature.values, "serum") }] },
       },
@@ -257,6 +274,7 @@ describe("productRepository", () => {
         name: "Sérum bio",
         slug: "serum-bio",
         productType: "COSMETIC",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
         categories: { connect: [{ id: c1.id }, { id: c2.id }] },
         primaryCategory: { connect: { id: c1.id } },
         variants: { create: { sku: "SB-1", priceExclTax: 1990 } },

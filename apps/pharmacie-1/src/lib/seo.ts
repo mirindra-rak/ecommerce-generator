@@ -22,11 +22,17 @@ export interface LocalizedAlternates {
  * (sans préfixe de locale, ex. `/categorie/visage`). `localePrefix: "always"` ⇒ aucune URL
  * non préfixée n'existe : `x-default` pointe donc vers la `defaultLocale` préfixée.
  *
+ * `page` (≥ 2) ajoute un suffixe `?page=N` à TOUTES les URLs (canonique + `hreflang`) pour des
+ * alternances paginées exactes et auto-référentes. Le tri et les filtres sont VOLONTAIREMENT
+ * exclus de la canonique (consolidation des signaux vers la page paginée de base, évite le
+ * duplicate content des vues réordonnées/filtrées).
+ *
  * Assignable tel quel à `Metadata["alternates"]` (Next) et à `alternates` d'une entrée de
  * sitemap.
  */
-export function alternatesFor(pathname: string, locale: string): LocalizedAlternates {
-  const absolute = (loc: string) => `${siteUrl}${localizedPath(pathname, loc)}`;
+export function alternatesFor(pathname: string, locale: string, page = 1): LocalizedAlternates {
+  const query = page > 1 ? `?page=${page}` : "";
+  const absolute = (loc: string) => `${siteUrl}${localizedPath(pathname, loc)}${query}`;
 
   const languages: Record<string, string> = {};
   for (const loc of routing.locales) languages[loc] = absolute(loc);

@@ -165,6 +165,19 @@ pharmacie-generator/
   Next (pas d'étape de build des packages).
 - **Conséquences** : itération rapide ; pas de pipeline de build intermédiaire.
 
+### ADR-004 — Pricing centralisé, consommé par les modules transactionnels
+
+- **Contexte** : les montants HT / TVA / TTC doivent être calculés de façon
+  déterministe et cohérente entre storefront, panier, commande, factures et
+  remboursements.
+- **Décision** : le module `pricing` (`packages/core/src/modules/pricing`) est la
+  **source unique** de calcul des montants. Les modules `cart`, `order`, `returns`
+  et `payment` **consomment** le contrat `PriceBreakdown` exporté par `pricing` —
+  ils ne recalculent jamais HT/TVA/TTC eux-mêmes.
+- **Conséquences** : toute évolution des règles d'arrondi, de TVA ou de formatage
+  monétaire se fait dans `pricing` ; les modules consommateurs héritent du
+  changement sans modification.
+
 ### ADR-003 — Prisma (et non Drizzle)
 
 - **Contexte** : en Silo, pas de RLS multi-tenant à arbitrer (le point faible de Prisma).

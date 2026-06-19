@@ -107,15 +107,7 @@ export function VariantsEditor({ initial }: { initial: VariantRow[] }) {
                 onChange={(e) => update(row.key, { price: e.target.value })}
               />
             </Field>
-            <Field label={t("stock")} htmlFor={`stock-${row.key}`}>
-              <Input
-                id={`stock-${row.key}`}
-                type="number"
-                min={0}
-                value={row.stock}
-                onChange={(e) => update(row.key, { stock: e.target.value })}
-              />
-            </Field>
+            {/* Stock géré dans la section Stocks (inventory) */}
           </div>
         </div>
       ))}

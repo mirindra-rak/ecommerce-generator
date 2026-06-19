@@ -5,6 +5,7 @@
 //    valident les attributs et traduisent les violations d'unicité Prisma.
 
 import { Prisma } from "@prisma/client";
+import { taxRateRepository, TaxRateNotFoundError } from "../pricing";
 import { buildUniqueSlug } from "../../utils/slugify";
 import { productRepository, type ProductWithRelations } from "./product.repository";
 import { validateAttributes } from "./product-attributes";
@@ -98,6 +99,7 @@ export interface CreateProductInput {
   productType: string;
   description?: string | null;
   active?: boolean;
+  taxRateId?: string;
   brandId?: string | null;
   /** Catégories du produit (M2M). Un produit peut être rattaché à plusieurs catégories. */
   categoryIds?: string[];
@@ -106,6 +108,17 @@ export interface CreateProductInput {
   attributes?: unknown;
   variants: ProductVariantInput[]; // ≥ 1 (invariant « tout est déclinaison »)
   facetValueIds?: string[];
+}
+
+async function resolveTaxRateId(taxRateId?: string): Promise<string> {
+  if (taxRateId) {
+    const taxRate = await taxRateRepository.findById(taxRateId);
+    if (!taxRate || !taxRate.active) throw new TaxRateNotFoundError(taxRateId);
+    return taxRate.id;
+  }
+  const taxRate = await taxRateRepository.findDefault();
+  if (!taxRate || !taxRate.active) throw new TaxRateNotFoundError("default");
+  return taxRate.id;
 }
 
 /**
@@ -142,6 +155,7 @@ export async function createProduct(input: CreateProductInput): Promise<ProductW
   if (input.variants.length === 0) throw new ProductRequiresVariantError();
   const attributes = validateAttributes(input.productType, input.attributes ?? {});
   const slug = await buildUniqueSlug(input.name, productSlugExists);
+  const taxRateId = await resolveTaxRateId(input.taxRateId);
   try {
     const product = await productRepository.createWithVariants({
       product: {
@@ -151,6 +165,7 @@ export async function createProduct(input: CreateProductInput): Promise<ProductW
         description: input.description ?? null,
         active: input.active ?? true,
         attributes: attributes as Prisma.InputJsonValue,
+        taxRate: { connect: { id: taxRateId } },
         ...(input.brandId ? { brand: { connect: { id: input.brandId } } } : {}),
         ...categoryWrite(input.categoryIds ?? [], input.primaryCategoryId ?? null, "connect"),
       },
@@ -173,6 +188,7 @@ export type UpdateProductInput = CreateProductInput;
 export async function updateProduct(id: string, input: UpdateProductInput): Promise<void> {
   if (input.variants.length === 0) throw new ProductRequiresVariantError();
   const attributes = validateAttributes(input.productType, input.attributes ?? {});
+  const taxRateId = await resolveTaxRateId(input.taxRateId);
   try {
     await productRepository.reconcileVariants(id, input.variants);
     await productRepository.update(id, {
@@ -181,6 +197,7 @@ export async function updateProduct(id: string, input: UpdateProductInput): Prom
       description: input.description ?? null,
       active: input.active ?? true,
       attributes: attributes as Prisma.InputJsonValue,
+      taxRate: { connect: { id: taxRateId } },
       brand: input.brandId ? { connect: { id: input.brandId } } : { disconnect: true },
       ...categoryWrite(input.categoryIds ?? [], input.primaryCategoryId ?? null, "set"),
     });

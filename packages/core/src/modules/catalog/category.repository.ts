@@ -13,7 +13,12 @@ export const categoryRepository = {
     return prisma.category.findUnique({ where: { id } });
   },
 
-  findBySlug(slug: string): Promise<Category | null> {
+  findBySlug(slug: string, excludeId?: string): Promise<Category | null> {
+    if (excludeId) {
+      return prisma.category.findFirst({
+        where: { slug, id: { not: excludeId } },
+      });
+    }
     return prisma.category.findUnique({ where: { slug } });
   },
 

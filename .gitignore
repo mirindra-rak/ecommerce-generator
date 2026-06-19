@@ -31,6 +31,9 @@ test-results/
 npm-debug.log*
 pnpm-debug.log*
 
+# Uploaded files (local dev)
+**/public/uploads/
+
 # OS / editors
 .DS_Store
 .idea/

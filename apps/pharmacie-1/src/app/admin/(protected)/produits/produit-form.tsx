@@ -35,6 +35,7 @@ export interface ProductFormValue {
   productType: string;
   description: string | null;
   active: boolean;
+  taxRateId: string;
   brandId: string | null;
   categoryIds: string[];
   primaryCategoryId: string | null;
@@ -47,6 +48,7 @@ export interface ProductFormValue {
 interface ProductFormProps {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   productTypes: readonly string[];
+  taxRateOptions: Option[];
   brandOptions: Option[];
   categoryOptions: Option[];
   facets: FacetOption[];
@@ -90,6 +92,7 @@ function imageUrl(key: string): string {
 export function ProductForm({
   action,
   productTypes,
+  taxRateOptions,
   brandOptions,
   categoryOptions,
   facets,
@@ -172,6 +175,15 @@ export function ProductForm({
               />
             </Field>
           </div>
+
+          <Field label={t("form.taxRate")} htmlFor="taxRateId" hint={t("form.taxRateHint")}>
+            <Select
+              id="taxRateId"
+              name="taxRateId"
+              defaultValue={product?.taxRateId ?? taxRateOptions[0]?.id ?? ""}
+              options={taxRateOptions.map((option) => ({ value: option.id, label: option.label }))}
+            />
+          </Field>
 
           <Field label={t("form.categories")} htmlFor="categoryIds">
             <MultiSelect

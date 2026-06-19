@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { cx } from "../lib/cx";
 import { CheckIcon, ChevronDownIcon } from "../icons";
 import type { SelectOption } from "./select";
+import { Input } from "./input";
 
 // Sélection multiple éditoriale. Radix Select étant mono-sélection, on s'appuie sur
 // Radix Popover : positionnement, focus, fermeture (clic extérieur / Échap) gérés par
@@ -31,6 +32,8 @@ export interface MultiSelectProps {
   className?: string;
   /** Classes du panneau d'options. */
   contentClassName?: string;
+  searchPlaceholder?: string;
+  emptySearchLabel?: string;
   "aria-label"?: string;
 }
 
@@ -46,10 +49,13 @@ export function MultiSelect({
   size = "md",
   className,
   contentClassName,
+  searchPlaceholder = "Rechercher…",
+  emptySearchLabel = "Aucun résultat.",
   "aria-label": ariaLabel,
 }: MultiSelectProps) {
   const isControlled = controlledValue !== undefined;
   const [internal, setInternal] = useState<string[]>(defaultValue ?? []);
+  const [query, setQuery] = useState("");
   const selected = isControlled ? controlledValue : internal;
 
   function toggle(optionValue: string) {
@@ -63,6 +69,11 @@ export function MultiSelect({
   const triggerSize =
     size === "sm" ? "min-h-9 px-3 py-1.5 text-sm" : "min-h-[2.625rem] px-4 py-2 text-sm";
   const selectedOptions = options.filter((o) => selected.includes(o.value));
+  const filteredOptions = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase();
+    if (!normalizedQuery) return options;
+    return options.filter((option) => option.label.toLocaleLowerCase().includes(normalizedQuery));
+  }, [options, query]);
 
   return (
     <Popover.Root>
@@ -103,11 +114,23 @@ export function MultiSelect({
             contentClassName,
           )}
         >
+          <div className="border-b border-line p-2">
+            <Input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={searchPlaceholder}
+              aria-label={searchPlaceholder}
+              className="min-h-9"
+            />
+          </div>
           <div role="listbox" aria-multiselectable aria-label={ariaLabel}>
             {options.length === 0 && (
               <p className="px-3 py-2 text-sm text-muted">Aucune option disponible.</p>
             )}
-            {options.map((option) => {
+            {options.length > 0 && filteredOptions.length === 0 && (
+              <p className="px-3 py-2 text-sm text-muted">{emptySearchLabel}</p>
+            )}
+            {filteredOptions.map((option) => {
               const isSelected = selected.includes(option.value);
               return (
                 <button

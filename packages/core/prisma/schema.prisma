@@ -79,6 +79,20 @@ model Category {
   @@index([parentId])
 }
 
+model TaxRate {
+  // Référentiel fiscal stable : IDs lisibles pour simplifier les seeds et migrations.
+  id       String  @id
+  code     String  @unique
+  name     String
+  rateBps  Int
+  active   Boolean @default(true)
+  position Int     @default(0)
+
+  products  Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Product {
   id          String      @id @default(cuid())
   name        String
@@ -89,8 +103,6 @@ model Product {
   // SEO produit (parité avec Category).
   metaTitle       String?
   metaDescription String?
-  // TVA en POINTS DE BASE (550 = 5,5 %, 2000 = 20 %). Entier — pas de float pour la monnaie.
-  vatRate     Int     @default(2000)
   // Identifiant d'origine (produit PrestaShop) pour ré-import idempotent.
   externalId  Int?    @unique
   // Type ouvert (String + union TS côté code) : ajouter un type ne demande pas de migration.
@@ -98,6 +110,8 @@ model Product {
   // Attributs DESCRIPTIFS propres au vertical (parapharmacie : inci, precautions…).
   // Validés par attribute-set Zod selon productType. Les champs commerce restent en colonnes.
   attributes  Json    @default("{}")
+  taxRateId   String
+  taxRate     TaxRate @relation(fields: [taxRateId], references: [id], onDelete: Restrict)
 
   // Marque optionnelle : supprimer une marque détache ses produits (SetNull).
   brandId String?
@@ -120,6 +134,7 @@ model Product {
 
   @@index([primaryCategoryId])
   @@index([brandId])
+  @@index([taxRateId])
 }
 
 model ProductOption {
@@ -160,6 +175,14 @@ model ProductVariant {
   stock        Int                  @default(0)
   optionValues VariantOptionValue[]
 
+  // ── Inventory ──
+  minOrderQty      Int                @default(1)
+  stockLocation    String?
+  lowStockThreshold Int?
+  lowStockAlert    Boolean            @default(false)
+  outOfStockBehavior OutOfStockBehavior @default(DEFAULT)
+  stockMovements   StockMovement[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -188,6 +211,36 @@ model ProductMedia {
   createdAt  DateTime @default(now())
 
   @@index([productId])
+}
+
+// ───────────────────────── Inventory ─────────────────────────
+
+enum OutOfStockBehavior {
+  DENY
+  ALLOW
+  DEFAULT
+}
+
+enum StockMovementReason {
+  MANUAL_ADJUSTMENT
+  RECEPTION
+  SALE
+  RETURN
+  CORRECTION
+}
+
+model StockMovement {
+  id        String              @id @default(cuid())
+  variantId String
+  variant   ProductVariant      @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  delta     Int
+  stockAfter Int
+  reason    StockMovementReason
+  note      String?
+  createdAt DateTime            @default(now())
+
+  @@index([variantId])
+  @@index([createdAt])
 }
 
 // ───────────────────────── Facettes (filtres produit) ─────────────────────────

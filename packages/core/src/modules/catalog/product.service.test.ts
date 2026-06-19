@@ -14,6 +14,7 @@ import {
   PrimaryCategoryNotAssignedError,
   ProductRequiresVariantError,
 } from "./catalog-errors";
+import { DEFAULT_TAX_RATE_ID, TaxRateNotFoundError } from "../pricing";
 
 describe("priceRange", () => {
   it("retourne la fourchette min/max", () => {
@@ -65,6 +66,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Crème test",
       productType: "COSMETIC",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       attributes: { inci: "Aqua" },
       variants: [{ sku: "TEST-SKU", ean: "1234567890123", priceExclTax: 1500, stock: 10 }],
     });
@@ -83,6 +85,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Crème multi",
       productType: "COSMETIC",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [
         { sku: "M-50", volume: "50 ml", priceExclTax: 1490, stock: 5 },
         { sku: "M-100", volume: "100 ml", priceExclTax: 2290, stock: 3 },
@@ -104,11 +107,13 @@ describe("product write services", () => {
     await createProduct({
       name: "Doublon",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ sku: "A1", priceExclTax: 100 }],
     });
     const second = await createProduct({
       name: "Doublon",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ sku: "A2", priceExclTax: 100 }],
     });
     expect(second.slug).toBe("doublon-2");
@@ -119,6 +124,7 @@ describe("product write services", () => {
       createProduct({
         name: "Invalide",
         productType: "COSMETIC",
+        taxRateId: DEFAULT_TAX_RATE_ID,
         attributes: { inci: 123 },
         variants: [{ sku: "INV-1", priceExclTax: 100 }],
       }),
@@ -129,6 +135,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Avant",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ sku: "U1", priceExclTax: 1000, stock: 5 }],
     });
     const [created] = product.variants;
@@ -137,6 +144,7 @@ describe("product write services", () => {
     await updateProduct(product.id, {
       name: "Après",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ id: created.id, sku: "U1", priceExclTax: 2000, stock: 8 }],
     });
 
@@ -154,6 +162,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Réconcilie",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [
         { sku: "R-A", volume: "A", priceExclTax: 100 },
         { sku: "R-B", volume: "B", priceExclTax: 200 },
@@ -167,6 +176,7 @@ describe("product write services", () => {
     await updateProduct(product.id, {
       name: "Réconcilie",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [
         { id: idA, sku: "R-A", volume: "A", priceExclTax: 150 },
         { sku: "R-C", volume: "C", priceExclTax: 300 },
@@ -183,6 +193,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Garde une",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ sku: "G1", priceExclTax: 100 }],
     });
     await expect(
@@ -194,6 +205,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "À supprimer",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ sku: "D1", priceExclTax: 100 }],
     });
 
@@ -207,6 +219,7 @@ describe("product write services", () => {
     await createProduct({
       name: "Premier",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ sku: "DUP", ean: "999", priceExclTax: 100 }],
     });
 
@@ -214,6 +227,7 @@ describe("product write services", () => {
       createProduct({
         name: "SKU dupliqué",
         productType: "OTHER",
+        taxRateId: DEFAULT_TAX_RATE_ID,
         variants: [{ sku: "DUP", priceExclTax: 100 }],
       }),
     ).rejects.toBeInstanceOf(DuplicateProductFieldError);
@@ -222,6 +236,7 @@ describe("product write services", () => {
       createProduct({
         name: "EAN dupliqué",
         productType: "OTHER",
+        taxRateId: DEFAULT_TAX_RATE_ID,
         variants: [{ sku: "AUTRE", ean: "999", priceExclTax: 100 }],
       }),
     ).rejects.toBeInstanceOf(DuplicateProductFieldError);
@@ -231,6 +246,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Sans SKU",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ priceExclTax: 100 }],
     });
     expect(product.variants).toHaveLength(1);
@@ -241,12 +257,14 @@ describe("product write services", () => {
     await createProduct({
       name: "Sans SKU 1",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ priceExclTax: 100 }],
     });
     // Un autre produit sans SKU + un produit à 2 déclinaisons sans SKU : aucun conflit d'unicité.
     await createProduct({
       name: "Sans SKU 2",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [
         { priceExclTax: 100, volume: "A" },
         { priceExclTax: 200, volume: "B" },
@@ -276,6 +294,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Avec facette",
       productType: "COSMETIC",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ sku: "F1", priceExclTax: 100 }],
       facetValueIds: [creme.id],
     });
@@ -288,6 +307,7 @@ describe("product write services", () => {
     await updateProduct(product.id, {
       name: "Avec facette",
       productType: "COSMETIC",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       variants: [{ id: variant.id, sku: "F1", priceExclTax: 100 }],
       facetValueIds: [gel.id],
     });
@@ -304,6 +324,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Multi-cat",
       productType: "COSMETIC",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       categoryIds: [c1.id, c2.id],
       primaryCategoryId: c1.id,
       variants: [{ sku: "MC-1", priceExclTax: 100 }],
@@ -323,6 +344,7 @@ describe("product write services", () => {
     const product = await createProduct({
       name: "Re-cat",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       categoryIds: [c1.id, c2.id],
       variants: [{ sku: "RC-1", priceExclTax: 100 }],
     });
@@ -332,6 +354,7 @@ describe("product write services", () => {
     await updateProduct(product.id, {
       name: "Re-cat",
       productType: "OTHER",
+      taxRateId: DEFAULT_TAX_RATE_ID,
       categoryIds: [c2.id],
       primaryCategoryId: c2.id,
       variants: [{ id: variant.id, sku: "RC-1", priceExclTax: 100 }],
@@ -352,10 +375,22 @@ describe("product write services", () => {
       createProduct({
         name: "Principale invalide",
         productType: "OTHER",
+        taxRateId: DEFAULT_TAX_RATE_ID,
         categoryIds: [c1.id],
         primaryCategoryId: c2.id,
         variants: [{ sku: "PI-1", priceExclTax: 100 }],
       }),
     ).rejects.toBeInstanceOf(PrimaryCategoryNotAssignedError);
+  });
+
+  it("rejette un taxRateId inconnu", async () => {
+    await expect(
+      createProduct({
+        name: "Taxe invalide",
+        productType: "OTHER",
+        taxRateId: "missing-tax-rate",
+        variants: [{ sku: "TX-1", priceExclTax: 100 }],
+      }),
+    ).rejects.toBeInstanceOf(TaxRateNotFoundError);
   });
 });
