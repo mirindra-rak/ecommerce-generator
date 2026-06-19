@@ -157,7 +157,8 @@
     "typeSupplement": "Complément alimentaire",
     "typeDevice": "Dispositif médical",
     "typeOther": "Produit",
-    "priceSuffix": "HT",
+    "priceSuffix": "TTC",
+    "taxRate": "TVA {rate}",
     "addToCart": "Ajouter au panier",
     "references": "Références",
     "inci": "Composition (INCI)",
@@ -173,6 +174,7 @@
       "products": "Produits",
       "categories": "Catégories",
       "brands": "Marques",
+      "facets": "Facettes",
       "settings": "Paramètres"
     },
     "topbar": {
@@ -367,9 +369,62 @@
         "idMissing": "Identifiant manquant."
       }
     },
+    "facets": {
+      "pageTitle": "Facettes",
+      "total": "{count} au total",
+      "new": {
+        "title": "Nouvelle facette",
+        "subtitle": "Le code est généré automatiquement depuis le nom."
+      },
+      "table": {
+        "search": "Rechercher une facette…",
+        "colName": "Nom",
+        "colCode": "Code",
+        "colValues": "Valeurs",
+        "colProducts": "Produits",
+        "emptyTitle": "Aucune facette trouvée",
+        "emptyHint": "Modifiez votre recherche ou créez une facette.",
+        "edit": "Éditer",
+        "delete": "Supprimer",
+        "confirmDelete": "Supprimer cette facette et toutes ses valeurs ?"
+      },
+      "form": {
+        "name": "Nom",
+        "code": "Code",
+        "codeHint": "Généré automatiquement depuis le nom (non modifiable après création).",
+        "codeImmutable": "Le code est figé (clé stable pour les URLs de filtrage)."
+      },
+      "edit": {
+        "title": "Éditer « {name} »"
+      },
+      "values": {
+        "title": "Valeurs",
+        "description": "Les valeurs proposées dans ce filtre. Réordonnez avec les flèches.",
+        "colLabel": "Label",
+        "colCode": "Code",
+        "add": "+ Ajouter une valeur",
+        "addPlaceholder": "Nom de la valeur…",
+        "moveUp": "Monter",
+        "moveDown": "Descendre",
+        "delete": "Supprimer",
+        "confirmDelete": "Supprimer cette valeur ? Les liaisons produits seront retirées.",
+        "rename": "Renommer",
+        "renamePlaceholder": "Nouveau label…"
+      },
+      "errors": {
+        "nameRequired": "Le nom est requis.",
+        "idMissing": "Identifiant manquant.",
+        "duplicateCode": "Une facette avec ce code existe déjà.",
+        "labelRequired": "Le label est requis.",
+        "duplicateValueCode": "Une valeur avec ce code existe déjà dans cette facette."
+      }
+    },
     "products": {
       "pageTitle": "Produits",
       "total": "{count} au total",
+      "tabs": {
+        "product": "Produit"
+      },
       "new": {
         "title": "Nouveau produit",
         "subtitle": "Le slug est généré automatiquement depuis le nom. Une déclinaison par défaut est créée."
@@ -416,6 +471,8 @@
         "name": "Nom",
         "active": "Actif (visible sur la boutique)",
         "type": "Type",
+        "taxRate": "Taux de TVA",
+        "taxRateHint": "Règle fiscale appliquée à toutes les déclinaisons du produit.",
         "brand": "Marque",
         "brandNone": "— Aucune —",
         "categories": "Catégories",
@@ -458,6 +515,47 @@
       "edit": {
         "title": "Éditer « {name} »"
       },
+      "stock": {
+        "sectionTitle": "Stocks",
+        "sectionDesc": "Gestion des stocks, alertes et comportement en rupture.",
+        "currentStock": "Stock actuel",
+        "adjust": "Ajuster",
+        "adjustPlaceholder": "+10 ou -5",
+        "adjustNote": "Note (optionnel)",
+        "adjustNotePlaceholder": "Motif de l'ajustement…",
+        "adjustSubmit": "Appliquer",
+        "adjusting": "Ajustement…",
+        "minOrderQty": "Quantité minimale de vente",
+        "stockLocation": "Emplacement du stock",
+        "stockLocationPlaceholder": "Saisir l'emplacement du stock",
+        "lowStockAlert": "Alerte stock faible",
+        "lowStockThreshold": "Seuil d'alerte",
+        "lowStockThresholdPlaceholder": "Entrez la valeur seuil",
+        "outOfStockBehavior": "En cas de rupture de stock",
+        "behaviorDeny": "Refuser les commandes",
+        "behaviorAllow": "Accepter les commandes",
+        "behaviorDefault": "Utiliser le comportement par défaut (Refuser les commandes)",
+        "saveSettings": "Enregistrer",
+        "savingSettings": "Enregistrement…",
+        "history": "Historique des mouvements",
+        "historyEmpty": "Aucun mouvement enregistré.",
+        "historyDate": "Date",
+        "historyDelta": "Quantité",
+        "historyStockAfter": "Stock après",
+        "historyReason": "Motif",
+        "historyNote": "Note",
+        "reasonMANUAL_ADJUSTMENT": "Ajustement manuel",
+        "reasonRECEPTION": "Réception",
+        "reasonSALE": "Vente",
+        "reasonRETURN": "Retour",
+        "reasonCORRECTION": "Correction",
+        "errors": {
+          "deltaRequired": "Saisissez une quantité à ajuster.",
+          "deltaInvalid": "La quantité doit être un entier non nul.",
+          "adjustFailed": "Échec de l'ajustement.",
+          "settingsFailed": "Échec de l'enregistrement des paramètres."
+        }
+      },
       "errors": {
         "nameRequired": "Le nom est requis.",
         "idMissing": "Identifiant manquant.",
@@ -470,7 +568,8 @@
         "invalidAttributes": "Attributs produit invalides.",
         "duplicateField": "Ce SKU ou EAN est déjà utilisé par une autre déclinaison.",
         "requiresVariant": "Un produit doit avoir au moins une déclinaison.",
-        "primaryCategoryNotAssigned": "La catégorie principale doit faire partie des catégories du produit."
+        "primaryCategoryNotAssigned": "La catégorie principale doit faire partie des catégories du produit.",
+        "taxRateInvalid": "Le taux de TVA sélectionné est invalide."
       }
     },
     "login": {

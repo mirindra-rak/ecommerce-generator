@@ -157,7 +157,8 @@
     "typeSupplement": "Food supplement",
     "typeDevice": "Medical device",
     "typeOther": "Product",
-    "priceSuffix": "excl. VAT",
+    "priceSuffix": "incl. VAT",
+    "taxRate": "VAT {rate}",
     "addToCart": "Add to basket",
     "references": "References",
     "inci": "Composition (INCI)",
@@ -173,6 +174,7 @@
       "products": "Products",
       "categories": "Categories",
       "brands": "Brands",
+      "facets": "Facets",
       "settings": "Settings"
     },
     "topbar": {
@@ -367,9 +369,62 @@
         "idMissing": "Missing identifier."
       }
     },
+    "facets": {
+      "pageTitle": "Facets",
+      "total": "{count} total",
+      "new": {
+        "title": "New facet",
+        "subtitle": "The code is generated automatically from the name."
+      },
+      "table": {
+        "search": "Search a facet…",
+        "colName": "Name",
+        "colCode": "Code",
+        "colValues": "Values",
+        "colProducts": "Products",
+        "emptyTitle": "No facet found",
+        "emptyHint": "Adjust your search or create a facet.",
+        "edit": "Edit",
+        "delete": "Delete",
+        "confirmDelete": "Delete this facet and all its values?"
+      },
+      "form": {
+        "name": "Name",
+        "code": "Code",
+        "codeHint": "Generated automatically from the name (read-only after creation).",
+        "codeImmutable": "The code is locked (stable key for filter URLs)."
+      },
+      "edit": {
+        "title": "Edit \"{name}\""
+      },
+      "values": {
+        "title": "Values",
+        "description": "The values available in this filter. Use arrows to reorder.",
+        "colLabel": "Label",
+        "colCode": "Code",
+        "add": "+ Add a value",
+        "addPlaceholder": "Value name…",
+        "moveUp": "Move up",
+        "moveDown": "Move down",
+        "delete": "Delete",
+        "confirmDelete": "Delete this value? Product links will be removed.",
+        "rename": "Rename",
+        "renamePlaceholder": "New label…"
+      },
+      "errors": {
+        "nameRequired": "Name is required.",
+        "idMissing": "Missing identifier.",
+        "duplicateCode": "A facet with this code already exists.",
+        "labelRequired": "Label is required.",
+        "duplicateValueCode": "A value with this code already exists in this facet."
+      }
+    },
     "products": {
       "pageTitle": "Products",
       "total": "{count} total",
+      "tabs": {
+        "product": "Product"
+      },
       "new": {
         "title": "New product",
         "subtitle": "The slug is generated automatically from the name. A default variant is created."
@@ -416,6 +471,8 @@
         "name": "Name",
         "active": "Active (shown in the store)",
         "type": "Type",
+        "taxRate": "VAT rate",
+        "taxRateHint": "Tax rule applied to every sellable variant of the product.",
         "brand": "Brand",
         "brandNone": "— None —",
         "categories": "Categories",
@@ -458,6 +515,47 @@
       "edit": {
         "title": "Edit “{name}”"
       },
+      "stock": {
+        "sectionTitle": "Stock",
+        "sectionDesc": "Stock management, alerts and out-of-stock behaviour.",
+        "currentStock": "Current stock",
+        "adjust": "Adjust",
+        "adjustPlaceholder": "+10 or -5",
+        "adjustNote": "Note (optional)",
+        "adjustNotePlaceholder": "Reason for adjustment…",
+        "adjustSubmit": "Apply",
+        "adjusting": "Adjusting…",
+        "minOrderQty": "Minimum order quantity",
+        "stockLocation": "Stock location",
+        "stockLocationPlaceholder": "Enter stock location",
+        "lowStockAlert": "Low stock alert",
+        "lowStockThreshold": "Alert threshold",
+        "lowStockThresholdPlaceholder": "Enter threshold value",
+        "outOfStockBehavior": "When out of stock",
+        "behaviorDeny": "Deny orders",
+        "behaviorAllow": "Accept orders",
+        "behaviorDefault": "Use default behaviour (Deny orders)",
+        "saveSettings": "Save",
+        "savingSettings": "Saving…",
+        "history": "Movement history",
+        "historyEmpty": "No movements recorded.",
+        "historyDate": "Date",
+        "historyDelta": "Quantity",
+        "historyStockAfter": "Stock after",
+        "historyReason": "Reason",
+        "historyNote": "Note",
+        "reasonMANUAL_ADJUSTMENT": "Manual adjustment",
+        "reasonRECEPTION": "Reception",
+        "reasonSALE": "Sale",
+        "reasonRETURN": "Return",
+        "reasonCORRECTION": "Correction",
+        "errors": {
+          "deltaRequired": "Enter a quantity to adjust.",
+          "deltaInvalid": "Quantity must be a non-zero integer.",
+          "adjustFailed": "Adjustment failed.",
+          "settingsFailed": "Failed to save settings."
+        }
+      },
       "errors": {
         "nameRequired": "Name is required.",
         "idMissing": "Missing identifier.",
@@ -470,7 +568,8 @@
         "invalidAttributes": "Invalid product attributes.",
         "duplicateField": "This SKU or EAN is already used by another variant.",
         "requiresVariant": "A product must have at least one variant.",
-        "primaryCategoryNotAssigned": "The primary category must be one of the product's categories."
+        "primaryCategoryNotAssigned": "The primary category must be one of the product's categories.",
+        "taxRateInvalid": "The selected VAT rate is invalid."
       }
     },
     "login": {

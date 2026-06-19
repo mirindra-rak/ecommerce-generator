@@ -51,6 +51,8 @@ export {
   ArrowCounterClockwise as ResetIcon,
   X as XIcon,
   CircleNotch as SpinnerIcon,
+  Faders as FadersIcon,
+  CaretUp as ChevronUpIcon,
 } from "@phosphor-icons/react";
 
 // Étoile pleine (notation) — variante « fill ».
