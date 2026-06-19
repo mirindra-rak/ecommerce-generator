@@ -49,6 +49,19 @@ export { safeTextField, validateCategoryFields } from "./category-fields";
 export { createBrand, updateBrand, deleteBrand } from "./brand.service";
 
 export {
+  createFacet,
+  updateFacet,
+  deleteFacet,
+  reorderFacets,
+  createFacetValue,
+  updateFacetValue,
+  deleteFacetValue,
+  reorderFacetValues,
+  DuplicateFacetCodeError,
+  DuplicateFacetValueCodeError,
+} from "./facet.service";
+
+export {
   ReparentCycleError,
   CategoryNotEmptyError,
   PrimaryCategoryNotAssignedError,

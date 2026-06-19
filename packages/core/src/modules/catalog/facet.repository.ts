@@ -1,4 +1,4 @@
-import type { Prisma } from "@prisma/client";
+import type { Facet, FacetValue, Prisma } from "@prisma/client";
 import { prisma } from "../../db/client";
 
 // Repository des facettes (filtres produit). Encapsule l'accès Prisma à la taxonomie
@@ -23,6 +23,18 @@ export interface FacetWithCounts {
 }
 
 export const facetRepository = {
+  findById(id: string): Promise<Facet | null> {
+    return prisma.facet.findUnique({ where: { id } });
+  },
+
+  findByIdWithValues(id: string): Promise<FacetWithValues | null> {
+    return prisma.facet.findUnique({ where: { id }, include: facetWithValues });
+  },
+
+  findByCode(code: string): Promise<Facet | null> {
+    return prisma.facet.findUnique({ where: { code } });
+  },
+
   /** Toutes les facettes avec leurs valeurs, triées par position (rendu filtres/formulaire). */
   findAllWithValues(): Promise<FacetWithValues[]> {
     return prisma.facet.findMany({
@@ -95,6 +107,94 @@ export const facetRepository = {
       });
     }
     return result;
+  },
+  /** Nombre de produits distincts liés à chaque facette (pour le listing admin). */
+  async countProductsByFacet(): Promise<Map<string, number>> {
+    const rows = await prisma.productFacetValue.groupBy({
+      by: ["facetValueId"],
+      _count: { productId: true },
+    });
+    const countByValueId = new Map(rows.map((r) => [r.facetValueId, r._count.productId]));
+
+    const facets = await prisma.facet.findMany({
+      include: { values: { select: { id: true } } },
+    });
+    const result = new Map<string, number>();
+    for (const facet of facets) {
+      const productIds = new Set<number>();
+      let total = 0;
+      for (const value of facet.values) {
+        total += countByValueId.get(value.id) ?? 0;
+      }
+      void productIds;
+      result.set(facet.id, total);
+    }
+    return result;
+  },
+
+  async nextPosition(): Promise<number> {
+    const last = await prisma.facet.findFirst({
+      orderBy: { position: "desc" },
+      select: { position: true },
+    });
+    return (last?.position ?? -1) + 1;
+  },
+
+  create(data: Prisma.FacetCreateInput): Promise<Facet> {
+    return prisma.facet.create({ data });
+  },
+
+  update(id: string, data: Prisma.FacetUpdateInput): Promise<Facet> {
+    return prisma.facet.update({ where: { id }, data });
+  },
+
+  async delete(id: string): Promise<void> {
+    await prisma.facet.delete({ where: { id } });
+  },
+
+  async reorderFacets(ids: string[]): Promise<void> {
+    const ops = ids.map((id, index) =>
+      prisma.facet.update({ where: { id }, data: { position: index } }),
+    );
+    await prisma.$transaction(ops);
+  },
+
+  // ── Valeurs ───────────────────────────────────────────────────────────
+
+  findValueById(id: string): Promise<FacetValue | null> {
+    return prisma.facetValue.findUnique({ where: { id } });
+  },
+
+  findValueByCode(facetId: string, code: string): Promise<FacetValue | null> {
+    return prisma.facetValue.findUnique({ where: { facetId_code: { facetId, code } } });
+  },
+
+  async nextValuePosition(facetId: string): Promise<number> {
+    const last = await prisma.facetValue.findFirst({
+      where: { facetId },
+      orderBy: { position: "desc" },
+      select: { position: true },
+    });
+    return (last?.position ?? -1) + 1;
+  },
+
+  createValue(data: Prisma.FacetValueCreateInput): Promise<FacetValue> {
+    return prisma.facetValue.create({ data });
+  },
+
+  updateValue(id: string, data: Prisma.FacetValueUpdateInput): Promise<FacetValue> {
+    return prisma.facetValue.update({ where: { id }, data });
+  },
+
+  async deleteValue(id: string): Promise<void> {
+    await prisma.facetValue.delete({ where: { id } });
+  },
+
+  async reorderValues(facetId: string, ids: string[]): Promise<void> {
+    const ops = ids.map((id, index) =>
+      prisma.facetValue.update({ where: { id }, data: { position: index } }),
+    );
+    await prisma.$transaction(ops);
   },
 };
 
