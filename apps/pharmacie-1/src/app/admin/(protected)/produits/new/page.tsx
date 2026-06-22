@@ -31,6 +31,7 @@ export default async function NewProductPage() {
           taxRateOptions={taxRates.map((taxRate) => ({
             id: taxRate.id,
             label: `${taxRate.name} (${(taxRate.rateBps / 100).toFixed(2).replace(".", ",")} %)`,
+            rateBps: taxRate.rateBps,
           }))}
           brandOptions={brands.map((b) => ({ id: b.id, label: b.name }))}
           categoryOptions={categories.map((c) => ({ id: c.id, label: c.name }))}

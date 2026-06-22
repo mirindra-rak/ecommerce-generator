@@ -509,6 +509,8 @@
         "ean": "Code-barres (EAN)",
         "price": "Prix HT (€)",
         "pricePlaceholder": "14.90",
+        "priceInclTax": "Prix TTC (€)",
+        "priceInclTaxPlaceholder": "17.88",
         "stock": "Stock",
         "add": "+ Ajouter une déclinaison"
       },

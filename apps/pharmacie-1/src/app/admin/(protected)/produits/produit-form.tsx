@@ -21,6 +21,7 @@ import { VariantsEditor, type VariantRow } from "./variants-editor";
 export interface Option {
   id: string;
   label: string;
+  rateBps?: number;
 }
 
 export interface FacetOption {
@@ -105,6 +106,13 @@ export function ProductForm({
   const formRef = useRef<HTMLFormElement>(null);
   useUnsavedChanges(formRef);
 
+  const defaultTaxRateId = product?.taxRateId ?? taxRateOptions[0]?.id ?? "";
+  const [selectedTaxRateId, setSelectedTaxRateId] = useState(defaultTaxRateId);
+  const selectedRateBps = useMemo(() => {
+    const found = taxRateOptions.find((o) => o.id === selectedTaxRateId);
+    return found?.rateBps ?? 0;
+  }, [taxRateOptions, selectedTaxRateId]);
+
   const initialMedia: MediaItem[] = useMemo(
     () =>
       (product?.media ?? []).map((m) => ({
@@ -180,7 +188,8 @@ export function ProductForm({
             <Select
               id="taxRateId"
               name="taxRateId"
-              defaultValue={product?.taxRateId ?? taxRateOptions[0]?.id ?? ""}
+              value={selectedTaxRateId}
+              onValueChange={setSelectedTaxRateId}
               options={taxRateOptions.map((option) => ({ value: option.id, label: option.label }))}
             />
           </Field>
@@ -239,7 +248,7 @@ export function ProductForm({
       </FormSection>
 
       <FormSection title={t("form.sectionVariants")} description={t("form.sectionVariantsDesc")}>
-        <VariantsEditor initial={product?.variants ?? []} />
+        <VariantsEditor initial={product?.variants ?? []} rateBps={selectedRateBps} />
       </FormSection>
 
       <FormSection
