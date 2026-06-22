@@ -3,14 +3,16 @@ import { Link } from "@/i18n/navigation";
 import { Container, Cross, IconButton } from "@pharmacie/ui";
 import { siteConfig } from "@/lib/site";
 import { getMenuTree } from "@/lib/catalog";
-import { CartIcon, HeartIcon, MenuIcon, SearchIcon, UserIcon } from "./icons";
+import { CartIcon, HeartIcon, MenuIcon, SearchIcon } from "./icons";
 import { LanguageSwitcher } from "./language-switcher";
 import { MegaMenu } from "./mega-menu";
+import { UserMenu } from "./user-menu";
 
-// En-tête vitrine partagé par le groupe (storefront). La navigation catégories est
-// data-driven : l'arbre racines + sous-catégories actives vient du module catalog et
-// alimente le mega menu (composant client).
-export async function SiteHeader() {
+interface SiteHeaderProps {
+  user: { name: string } | null;
+}
+
+export async function SiteHeader({ user }: SiteHeaderProps) {
   const [menu, t, tc] = await Promise.all([
     getMenuTree(),
     getTranslations("header"),
@@ -56,9 +58,7 @@ export async function SiteHeader() {
 
         <nav className="ml-auto flex items-center gap-1">
           <LanguageSwitcher />
-          <IconButton label={t("account")}>
-            <UserIcon className="h-5 w-5" />
-          </IconButton>
+          <UserMenu user={user} />
           <IconButton label={t("favorites")}>
             <HeartIcon className="h-5 w-5" />
           </IconButton>

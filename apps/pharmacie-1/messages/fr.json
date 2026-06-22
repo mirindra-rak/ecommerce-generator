@@ -589,5 +589,25 @@
       "message": "Votre compte n'a pas les droits nécessaires pour accéder au back-office.",
       "backToShop": "Retour à la boutique"
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Connectez-vous à votre compte.",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "pending": "Connexion…",
+      "invalid": "Identifiants invalides.",
+      "signUpLink": "Créer un compte",
+      "signUpHint": "Pas encore de compte ?",
+      "forgotPassword": "Mot de passe oublié ?"
+    },
+    "userMenu": {
+      "myAccount": "Mon compte",
+      "signOut": "Se déconnecter",
+      "signingOut": "Déconnexion…",
+      "signIn": "Se connecter"
+    }
   }
 }

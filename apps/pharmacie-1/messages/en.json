@@ -589,5 +589,25 @@
       "message": "Your account does not have the required permissions to access the back office.",
       "backToShop": "Back to the store"
     }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Sign in to your account.",
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Sign in",
+      "pending": "Signing in…",
+      "invalid": "Invalid credentials.",
+      "signUpLink": "Create an account",
+      "signUpHint": "Don't have an account?",
+      "forgotPassword": "Forgot password?"
+    },
+    "userMenu": {
+      "myAccount": "My account",
+      "signOut": "Sign out",
+      "signingOut": "Signing out…",
+      "signIn": "Sign in"
+    }
   }
 }
