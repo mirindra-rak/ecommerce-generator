@@ -1,6 +1,6 @@
 # Epic : Internationalisation (i18n) — UI multilingue (V1)
 
-**Date** : 2026-06-12 · **Statut** 🟡 · **Estimation globale** : M/L
+**Date** : 2026-06-12 · **Statut** ✅ Terminé (2026-06-22) · **Estimation globale** : M/L
 
 ## Contexte & vision
 
