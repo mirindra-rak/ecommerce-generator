@@ -165,6 +165,25 @@
     "precautions": "Précautions d'emploi",
     "notFound": "Produit introuvable"
   },
+  "cart": {
+    "addToCart": "Ajouter {name} au panier",
+    "addToCartButton": "Ajouter au panier",
+    "added": "Ajouté au panier",
+    "outOfStock": "Produit indisponible",
+    "error": "Une erreur est survenue",
+    "pageTitle": "Mon panier",
+    "empty": "Votre panier est vide",
+    "emptyLink": "Continuer mes achats",
+    "product": "Produit",
+    "unitPrice": "Prix unitaire",
+    "quantity": "Quantité",
+    "subtotal": "Sous-total",
+    "remove": "Supprimer",
+    "totalExclTax": "Total HT",
+    "totalTax": "TVA",
+    "totalInclTax": "Total TTC",
+    "itemCount": "{count, plural, =0 {Aucun article} =1 {1 article} other {# articles}}"
+  },
   "admin": {
     "nav": {
       "backOffice": "Back-office",
@@ -497,6 +516,12 @@
         "sectionAttributesDesc": "Informations libres, non utilisées pour le filtrage.",
         "inci": "INCI",
         "precautions": "Précautions",
+        "sectionSeo": "SEO",
+        "sectionSeoDesc": "Métadonnées pour les moteurs de recherche.",
+        "metaTitle": "Balise titre",
+        "metaTitleHint": "Idéalement 50–60 caractères.",
+        "metaDescription": "Meta description",
+        "metaDescriptionHint": "Idéalement 150–160 caractères.",
         "sectionFacets": "Filtres / Caractéristiques",
         "sectionFacetsDesc": "Critères de filtrage proposés sur la boutique."
       },
@@ -635,6 +660,69 @@
       "text": "Veuillez vérifier votre adresse e-mail.",
       "resend": "Renvoyer",
       "resent": "E-mail renvoyé !"
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Saisissez votre adresse e-mail pour recevoir un lien de réinitialisation.",
+      "email": "Adresse e-mail",
+      "submit": "Envoyer le lien",
+      "pending": "Envoi…",
+      "success": "Si un compte existe avec cette adresse, un e-mail a été envoyé.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "passwordHint": "8 caractères minimum",
+      "submit": "Réinitialiser",
+      "pending": "Réinitialisation…",
+      "success": "Votre mot de passe a été réinitialisé.",
+      "successCta": "Se connecter",
+      "expired": "Ce lien est expiré ou invalide.",
+      "expiredCta": "Refaire une demande",
+      "mismatch": "Les mots de passe ne correspondent pas."
+    },
+    "account": {
+      "title": "Mon compte",
+      "nav": {
+        "dashboard": "Tableau de bord",
+        "profile": "Profil",
+        "password": "Mot de passe",
+        "signOut": "Se déconnecter",
+        "orders": "Commandes",
+        "addresses": "Adresses",
+        "wishlist": "Favoris",
+        "comingSoon": "Bientôt"
+      },
+      "dashboard": {
+        "welcome": "Bonjour, {name}",
+        "email": "E-mail",
+        "emailVerified": "Vérifié",
+        "emailNotVerified": "Non vérifié",
+        "quickLinks": "Accès rapides",
+        "editProfile": "Modifier mon profil",
+        "changePassword": "Changer mon mot de passe"
+      },
+      "profile": {
+        "title": "Mon profil",
+        "name": "Nom complet",
+        "submit": "Enregistrer",
+        "pending": "Enregistrement…",
+        "success": "Profil mis à jour."
+      },
+      "password": {
+        "title": "Changer le mot de passe",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe",
+        "passwordHint": "8 caractères minimum",
+        "submit": "Changer le mot de passe",
+        "pending": "Modification…",
+        "success": "Mot de passe modifié.",
+        "wrongCurrent": "Mot de passe actuel incorrect.",
+        "mismatch": "Les mots de passe ne correspondent pas."
+      }
     }
   }
 }
