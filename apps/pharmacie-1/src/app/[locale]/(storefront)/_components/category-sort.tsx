@@ -45,7 +45,7 @@ export function CategorySort() {
         id={selectId}
         value={current}
         onChange={(event) => onChange(event.target.value)}
-        className="rounded-sm border border-line bg-surface px-3 py-1.5 text-sm text-foreground"
+        className="cursor-pointer rounded-sm border border-line bg-surface px-3 py-1.5 text-sm text-foreground"
       >
         {SORT_OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>

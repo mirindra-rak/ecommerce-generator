@@ -316,6 +316,50 @@ model CartItem {
   @@index([cartId])
 }
 
+// ───────────────────────── Promotions (Catalog Price Rules) ─────────────────────────
+
+enum TargetType {
+  ALL
+  CATEGORY
+  PRODUCT
+  BRAND
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+model CatalogPriceRule {
+  id               String       @id @default(cuid())
+  name             String
+  active           Boolean      @default(true)
+  startDate        DateTime?
+  endDate          DateTime?
+  priority         Int          @default(0)
+  targetType       TargetType
+  discountType     DiscountType
+  discountValue    Int
+  floorPrice       Int?
+  customerLabel    String?
+  showStrikethrough Boolean     @default(true)
+  targets          CatalogPriceRuleTarget[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([active, startDate, endDate])
+}
+
+model CatalogPriceRuleTarget {
+  id       String           @id @default(cuid())
+  ruleId   String
+  rule     CatalogPriceRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  targetId String
+
+  @@unique([ruleId, targetId])
+  @@index([targetId])
+}
+
 // ───────────────────────── Auth (Better Auth) ─────────────────────────
 // Socle commun d'authentification. ⛔ Aucun tenant_id (modèle Silo).
 // Champs cœur attendus par Better Auth + rôle métier.

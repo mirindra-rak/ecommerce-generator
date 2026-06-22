@@ -12,6 +12,8 @@ export interface SearchRawRow {
   taxRateBps: number;
   imageKey: string | null;
   hasMultiplePrices: boolean;
+  rank: number;
+  fuzzyRank: number;
 }
 
 export interface SearchCountRow {
@@ -31,6 +33,9 @@ export interface FacetCountRow {
   facetValueId: string;
   cnt: bigint;
 }
+
+const MIN_FUZZY_QUERY_LENGTH = 4;
+const FUZZY_SIMILARITY_THRESHOLD = 0.3;
 
 function buildOrderBy(sort: SearchSortKey): Prisma.Sql {
   switch (sort) {
@@ -63,6 +68,37 @@ function buildFacetWhereClauses(filters: Record<string, string[]>): Prisma.Sql[]
     );
 }
 
+function buildSearchMatchClause(tsquery: string, normalizedQuery: string): Prisma.Sql {
+  const ftsClause = Prisma.sql`
+    p."search_vector" @@ (to_tsquery('french', ${tsquery}) || to_tsquery('simple', ${tsquery}))
+  `;
+
+  if (normalizedQuery.length < MIN_FUZZY_QUERY_LENGTH) {
+    return ftsClause;
+  }
+
+  const fuzzyClause = Prisma.sql`
+    similarity(immutable_unaccent(lower(p."name")), ${normalizedQuery}) >= ${FUZZY_SIMILARITY_THRESHOLD}
+    OR EXISTS (
+      SELECT 1
+      FROM "Brand" b_fuzzy
+      WHERE b_fuzzy."id" = p."brandId"
+        AND similarity(immutable_unaccent(lower(b_fuzzy."name")), ${normalizedQuery}) >= ${FUZZY_SIMILARITY_THRESHOLD}
+    )
+    OR EXISTS (
+      SELECT 1
+      FROM "ProductVariant" pv_fuzzy
+      WHERE pv_fuzzy."productId" = p."id"
+        AND (
+          similarity(immutable_unaccent(lower(COALESCE(pv_fuzzy."sku", ''))), ${normalizedQuery}) >= ${FUZZY_SIMILARITY_THRESHOLD}
+          OR similarity(immutable_unaccent(lower(COALESCE(pv_fuzzy."ean", ''))), ${normalizedQuery}) >= ${FUZZY_SIMILARITY_THRESHOLD}
+        )
+    )
+  `;
+
+  return Prisma.sql`(${ftsClause} OR (${fuzzyClause}))`;
+}
+
 export const searchRepository = {
   refreshSearchVector(productId: string): Promise<void> {
     return prisma.$executeRaw`
@@ -85,17 +121,18 @@ export const searchRepository = {
 
   async search(
     tsquery: string,
+    normalizedQuery: string,
     filters: Record<string, string[]>,
     sort: SearchSortKey,
     limit: number,
     offset: number,
+    options?: { allowFuzzy?: boolean },
   ): Promise<{ rows: SearchRawRow[]; total: number }> {
+    const matchClause = options?.allowFuzzy
+      ? buildSearchMatchClause(tsquery, normalizedQuery)
+      : Prisma.sql`p."search_vector" @@ (to_tsquery('french', ${tsquery}) || to_tsquery('simple', ${tsquery}))`;
     const facetClauses = buildFacetWhereClauses(filters);
-    const allWhere = [
-      Prisma.sql`p."active" = true`,
-      Prisma.sql`p."search_vector" @@ (to_tsquery('french', ${tsquery}) || to_tsquery('simple', ${tsquery}))`,
-      ...facetClauses,
-    ];
+    const allWhere = [Prisma.sql`p."active" = true`, matchClause, ...facetClauses];
     const whereClause = Prisma.sql`WHERE ${Prisma.join(allWhere, " AND ")}`;
     const orderBy = buildOrderBy(sort);
 
@@ -110,6 +147,20 @@ export const searchRepository = {
         m."storageKey" AS "imageKey",
         (v."priceCount" > 1) AS "hasMultiplePrices",
         ts_rank(p."search_vector", to_tsquery('french', ${tsquery}) || to_tsquery('simple', ${tsquery})) AS rank,
+        GREATEST(
+          similarity(immutable_unaccent(lower(p."name")), ${normalizedQuery}),
+          similarity(immutable_unaccent(lower(COALESCE(b."name", ''))), ${normalizedQuery}),
+          COALESCE((
+            SELECT MAX(
+              GREATEST(
+                similarity(immutable_unaccent(lower(COALESCE(pv_score."sku", ''))), ${normalizedQuery}),
+                similarity(immutable_unaccent(lower(COALESCE(pv_score."ean", ''))), ${normalizedQuery})
+              )
+            )
+            FROM "ProductVariant" pv_score
+            WHERE pv_score."productId" = p."id"
+          ), 0)
+        ) AS fuzzy_rank,
         (v."minPriceExclTax" * (10000 + tr."rateBps") / 10000) AS min_price_ttc
       FROM "Product" p
       LEFT JOIN "Brand" b ON b."id" = p."brandId"
@@ -126,7 +177,7 @@ export const searchRepository = {
         ORDER BY pm."position" ASC LIMIT 1
       ) m ON true
       ${whereClause}
-      ORDER BY ${orderBy}
+      ORDER BY ${sort === "relevance" ? Prisma.sql`rank DESC, fuzzy_rank DESC` : orderBy}
       LIMIT ${limit} OFFSET ${offset}
     `;
 
@@ -170,7 +221,9 @@ export const searchRepository = {
 
   async searchFacetCounts(
     tsquery: string,
+    normalizedQuery: string,
     filters: Record<string, string[]>,
+    options?: { allowFuzzy?: boolean },
   ): Promise<{
     facets: Array<{
       id: string;
@@ -180,9 +233,12 @@ export const searchRepository = {
     }>;
     counts: Map<string, Map<string, number>>;
   }> {
+    const matchClause = options?.allowFuzzy
+      ? buildSearchMatchClause(tsquery, normalizedQuery)
+      : Prisma.sql`p."search_vector" @@ (to_tsquery('french', ${tsquery}) || to_tsquery('simple', ${tsquery}))`;
     const matchingBase = Prisma.sql`
       p."active" = true
-      AND p."search_vector" @@ (to_tsquery('french', ${tsquery}) || to_tsquery('simple', ${tsquery}))
+      AND ${matchClause}
     `;
 
     const presentFacets = await prisma.$queryRaw<

@@ -14,6 +14,21 @@
     "favorites": "My favourites",
     "cart": "My basket"
   },
+  "searchBox": {
+    "submit": "Search",
+    "seeAllResults": "See all results for \"{query}\"",
+    "productFallback": "Product"
+  },
+  "searchPage": {
+    "eyebrow": "Search",
+    "title": "Search for a product",
+    "titleWithQuery": "Results for \"{query}\"",
+    "resultCount": "{count, plural, =0 {No results} one {# result} other {# results}}",
+    "emptyQueryHint": "Enter a search term to explore the catalog.",
+    "emptyTitle": "No products found",
+    "emptyBody": "Try another term, a brand, or a broader category.",
+    "productFallback": "Product"
+  },
   "reassurance": {
     "adviceTitle": "Pharmacist advice",
     "adviceSubtitle": "Qualified team, 6 days a week",
@@ -140,6 +155,7 @@
   },
   "categoryPage": {
     "breadcrumbHome": "Home",
+    "childCategoriesLabel": "Subcategories",
     "productCount": "{count, plural, one {# product} other {# products}}",
     "empty": "No products match these filters.",
     "notFound": "Category not found",
@@ -169,20 +185,31 @@
     "addToCart": "Add {name} to basket",
     "addToCartButton": "Add to basket",
     "added": "Added to basket",
+    "addedNotice": "Item added to basket",
     "outOfStock": "Product unavailable",
     "error": "Something went wrong",
     "pageTitle": "My basket",
+    "drawerTitle": "Basket",
+    "closeDrawer": "Close basket",
+    "drawerEmptyHint": "Add a product to see a quick order summary here.",
     "empty": "Your basket is empty",
     "emptyLink": "Continue shopping",
+    "continueShopping": "Continue shopping",
     "product": "Product",
     "unitPrice": "Unit price",
     "quantity": "Quantity",
+    "decreaseQuantity": "Decrease quantity",
+    "increaseQuantity": "Increase quantity",
     "subtotal": "Subtotal",
+    "drawerSubtotal": "Basket subtotal",
     "remove": "Remove",
     "totalExclTax": "Subtotal excl. tax",
     "totalTax": "VAT",
     "totalInclTax": "Total",
-    "itemCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}"
+    "itemCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}",
+    "freeShippingRemaining": "{amount} left before free pickup-point delivery",
+    "freeShippingReached": "Free pickup-point delivery unlocked",
+    "viewCart": "View basket"
   },
   "admin": {
     "nav": {

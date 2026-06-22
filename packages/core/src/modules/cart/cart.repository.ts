@@ -7,6 +7,7 @@ const itemInclude = {
         select: {
           name: true,
           slug: true,
+          brand: { select: { name: true } },
           media: { select: { storageKey: true }, orderBy: { position: "asc" as const }, take: 1 },
         },
       },

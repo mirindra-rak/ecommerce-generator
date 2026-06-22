@@ -3,10 +3,11 @@ import { Link } from "@/i18n/navigation";
 import { Container, Cross, IconButton } from "@pharmacie/ui";
 import { siteConfig } from "@/lib/site";
 import { getMenuTree } from "@/lib/catalog";
-import { HeartIcon, MenuIcon, SearchIcon } from "./icons";
+import { HeartIcon, MenuIcon } from "./icons";
 import { CartBadge } from "./cart-badge";
 import { LanguageSwitcher } from "./language-switcher";
 import { MegaMenu } from "./mega-menu";
+import { SearchBox } from "./search-box";
 import { UserMenu } from "./user-menu";
 
 interface SiteHeaderProps {
@@ -37,7 +38,7 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
         <button
           type="button"
           aria-label={t("openMenu")}
-          className="p-1.5 text-foreground lg:hidden"
+          className="cursor-pointer p-1.5 text-foreground lg:hidden"
         >
           <MenuIcon />
         </button>
@@ -51,11 +52,7 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
           </span>
         </Link>
 
-        {/* Recherche (placeholder — branchée au module search, lot 4.4) */}
-        <div className="ml-2 hidden flex-1 items-center gap-2 rounded-sm border border-line bg-surface px-5 py-3 text-sm text-muted md:flex">
-          <SearchIcon className="h-4 w-4 shrink-0" />
-          <span>{t("searchPlaceholder")}</span>
-        </div>
+        <SearchBox placeholder={t("searchPlaceholder")} />
 
         <nav className="ml-auto flex items-center gap-1">
           <LanguageSwitcher />

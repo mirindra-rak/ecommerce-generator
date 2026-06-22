@@ -63,7 +63,7 @@ export function AccountNav() {
       <button
         type="button"
         onClick={handleSignOut}
-        className="whitespace-nowrap rounded-sm px-3 py-2 text-left text-sm text-foreground/70 transition-colors hover:bg-surface hover:text-foreground"
+        className="cursor-pointer whitespace-nowrap rounded-sm px-3 py-2 text-left text-sm text-foreground/70 transition-colors hover:bg-surface hover:text-foreground"
       >
         {t("signOut")}
       </button>

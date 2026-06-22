@@ -3,10 +3,33 @@ import { prisma } from "../../db/client";
 import { createProduct, type CreateProductInput } from "../catalog/product.service";
 import { DEFAULT_TAX_RATE_ID } from "../pricing";
 import { search, suggest } from "./search.service";
+import type { SearchConfig } from "./search-dictionary.types";
 
 const base: Pick<CreateProductInput, "productType" | "taxRateId"> = {
   productType: "OTHER",
   taxRateId: DEFAULT_TAX_RATE_ID,
+};
+
+const searchConfig: SearchConfig = {
+  dictionary: {
+    entries: [
+      {
+        canonicalTerm: "avene",
+        aliases: ["avene", "avène"],
+        entity: { kind: "brand", code: "avene" },
+      },
+      {
+        canonicalTerm: "solaire",
+        aliases: ["spf", "ecran solaire"],
+        entity: { kind: "category", code: "solaire" },
+      },
+      {
+        canonicalTerm: "spray",
+        aliases: ["brume"],
+        entity: { kind: "attributeValue", code: "spray" },
+      },
+    ],
+  },
 };
 
 let fvSprayId: string;
@@ -101,6 +124,12 @@ describe("search service", () => {
     expect(result.items[0]?.name).toBe("Crème solaire SPF 50");
   });
 
+  it("normalise les accents et la casse dans l'intention", async () => {
+    const result = await search({ query: "  CRÈME   solaire " });
+    expect(result.intent?.normalizedQuery).toBe("creme solaire");
+    expect(result.items[0]?.name).toBe("Crème solaire SPF 50");
+  });
+
   it("recherche par EAN", async () => {
     const result = await search({ query: "3401560000001" });
     expect(result.items).toHaveLength(1);
@@ -156,6 +185,40 @@ describe("search service", () => {
     expect(result.items[1]?.name).toBe("Crème solaire SPF 50");
   });
 
+  it("canonicalise les alias configurés avant le retrieval", async () => {
+    const result = await search({
+      query: "spf",
+      searchConfig,
+    });
+    expect(result.intent?.normalizedQuery).toBe("solaire");
+    expect(result.total).toBe(2);
+  });
+
+  it("tolère une faute de frappe légère sur le nom produit", async () => {
+    const result = await search({ query: "dolipranne" });
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]?.name).toBe("Doliprane 1000mg");
+  });
+
+  it("tolère une faute de frappe légère sur la marque", async () => {
+    const result = await search({ query: "avenne" });
+    expect(result.total).toBe(2);
+    expect(result.items.every((item) => item.brandName === "Avène")).toBe(true);
+  });
+
+  it("expose les entités détectées dans l'intention", async () => {
+    const result = await search({
+      query: "Avène écran solaire spray",
+      searchConfig,
+    });
+
+    expect(result.intent?.entities).toEqual({
+      brand: ["avene"],
+      category: ["solaire"],
+      attributeValue: ["spray"],
+    });
+  });
+
   it("tri par nom", async () => {
     const result = await search({ query: "solaire", sort: "name" });
     expect(result.items[0]?.name).toBe("Crème solaire SPF 50");
@@ -206,6 +269,11 @@ describe("suggest service", () => {
   it("retourne un tableau vide pour un terme trop court", async () => {
     const items = await suggest("a");
     expect(items).toHaveLength(0);
+  });
+
+  it("normalise les accents et la casse pour les suggestions", async () => {
+    const items = await suggest("SOL");
+    expect(items.length).toBeGreaterThanOrEqual(1);
   });
 
   it("limite le nombre de suggestions", async () => {

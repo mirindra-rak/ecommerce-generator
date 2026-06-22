@@ -1,7 +1,26 @@
 // Module: promotions
-// Responsabilité: Codes promo, remises, règles de réduction
-//
-// Frontière d'accès données via Repository (voir ../../repositories).
-// La logique métier vit dans des services de domaine de ce module.
+// Responsabilité: Catalog Price Rules — réductions catalogue, prix barrés
 
-export {};
+export { catalogPriceRuleRepository } from "./promotion.repository";
+export type {
+  CatalogPriceRuleRepository,
+  CatalogPriceRuleWithTargets,
+} from "./promotion.repository";
+
+export { resolvePrice, resolvePrices, matchesContext } from "./promotion.service";
+
+export type {
+  CreateCatalogPriceRuleInput,
+  UpdateCatalogPriceRuleInput,
+  ProductContext,
+  DiscountDetail,
+  ResolvedPrice,
+  DiscountType,
+  TargetType,
+} from "./promotion.types";
+
+export {
+  InvalidDiscountValueError,
+  InvalidFloorPriceError,
+  MissingTargetIdsError,
+} from "./promotion-errors";

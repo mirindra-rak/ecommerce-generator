@@ -14,6 +14,7 @@ import {
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useActionState, useCallback, useRef, useState, type ReactNode } from "react";
+import { RichTextEditor } from "@/components/rich-text-editor";
 import type { FormState } from "../_lib/form-state";
 import { useUnsavedChanges } from "../_lib/use-unsaved-changes";
 
@@ -251,22 +252,18 @@ export function CategoryForm({ action, parentOptions, category }: CategoryFormPr
               defaultValue={category?.shortDescription ?? ""}
             />
           </Field>
-          <Field label={t("description")} htmlFor="description">
-            <Textarea
-              id="description"
-              name="description"
-              rows={4}
-              defaultValue={category?.description ?? ""}
-            />
-          </Field>
-          <Field label={t("additionalInfo")} htmlFor="additionalInfo">
-            <Textarea
-              id="additionalInfo"
-              name="additionalInfo"
-              rows={3}
-              defaultValue={category?.additionalInfo ?? ""}
-            />
-          </Field>
+          <RichTextEditor
+            label={t("description")}
+            htmlFor="description"
+            name="description"
+            defaultValue={category?.description ?? ""}
+          />
+          <RichTextEditor
+            label={t("additionalInfo")}
+            htmlFor="additionalInfo"
+            name="additionalInfo"
+            defaultValue={category?.additionalInfo ?? ""}
+          />
         </div>
       </FormSection>
 

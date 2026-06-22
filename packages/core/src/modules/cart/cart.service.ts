@@ -65,6 +65,7 @@ export async function getCart(cartId: string): Promise<CartVM | null> {
     id: item.id,
     variantId: item.variantId,
     productName: item.variant.product.name,
+    brandName: item.variant.product.brand?.name ?? null,
     productSlug: item.variant.product.slug,
     variantLabel: item.variant.volume,
     imageKey: item.variant.product.media[0]?.storageKey ?? null,

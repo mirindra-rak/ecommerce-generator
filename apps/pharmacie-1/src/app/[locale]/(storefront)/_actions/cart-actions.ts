@@ -6,12 +6,17 @@ import {
   removeItem,
   ItemNotAvailableError,
 } from "@pharmacie/core/modules/cart";
+import { getCartPageVM } from "@/lib/cart";
 import { getOrCreateCartId } from "@/lib/cart-session";
 import { revalidatePath } from "next/cache";
 
 export interface CartActionResult {
   success: boolean;
   error?: string;
+}
+
+export async function getCartSnapshotAction() {
+  return getCartPageVM();
 }
 
 export async function addToCartAction(variantId: string): Promise<CartActionResult> {

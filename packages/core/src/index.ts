@@ -9,4 +9,32 @@ export {
   type FeatureFlags,
   type BrandConfig,
   type LocaleConfig,
+  type SearchConfig,
+  type SearchDictionaryConfig,
+  type SearchDictionaryEntryConfig,
+  type SearchDictionaryEntityConfig,
+  type SearchEntityKind,
+  type SearchRankingWeightsConfig,
 } from "./config/site-config";
+
+// ── Promotions ──
+export {
+  catalogPriceRuleRepository,
+  resolvePrice,
+  resolvePrices,
+  matchesContext,
+} from "./modules/promotions";
+export type {
+  CatalogPriceRuleRepository,
+  CatalogPriceRuleWithTargets,
+  CreateCatalogPriceRuleInput,
+  UpdateCatalogPriceRuleInput,
+  ProductContext,
+  DiscountDetail,
+  ResolvedPrice,
+} from "./modules/promotions";
+export {
+  InvalidDiscountValueError,
+  InvalidFloorPriceError,
+  MissingTargetIdsError,
+} from "./modules/promotions";

@@ -11,6 +11,7 @@ export interface CartLineVM {
   id: string;
   variantId: string;
   productName: string;
+  brandName: string | null;
   productSlug: string;
   variantLabel: string | null;
   imageKey: string | null;

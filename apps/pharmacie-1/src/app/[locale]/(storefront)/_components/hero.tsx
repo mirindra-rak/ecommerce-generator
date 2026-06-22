@@ -120,7 +120,7 @@ export function Hero() {
                 aria-label={t("goToSlide", { number: i + 1 })}
                 aria-current={i === index}
                 onClick={() => goTo(i)}
-                className={`h-1 rounded-sm transition-all ${
+                className={`cursor-pointer h-1 rounded-sm transition-all ${
                   i === index ? "w-8 bg-brand-600" : "w-4 bg-foreground/20 hover:bg-foreground/40"
                 }`}
               />
@@ -133,7 +133,7 @@ export function Hero() {
               type="button"
               aria-label={t("prevSlide")}
               onClick={prev}
-              className="grid h-9 w-9 place-items-center rounded-sm border border-line bg-surface/90 text-foreground transition-colors hover:bg-brand-50 hover:text-brand-700"
+              className="grid h-9 w-9 cursor-pointer place-items-center rounded-sm border border-line bg-surface/90 text-foreground transition-colors hover:bg-brand-50 hover:text-brand-700"
             >
               <ArrowRight className="h-4 w-4 rotate-180" />
             </button>
@@ -141,7 +141,7 @@ export function Hero() {
               type="button"
               aria-label={t("nextSlide")}
               onClick={next}
-              className="grid h-9 w-9 place-items-center rounded-sm border border-line bg-surface/90 text-foreground transition-colors hover:bg-brand-50 hover:text-brand-700"
+              className="grid h-9 w-9 cursor-pointer place-items-center rounded-sm border border-line bg-surface/90 text-foreground transition-colors hover:bg-brand-50 hover:text-brand-700"
             >
               <ArrowRight className="h-4 w-4" />
             </button>

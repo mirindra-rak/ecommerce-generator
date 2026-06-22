@@ -14,6 +14,21 @@
     "favorites": "Mes favoris",
     "cart": "Mon panier"
   },
+  "searchBox": {
+    "submit": "Rechercher",
+    "seeAllResults": "Voir tous les résultats pour « {query} »",
+    "productFallback": "Produit"
+  },
+  "searchPage": {
+    "eyebrow": "Recherche",
+    "title": "Rechercher un produit",
+    "titleWithQuery": "Résultats pour « {query} »",
+    "resultCount": "{count, plural, =0 {Aucun résultat} one {# résultat} other {# résultats}}",
+    "emptyQueryHint": "Saisissez un terme de recherche pour explorer le catalogue.",
+    "emptyTitle": "Aucun produit trouvé",
+    "emptyBody": "Essayez un autre terme, une marque ou une catégorie plus large.",
+    "productFallback": "Produit"
+  },
   "reassurance": {
     "adviceTitle": "Conseil pharmacien",
     "adviceSubtitle": "Équipe diplômée, 6j/7",
@@ -140,6 +155,7 @@
   },
   "categoryPage": {
     "breadcrumbHome": "Accueil",
+    "childCategoriesLabel": "Sous-catégories",
     "productCount": "{count, plural, one {# produit} other {# produits}}",
     "empty": "Aucun produit ne correspond à ces filtres.",
     "notFound": "Catégorie introuvable",
@@ -169,20 +185,31 @@
     "addToCart": "Ajouter {name} au panier",
     "addToCartButton": "Ajouter au panier",
     "added": "Ajouté au panier",
+    "addedNotice": "Article ajouté au panier",
     "outOfStock": "Produit indisponible",
     "error": "Une erreur est survenue",
     "pageTitle": "Mon panier",
+    "drawerTitle": "Panier",
+    "closeDrawer": "Fermer le panier",
+    "drawerEmptyHint": "Ajoutez un produit pour retrouver ici un récapitulatif rapide de votre commande.",
     "empty": "Votre panier est vide",
     "emptyLink": "Continuer mes achats",
+    "continueShopping": "Continuer mes achats",
     "product": "Produit",
     "unitPrice": "Prix unitaire",
     "quantity": "Quantité",
+    "decreaseQuantity": "Diminuer la quantité",
+    "increaseQuantity": "Augmenter la quantité",
     "subtotal": "Sous-total",
+    "drawerSubtotal": "Sous-total du panier",
     "remove": "Supprimer",
     "totalExclTax": "Total HT",
     "totalTax": "TVA",
     "totalInclTax": "Total TTC",
-    "itemCount": "{count, plural, =0 {Aucun article} =1 {1 article} other {# articles}}"
+    "itemCount": "{count, plural, =0 {Aucun article} =1 {1 article} other {# articles}}",
+    "freeShippingRemaining": "Plus que {amount} avant la livraison offerte en point relais",
+    "freeShippingReached": "La livraison offerte en point relais est débloquée",
+    "viewCart": "Voir le panier"
   },
   "admin": {
     "nav": {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { Link } from "@/i18n/navigation";
@@ -8,22 +9,26 @@ import { updateCartItemAction, removeCartItemAction } from "../_actions/cart-act
 
 export function CartLineRow({ line }: { line: CartPageLineVM }) {
   const t = useTranslations("cart");
+  const router = useRouter();
   const [pending, startTransition] = useTransition();
 
   function handleQtyChange(delta: number) {
     const newQty = line.quantity + delta;
     startTransition(async () => {
       if (newQty <= 0) {
-        await removeCartItemAction(line.variantId);
+        const result = await removeCartItemAction(line.variantId);
+        if (result.success) router.refresh();
       } else {
-        await updateCartItemAction(line.variantId, newQty);
+        const result = await updateCartItemAction(line.variantId, newQty);
+        if (result.success) router.refresh();
       }
     });
   }
 
   function handleRemove() {
     startTransition(async () => {
-      await removeCartItemAction(line.variantId);
+      const result = await removeCartItemAction(line.variantId);
+      if (result.success) router.refresh();
     });
   }
 
@@ -55,7 +60,7 @@ export function CartLineRow({ line }: { line: CartPageLineVM }) {
           type="button"
           onClick={() => handleQtyChange(-1)}
           disabled={pending}
-          className="grid h-7 w-7 place-items-center rounded border border-line text-sm font-medium text-foreground hover:bg-slate-50 disabled:opacity-50"
+          className="grid h-7 w-7 cursor-pointer place-items-center rounded border border-line text-sm font-medium text-foreground hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           −
         </button>
@@ -64,7 +69,7 @@ export function CartLineRow({ line }: { line: CartPageLineVM }) {
           type="button"
           onClick={() => handleQtyChange(1)}
           disabled={pending}
-          className="grid h-7 w-7 place-items-center rounded border border-line text-sm font-medium text-foreground hover:bg-slate-50 disabled:opacity-50"
+          className="grid h-7 w-7 cursor-pointer place-items-center rounded border border-line text-sm font-medium text-foreground hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           +
         </button>
@@ -76,7 +81,7 @@ export function CartLineRow({ line }: { line: CartPageLineVM }) {
           type="button"
           onClick={handleRemove}
           disabled={pending}
-          className="text-xs text-danger-text hover:underline disabled:opacity-50"
+          className="cursor-pointer text-xs text-danger-text hover:underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("remove")}
         </button>

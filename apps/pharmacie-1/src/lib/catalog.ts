@@ -116,6 +116,8 @@ export interface CategoryPageVM {
   metaTitle: string | null;
   metaDescription: string | null;
   coverImageKey: string | null;
+  breadcrumbs: NavCategoryVM[];
+  childCategories: NavCategoryVM[];
   /** Produits de la page courante (déjà triés + paginés). */
   products: ProductCardVM[];
   /** Page effective (clampée), pour piloter la pagination. */
@@ -138,6 +140,15 @@ export async function getCategoryWithProducts(
   const category = await categoryRepository.findBySlug(slug);
   // Catégorie inexistante OU masquée côté boutique → 404 storefront.
   if (!category || !category.active) return null;
+  const breadcrumbs: NavCategoryVM[] = [];
+  let currentParentId = category.parentId;
+  while (currentParentId) {
+    const parent = await categoryRepository.findById(currentParentId);
+    if (!parent) break;
+    if (parent.active) breadcrumbs.unshift({ slug: parent.slug, label: parent.name });
+    currentParentId = parent.parentId;
+  }
+  const childCategories = await categoryRepository.findActiveChildren(category.id);
   // Jeu complet de la catégorie (réutilisé par les facettes) : on trie puis pagine en mémoire.
   const cards = await productRepository.findCardsByCategorySlug(slug, filters);
   const sorted = sortCards(cards, sort, siteConfig.locale.locale);
@@ -148,6 +159,8 @@ export async function getCategoryWithProducts(
     metaTitle: category.metaTitle,
     metaDescription: category.metaDescription,
     coverImageKey: category.coverImageKey,
+    breadcrumbs,
+    childCategories: childCategories.map((child) => ({ slug: child.slug, label: child.name })),
     products: pageResult.items.map(toCardVM),
     page: pageResult.page,
     pageSize: pageResult.pageSize,

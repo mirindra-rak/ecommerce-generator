@@ -26,4 +26,28 @@ export default defineSiteConfig({
     reviews: true,
     loyalty: false,
   },
+  search: {
+    dictionary: {
+      entries: [
+        {
+          canonicalTerm: "avene",
+          aliases: ["avene", "avène"],
+          entity: { kind: "brand", code: "avene" },
+        },
+        {
+          canonicalTerm: "solaire",
+          aliases: ["spf", "ecran solaire"],
+          entity: { kind: "category", code: "solaire" },
+        },
+      ],
+    },
+    ranking: {
+      textRank: 1,
+      fuzzyRank: 0.35,
+      exactNameMatch: 3,
+      exactBrandMatch: 2,
+      tokenCoverage: 1.5,
+      dictionaryMatch: 0.75,
+    },
+  },
 });

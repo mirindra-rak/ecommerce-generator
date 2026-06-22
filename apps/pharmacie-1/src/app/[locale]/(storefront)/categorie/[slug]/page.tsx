@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
-import Image from "next/image";
-import { notFound } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getCategoryFilters, getCategoryWithProducts } from "@/lib/catalog";
 import { parseSort } from "@/lib/category-listing";
+import { RichTextContent } from "@/components/rich-text-content";
+import { Link } from "@/i18n/navigation";
 import { alternatesFor } from "@/lib/seo";
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import Image from "next/image";
+import { notFound } from "next/navigation";
 import { CategoryFilters } from "../../_components/category-filters";
 import { CategoryPagination } from "../../_components/category-pagination";
 import { CategorySort } from "../../_components/category-sort";
@@ -83,8 +85,15 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
       <nav className="text-sm text-muted">
-        <span>{t("breadcrumbHome")}</span> <span className="px-1">/</span>{" "}
-        <span className="text-foreground">{data.name}</span>
+        <Link href="/">{t("breadcrumbHome")}</Link>
+        {data.breadcrumbs.map((category) => (
+          <span key={category.slug}>
+            {" "}
+            <span className="px-1">/</span>{" "}
+            <Link href={`/categorie/${category.slug}`}>{category.label}</Link>
+          </span>
+        ))}{" "}
+        <span className="px-1">/</span> <span className="text-foreground">{data.name}</span>
       </nav>
 
       <div className="relative mt-3 flex h-40 items-end overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-brand-50 to-slate-100 p-6">
@@ -106,16 +115,30 @@ export default async function CategoryPage({ params, searchParams }: PageProps) 
         </h1>
       </div>
 
-      {data.description && (
-        // Rendu en texte échappé (pas de dangerouslySetInnerHTML) — sanitization riche = lot 9.4.
-        <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-slate-600">
-          {data.description}
-        </p>
+      {data.childCategories.length > 0 && (
+        <div className="mt-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+            {t("childCategoriesLabel")}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2.5">
+            {data.childCategories.map((category) => (
+              <Link
+                key={category.slug}
+                href={`/categorie/${category.slug}`}
+                className="rounded-full border border-line bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
+              >
+                {category.label}
+              </Link>
+            ))}
+          </div>
+        </div>
       )}
 
-      <div className="mt-8 lg:flex lg:gap-8">
+      {data.description && <RichTextContent content={data.description} className="mt-4" />}
+
+      <div className="mt-8 lg:grid lg:grid-cols-[16rem_minmax(0,1fr)] lg:gap-8">
         {facets.length > 0 && (
-          <aside className="mb-6 lg:mb-0 lg:w-64 lg:shrink-0">
+          <aside className="mb-6 lg:mb-0 lg:sticky lg:top-50 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-2">
             <CategoryFilters facets={facets} />
           </aside>
         )}

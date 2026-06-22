@@ -54,7 +54,7 @@ export function UserMenu({ user }: UserMenuProps) {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-brand-50 hover:text-brand-700"
+        className="cursor-pointer flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-brand-50 hover:text-brand-700"
         aria-expanded={open}
         aria-haspopup="true"
       >
@@ -75,7 +75,7 @@ export function UserMenu({ user }: UserMenuProps) {
             type="button"
             onClick={handleSignOut}
             disabled={signingOut}
-            className="block w-full px-4 py-2.5 text-left text-sm text-foreground hover:bg-surface disabled:opacity-50"
+            className="block w-full cursor-pointer px-4 py-2.5 text-left text-sm text-foreground hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
           >
             {signingOut ? t("signingOut") : t("signOut")}
           </button>

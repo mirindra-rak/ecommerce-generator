@@ -30,7 +30,7 @@ export function EmailVerificationBanner({ email }: EmailVerificationBannerProps)
           type="button"
           onClick={handleResend}
           disabled={pending}
-          className="font-medium underline hover:no-underline disabled:opacity-50"
+          className="cursor-pointer font-medium underline hover:no-underline disabled:cursor-not-allowed disabled:opacity-50"
         >
           {t("resend")}
         </button>
