@@ -1,6 +1,6 @@
 # Epic : Inventory — Stock & disponibilité (lot 4.3)
 
-**Date** : 2026-06-19 · **Statut** 🟡 · **Estimation globale** : L (~4-6 jours)
+**Date** : 2026-06-19 · **Statut** 🟢 · **Estimation globale** : L (~4-6 jours)
 
 ## Contexte & vision
 
