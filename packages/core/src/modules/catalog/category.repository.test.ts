@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { prisma } from "../../db/client";
+import { DEFAULT_TAX_RATE_ID } from "../pricing";
 import { categoryRepository } from "./category.repository";
 
 describe("categoryRepository", () => {
@@ -94,7 +95,12 @@ describe("categoryRepository", () => {
   it("supprime une catégorie associée à des produits (M2M détachée, produit conservé)", async () => {
     const cat = await categoryRepository.create({ name: "Solaire", slug: "solaire" });
     const product = await prisma.product.create({
-      data: { name: "SPF50", slug: "spf50", categories: { connect: { id: cat.id } } },
+      data: {
+        name: "SPF50",
+        slug: "spf50",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
+        categories: { connect: { id: cat.id } },
+      },
     });
     expect(await categoryRepository.countProducts(cat.id)).toBe(1);
 

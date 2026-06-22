@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { PrismaClient } from "@prisma/client";
+import { TAX_RATE_REFERENCES } from "../src/modules/pricing";
 
 // Seed du catalogue. Idempotent : on vide les tables du catalogue puis on recrée. Le
 // catalogue (catégories, marques, produits) provient d'un dataset curé committé
@@ -124,11 +125,26 @@ async function main(): Promise<void> {
   // Reset (ordre géré par CASCADE).
   await prisma.$executeRawUnsafe(
     `TRUNCATE TABLE
+      "TaxRate",
       "ProductFacetValue","FacetValue","Facet",
       "ProductMedia","VariantOptionValue","ProductVariant","ProductOptionValue",
       "ProductOption","Product","Category","Brand"
      RESTART IDENTITY CASCADE`,
   );
+
+  const taxRateIdByRateBps = new Map<number, string>();
+  for (const taxRate of TAX_RATE_REFERENCES) {
+    await prisma.taxRate.create({
+      data: {
+        id: taxRate.id,
+        code: taxRate.code,
+        name: taxRate.name,
+        rateBps: taxRate.rateBps,
+        position: taxRate.position,
+      },
+    });
+    taxRateIdByRateBps.set(taxRate.rateBps, taxRate.id);
+  }
 
   // Marques — externalId conservé pour le ré-import idempotent.
   const brandIdByExternal = new Map<number, string>();
@@ -191,6 +207,8 @@ async function main(): Promise<void> {
   for (const product of catalog.products) {
     const brandId = brandIdByExternal.get(product.brandExternalId);
     const categoryId = categoryIdByExternal.get(product.categoryExternalId);
+    const taxRateId = taxRateIdByRateBps.get(product.vatRate);
+    if (!taxRateId) throw new Error(`Tax rate not seeded for rate ${product.vatRate}`);
     await prisma.product.create({
       data: {
         externalId: product.externalId,
@@ -200,8 +218,8 @@ async function main(): Promise<void> {
         shortDescription: product.shortDescription,
         metaTitle: product.metaTitle,
         metaDescription: product.metaDescription,
-        vatRate: product.vatRate,
         productType: product.productType,
+        taxRate: { connect: { id: taxRateId } },
         brand: brandId ? { connect: { id: brandId } } : undefined,
         // La source ne fournit qu'une catégorie : on la pose en M2M ET comme principale.
         categories: categoryId ? { connect: [{ id: categoryId }] } : undefined,
@@ -225,6 +243,7 @@ async function main(): Promise<void> {
     categories: await prisma.category.count(),
     products: await prisma.product.count(),
     variants: await prisma.productVariant.count(),
+    taxRates: await prisma.taxRate.count(),
     facets: await prisma.facet.count(),
     facetValues: await prisma.facetValue.count(),
   };

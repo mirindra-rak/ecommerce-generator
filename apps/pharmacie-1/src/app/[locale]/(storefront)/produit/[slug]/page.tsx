@@ -75,6 +75,9 @@ export default async function ProductPage({ params }: PageProps) {
               {t("priceSuffix")}
             </span>
           </p>
+          {product.taxLabel && (
+            <p className="mt-2 text-sm text-muted">{t("taxRate", { rate: product.taxLabel })}</p>
+          )}
 
           {product.description && (
             <p className="mt-5 leading-relaxed text-slate-600">{product.description}</p>

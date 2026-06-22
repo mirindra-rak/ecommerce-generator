@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { prisma } from "../../db/client";
+import { DEFAULT_TAX_RATE_ID } from "../pricing";
 import { facetRepository, type FacetWithCounts } from "./facet.repository";
 
 // Catégorie « soins » : 2 crèmes (dont une bio) + 1 sérum. Permet de vérifier le drill-down.
@@ -38,6 +39,7 @@ async function setup(): Promise<void> {
     data: {
       name: "Crème bio",
       slug: "creme-bio",
+      taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
       categories: { connect: { id: category.id } },
       facetValues: {
         create: [
@@ -51,6 +53,7 @@ async function setup(): Promise<void> {
     data: {
       name: "Crème simple",
       slug: "creme-simple",
+      taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
       categories: { connect: { id: category.id } },
       facetValues: { create: [{ facetValueId: id(nature.values, "creme") }] },
     },
@@ -59,6 +62,7 @@ async function setup(): Promise<void> {
     data: {
       name: "Sérum",
       slug: "serum-x",
+      taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
       categories: { connect: { id: category.id } },
       facetValues: { create: [{ facetValueId: id(nature.values, "serum") }] },
     },

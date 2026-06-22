@@ -11,11 +11,22 @@ import {
   ProductRequiresVariantError,
   type ProductVariantInput,
 } from "@pharmacie/core/modules/catalog";
+import { TaxRateNotFoundError } from "@pharmacie/core/modules/pricing";
+import {
+  adjust,
+  updateSettings,
+  setLowStockNotifier,
+  emailNotifier,
+  type OutOfStockBehavior,
+  type StockMovementReason,
+} from "@pharmacie/core/modules/inventory";
 import { requireStaff } from "@/lib/auth-guard";
 import { getTranslations } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { FormState } from "../_lib/form-state";
+
+setLowStockNotifier(emailNotifier);
 
 function revalidateProducts(): void {
   revalidatePath("/admin/produits");
@@ -67,6 +78,7 @@ function readBase(formData: FormData) {
     productType: String(formData.get("productType") ?? "OTHER"),
     description: text(formData, "description"),
     active: formData.get("active") === "on",
+    taxRateId: String(formData.get("taxRateId") ?? "").trim() || undefined,
     brandId: String(formData.get("brandId") ?? "") || null,
     categoryIds: formData.getAll("categoryIds").map(String),
     primaryCategoryId: String(formData.get("primaryCategoryId") ?? "") || null,
@@ -144,6 +156,7 @@ function domainErrorKey(error: unknown): string | null {
   if (error instanceof DuplicateProductFieldError) return "duplicateField";
   if (error instanceof ProductRequiresVariantError) return "requiresVariant";
   if (error instanceof PrimaryCategoryNotAssignedError) return "primaryCategoryNotAssigned";
+  if (error instanceof TaxRateNotFoundError) return "taxRateInvalid";
   return null;
 }
 
@@ -210,4 +223,59 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
   await deleteProduct(id);
   revalidateProducts();
   redirect("/admin/produits");
+}
+
+export async function adjustStockAction(_prev: FormState, formData: FormData): Promise<FormState> {
+  await requireStaff();
+  const t = await getTranslations("admin.products.stock.errors");
+  const variantId = String(formData.get("variantId") ?? "");
+  const deltaRaw = String(formData.get("delta") ?? "").trim();
+  if (!deltaRaw) return { error: t("deltaRequired") };
+  const delta = Number.parseInt(deltaRaw, 10);
+  if (!Number.isInteger(delta) || delta === 0) return { error: t("deltaInvalid") };
+  const note = String(formData.get("note") ?? "").trim() || undefined;
+
+  try {
+    await adjust({
+      variantId,
+      delta,
+      reason: "MANUAL_ADJUSTMENT" as StockMovementReason,
+      note,
+    });
+  } catch {
+    return { error: t("adjustFailed") };
+  }
+  revalidateProducts();
+  return {};
+}
+
+export async function updateInventorySettingsAction(
+  _prev: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  await requireStaff();
+  const t = await getTranslations("admin.products.stock.errors");
+  const variantId = String(formData.get("variantId") ?? "");
+  const minOrderQty = Number.parseInt(String(formData.get("minOrderQty") ?? "1"), 10);
+  const stockLocation = String(formData.get("stockLocation") ?? "").trim() || null;
+  const lowStockAlert = formData.get("lowStockAlert") === "on";
+  const thresholdRaw = String(formData.get("lowStockThreshold") ?? "").trim();
+  const lowStockThreshold = thresholdRaw ? Number.parseInt(thresholdRaw, 10) : null;
+  const outOfStockBehavior = String(
+    formData.get("outOfStockBehavior") ?? "DEFAULT",
+  ) as OutOfStockBehavior;
+
+  try {
+    await updateSettings(variantId, {
+      minOrderQty: Number.isFinite(minOrderQty) ? minOrderQty : 1,
+      stockLocation,
+      lowStockAlert,
+      lowStockThreshold,
+      outOfStockBehavior,
+    });
+  } catch {
+    return { error: t("settingsFailed") };
+  }
+  revalidateProducts();
+  return {};
 }

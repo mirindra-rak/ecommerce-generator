@@ -24,6 +24,8 @@ export { Field } from "./components/field";
 export { ImageUpload } from "./components/image-upload";
 export { MultiImageUpload } from "./components/multi-image-upload";
 export type { MediaItem } from "./components/multi-image-upload";
+export { Tabs } from "./components/tabs";
+export type { TabItem } from "./components/tabs";
 export { Rule } from "./components/rule";
 export { Cross } from "./components/cross";
 export { IconProvider } from "./components/icon-provider";

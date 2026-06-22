@@ -21,6 +21,7 @@ import { VariantsEditor, type VariantRow } from "./variants-editor";
 export interface Option {
   id: string;
   label: string;
+  rateBps?: number;
 }
 
 export interface FacetOption {
@@ -35,6 +36,7 @@ export interface ProductFormValue {
   productType: string;
   description: string | null;
   active: boolean;
+  taxRateId: string;
   brandId: string | null;
   categoryIds: string[];
   primaryCategoryId: string | null;
@@ -47,6 +49,7 @@ export interface ProductFormValue {
 interface ProductFormProps {
   action: (prev: FormState, formData: FormData) => Promise<FormState>;
   productTypes: readonly string[];
+  taxRateOptions: Option[];
   brandOptions: Option[];
   categoryOptions: Option[];
   facets: FacetOption[];
@@ -90,6 +93,7 @@ function imageUrl(key: string): string {
 export function ProductForm({
   action,
   productTypes,
+  taxRateOptions,
   brandOptions,
   categoryOptions,
   facets,
@@ -101,6 +105,13 @@ export function ProductForm({
   const [state, formAction, pending] = useActionState(action, {});
   const formRef = useRef<HTMLFormElement>(null);
   useUnsavedChanges(formRef);
+
+  const defaultTaxRateId = product?.taxRateId ?? taxRateOptions[0]?.id ?? "";
+  const [selectedTaxRateId, setSelectedTaxRateId] = useState(defaultTaxRateId);
+  const selectedRateBps = useMemo(() => {
+    const found = taxRateOptions.find((o) => o.id === selectedTaxRateId);
+    return found?.rateBps ?? 0;
+  }, [taxRateOptions, selectedTaxRateId]);
 
   const initialMedia: MediaItem[] = useMemo(
     () =>
@@ -173,6 +184,16 @@ export function ProductForm({
             </Field>
           </div>
 
+          <Field label={t("form.taxRate")} htmlFor="taxRateId" hint={t("form.taxRateHint")}>
+            <Select
+              id="taxRateId"
+              name="taxRateId"
+              value={selectedTaxRateId}
+              onValueChange={setSelectedTaxRateId}
+              options={taxRateOptions.map((option) => ({ value: option.id, label: option.label }))}
+            />
+          </Field>
+
           <Field label={t("form.categories")} htmlFor="categoryIds">
             <MultiSelect
               id="categoryIds"
@@ -227,7 +248,7 @@ export function ProductForm({
       </FormSection>
 
       <FormSection title={t("form.sectionVariants")} description={t("form.sectionVariantsDesc")}>
-        <VariantsEditor initial={product?.variants ?? []} />
+        <VariantsEditor initial={product?.variants ?? []} rateBps={selectedRateBps} />
       </FormSection>
 
       <FormSection

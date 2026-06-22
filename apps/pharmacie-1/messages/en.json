@@ -509,6 +509,8 @@
         "ean": "Barcode (EAN)",
         "price": "Price excl. tax (€)",
         "pricePlaceholder": "14.90",
+        "priceInclTax": "Price incl. tax (€)",
+        "priceInclTaxPlaceholder": "17.88",
         "stock": "Stock",
         "add": "+ Add a variant"
       },

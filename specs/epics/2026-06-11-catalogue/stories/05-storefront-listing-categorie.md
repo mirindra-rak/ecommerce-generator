@@ -1,7 +1,7 @@
 # Story : Storefront — listing de catégorie
 
 **Epic parent** : [Catalogue](../epic.md)
-**Date** : 2026-06-11 · **Statut** 🟡 · **Estimation** M
+**Date** : 2026-06-11 · **Statut** ✅ · **Estimation** M
 
 ## Contexte
 

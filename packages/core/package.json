@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./config": "./src/config/site-config.ts",
+    "./lib/storage": "./src/lib/storage.ts",
     "./modules/*": "./src/modules/*/index.ts"
   },
   "scripts": {

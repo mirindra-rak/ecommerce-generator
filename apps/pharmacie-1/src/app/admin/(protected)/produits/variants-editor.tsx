@@ -2,20 +2,20 @@
 
 import { Button, Field, Input } from "@pharmacie/ui";
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-// Ligne de déclinaison côté formulaire. Prix/stock en chaînes (saisie) ; `id` présent = existante.
 export interface VariantRow {
   id?: string;
-  volume: string; // étiquette libre (« 50 ml », « Lavande »)
+  volume: string;
   sku: string;
   ean: string;
-  price: string; // euros
+  price: string; // euros HT
   stock: string;
 }
 
 interface Row extends VariantRow {
   key: number;
+  priceInclTax: string; // euros TTC (derived, never sent to server)
 }
 
 const emptyRow = (): Omit<VariantRow, "id"> => ({
@@ -26,21 +26,62 @@ const emptyRow = (): Omit<VariantRow, "id"> => ({
   stock: "0",
 });
 
-// Éditeur de déclinaisons : liste de lignes en état React, sérialisée dans un champ caché
-// `variants` (JSON). Rendu adaptatif : 1 déclinaison → vue simple ; ≥ 2 → blocs numérotés.
-export function VariantsEditor({ initial }: { initial: VariantRow[] }) {
+function parseEuros(input: string): number | null {
+  const normalized = input.replace(",", ".").trim();
+  if (normalized === "") return null;
+  const value = Number.parseFloat(normalized);
+  return Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+function computeInclTax(priceExclTax: string, rateBps: number): string {
+  const ht = parseEuros(priceExclTax);
+  if (ht === null) return "";
+  return ((ht * (10000 + rateBps)) / 10000).toFixed(2);
+}
+
+function computeExclTax(priceInclTax: string, rateBps: number): string {
+  const ttc = parseEuros(priceInclTax);
+  if (ttc === null) return "";
+  return ((ttc * 10000) / (10000 + rateBps)).toFixed(2);
+}
+
+export function VariantsEditor({ initial, rateBps }: { initial: VariantRow[]; rateBps: number }) {
   const t = useTranslations("admin.products.variants");
   const keyRef = useRef(0);
   const [rows, setRows] = useState<Row[]>(() =>
-    (initial.length > 0 ? initial : [emptyRow()]).map((row) => ({ ...row, key: keyRef.current++ })),
+    (initial.length > 0 ? initial : [emptyRow()]).map((row) => ({
+      ...row,
+      key: keyRef.current++,
+      priceInclTax: computeInclTax(row.price, rateBps),
+    })),
   );
 
-  const update = (key: number, patch: Partial<VariantRow>): void =>
+  const prevRateBpsRef = useRef(rateBps);
+  useEffect(() => {
+    if (prevRateBpsRef.current === rateBps) return;
+    prevRateBpsRef.current = rateBps;
+    setRows((current) =>
+      current.map((row) => ({
+        ...row,
+        priceInclTax: computeInclTax(row.price, rateBps),
+      })),
+    );
+  }, [rateBps]);
+
+  const update = (key: number, patch: Partial<Row>): void =>
     setRows((current) => current.map((row) => (row.key === key ? { ...row, ...patch } : row)));
   const add = (): void =>
-    setRows((current) => [...current, { ...emptyRow(), key: keyRef.current++ }]);
+    setRows((current) => [...current, { ...emptyRow(), key: keyRef.current++, priceInclTax: "" }]);
   const remove = (key: number): void =>
     setRows((current) => (current.length > 1 ? current.filter((row) => row.key !== key) : current));
+
+  const handlePriceChange = (key: number, value: string): void => {
+    update(key, { price: value, priceInclTax: computeInclTax(value, rateBps) });
+  };
+
+  const handlePriceInclTaxChange = (key: number, value: string): void => {
+    update(key, { priceInclTax: value, price: computeExclTax(value, rateBps) });
+  };
 
   const serialized = JSON.stringify(
     rows.map((row) => ({
@@ -104,18 +145,19 @@ export function VariantsEditor({ initial }: { initial: VariantRow[] }) {
                 inputMode="decimal"
                 required
                 placeholder={t("pricePlaceholder")}
-                onChange={(e) => update(row.key, { price: e.target.value })}
+                onChange={(e) => handlePriceChange(row.key, e.target.value)}
               />
             </Field>
-            <Field label={t("stock")} htmlFor={`stock-${row.key}`}>
+            <Field label={t("priceInclTax")} htmlFor={`price-incl-tax-${row.key}`}>
               <Input
-                id={`stock-${row.key}`}
-                type="number"
-                min={0}
-                value={row.stock}
-                onChange={(e) => update(row.key, { stock: e.target.value })}
+                id={`price-incl-tax-${row.key}`}
+                value={row.priceInclTax}
+                inputMode="decimal"
+                placeholder={t("priceInclTaxPlaceholder")}
+                onChange={(e) => handlePriceInclTaxChange(row.key, e.target.value)}
               />
             </Field>
+            {/* Stock géré dans la section Stocks (inventory) */}
           </div>
         </div>
       ))}

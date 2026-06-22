@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { prisma } from "../../db/client";
+import { DEFAULT_TAX_RATE_ID } from "../pricing";
 import { categoryRepository } from "./category.repository";
 import {
   CategoryNotEmptyError,
@@ -53,7 +54,12 @@ describe("category.service (intégration)", () => {
   it("supprime une catégorie associée à des produits (détachés, non bloquant)", async () => {
     const category = await createCategory({ name: "Avec produit" });
     await prisma.product.create({
-      data: { name: "P", slug: "p-test", categories: { connect: { id: category.id } } },
+      data: {
+        name: "P",
+        slug: "p-test",
+        taxRate: { connect: { id: DEFAULT_TAX_RATE_ID } },
+        categories: { connect: { id: category.id } },
+      },
     });
     await deleteCategory(category.id);
     expect(await categoryRepository.findById(category.id)).toBeNull();

@@ -23,4 +23,16 @@ describe("alternatesFor", () => {
   it("expose des alternances réciproques (mêmes langues quelle que soit la locale courante)", () => {
     expect(alternatesFor("/", "fr").languages).toEqual(alternatesFor("/", "en").languages);
   });
+
+  it("suffixe ?page=N (N≥2) sur la canonique et chaque hreflang", () => {
+    const { canonical, languages } = alternatesFor("/categorie/visage", "fr", 2);
+    expect(canonical).toMatch(/\/fr\/categorie\/visage\?page=2$/);
+    expect(languages.en).toMatch(/\/en\/categorie\/visage\?page=2$/);
+    expect(languages["x-default"]).toMatch(/\?page=2$/);
+  });
+
+  it("n'ajoute aucun suffixe pour la page 1 (défaut)", () => {
+    expect(alternatesFor("/categorie/visage", "fr", 1).canonical).not.toContain("?page");
+    expect(alternatesFor("/categorie/visage", "fr").canonical).not.toContain("?page");
+  });
 });
