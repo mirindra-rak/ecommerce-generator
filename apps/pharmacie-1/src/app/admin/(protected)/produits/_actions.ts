@@ -82,6 +82,8 @@ function readBase(formData: FormData) {
     brandId: String(formData.get("brandId") ?? "") || null,
     categoryIds: formData.getAll("categoryIds").map(String),
     primaryCategoryId: String(formData.get("primaryCategoryId") ?? "") || null,
+    metaTitle: text(formData, "metaTitle"),
+    metaDescription: text(formData, "metaDescription"),
     attributes: readAttributes(formData),
     facetValueIds: formData.getAll("facetValueIds").map(String),
   };

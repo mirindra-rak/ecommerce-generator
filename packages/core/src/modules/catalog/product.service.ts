@@ -99,6 +99,8 @@ export interface CreateProductInput {
   name: string;
   productType: string;
   description?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   active?: boolean;
   taxRateId?: string;
   brandId?: string | null;
@@ -164,6 +166,8 @@ export async function createProduct(input: CreateProductInput): Promise<ProductW
         slug,
         productType: input.productType,
         description: input.description ?? null,
+        metaTitle: input.metaTitle ?? null,
+        metaDescription: input.metaDescription ?? null,
         active: input.active ?? true,
         attributes: attributes as Prisma.InputJsonValue,
         taxRate: { connect: { id: taxRateId } },
@@ -197,6 +201,8 @@ export async function updateProduct(id: string, input: UpdateProductInput): Prom
       name: input.name,
       productType: input.productType,
       description: input.description ?? null,
+      metaTitle: input.metaTitle ?? null,
+      metaDescription: input.metaDescription ?? null,
       active: input.active ?? true,
       attributes: attributes as Prisma.InputJsonValue,
       taxRate: { connect: { id: taxRateId } },
