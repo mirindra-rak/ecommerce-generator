@@ -14,17 +14,18 @@
     "seed:admin": "tsx --env-file=.env scripts/seed-admin.ts"
   },
   "dependencies": {
+    "@paralleldrive/cuid2": "^3.3.0",
     "@pharmacie/core": "workspace:*",
     "@pharmacie/ui": "workspace:*",
+    "@tanstack/react-query": "^5.80.6",
+    "@tanstack/react-table": "^8.21.3",
     "better-auth": "^1.6.17",
     "next": "^15.3.0",
     "next-intl": "^4.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "recharts": "^2.15.0",
-    "sharp": "^0.34.5",
-    "@tanstack/react-query": "^5.80.6",
-    "@tanstack/react-table": "^8.21.3"
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",

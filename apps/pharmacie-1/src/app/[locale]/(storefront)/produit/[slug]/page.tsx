@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getProductDetail } from "@/lib/catalog";
 import { alternatesFor } from "@/lib/seo";
-import { CartIcon } from "../../_components/icons";
+import { AddToCartButton } from "../../_components/add-to-cart-button";
 
 export const dynamic = "force-dynamic";
 
@@ -100,13 +100,7 @@ export default async function ProductPage({ params }: PageProps) {
             </div>
           ))}
 
-          <button
-            type="button"
-            className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-brand-700"
-          >
-            <CartIcon className="h-5 w-5" />
-            {t("addToCart")}
-          </button>
+          {product.variants[0] && <AddToCartButton variantId={product.variants[0].id} />}
 
           {/* Détails réglementaires */}
           <dl className="mt-10 space-y-4 border-t border-slate-200 pt-6 text-sm">

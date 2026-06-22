@@ -3,7 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { Container, Cross, IconButton } from "@pharmacie/ui";
 import { siteConfig } from "@/lib/site";
 import { getMenuTree } from "@/lib/catalog";
-import { CartIcon, HeartIcon, MenuIcon, SearchIcon } from "./icons";
+import { HeartIcon, MenuIcon, SearchIcon } from "./icons";
+import { CartBadge } from "./cart-badge";
 import { LanguageSwitcher } from "./language-switcher";
 import { MegaMenu } from "./mega-menu";
 import { UserMenu } from "./user-menu";
@@ -62,12 +63,7 @@ export async function SiteHeader({ user }: SiteHeaderProps) {
           <IconButton label={t("favorites")}>
             <HeartIcon className="h-5 w-5" />
           </IconButton>
-          <IconButton label={t("cart")}>
-            <CartIcon className="h-5 w-5" />
-            <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-sm bg-accent-600 px-1 text-[10px] font-semibold text-white">
-              0
-            </span>
-          </IconButton>
+          <CartBadge />
         </nav>
       </Container>
 

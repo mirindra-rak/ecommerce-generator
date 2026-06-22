@@ -184,6 +184,7 @@ model ProductVariant {
   lowStockAlert    Boolean            @default(false)
   outOfStockBehavior OutOfStockBehavior @default(DEFAULT)
   stockMovements   StockMovement[]
+  cartItems        CartItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -283,6 +284,38 @@ model ProductFacetValue {
   @@index([facetValueId]) // « tous les produits portant cette valeur » = le filtre
 }
 
+// ───────────────────────── Cart ─────────────────────────
+// Panier d'achat. Un Cart est lié à un sessionToken (anonyme) et/ou un userId (connecté).
+
+model Cart {
+  id           String     @id @default(cuid())
+  sessionToken String?    @unique
+  userId       String?
+  user         User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items        CartItem[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model CartItem {
+  id           String         @id @default(cuid())
+  cartId       String
+  cart         Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId    String
+  variant      ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  quantity     Int
+  priceExclTax Int
+  taxRateBps   Int
+  priceInclTax Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@unique([cartId, variantId])
+  @@index([cartId])
+}
+
 // ───────────────────────── Auth (Better Auth) ─────────────────────────
 // Socle commun d'authentification. ⛔ Aucun tenant_id (modèle Silo).
 // Champs cœur attendus par Better Auth + rôle métier.
@@ -302,6 +335,7 @@ model User {
   role          Role      @default(CUSTOMER)
   sessions      Session[]
   accounts      Account[]
+  carts         Cart[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }

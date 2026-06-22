@@ -28,7 +28,7 @@ export type ProductWithRelations = Prisma.ProductGetPayload<{ include: typeof pr
 const cardInclude = {
   brand: true,
   taxRate: true,
-  variants: { select: { priceExclTax: true } },
+  variants: { select: { id: true, priceExclTax: true } },
   media: { orderBy: { position: "asc" }, take: 1 },
 } satisfies Prisma.ProductInclude;
 

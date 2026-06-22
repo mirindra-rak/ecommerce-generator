@@ -38,6 +38,7 @@ export interface ProductCardVM {
   priceValue: number | null;
   /** true si le produit a plusieurs prix (afficher « à partir de »). */
   from: boolean;
+  defaultVariantId: string | null;
 }
 
 function getProductPriceRange(product: ProductCard): PriceBreakdownRange | null {
@@ -53,6 +54,7 @@ function toCardVM(product: ProductCard): ProductCardVM {
     priceLabel: range ? formatPrice(range.min.priceInclTax) : null,
     priceValue: range?.min.priceInclTax ?? null,
     from: range ? range.min.priceInclTax !== range.max.priceInclTax : false,
+    defaultVariantId: product.variants[0]?.id ?? null,
   };
 }
 
@@ -194,7 +196,13 @@ export interface ProductDetailVM {
   categories: NavCategoryVM[];
   primaryCategory: NavCategoryVM | null;
   options: { name: string; values: string[] }[];
-  variants: { sku: string | null; volume: string | null; priceLabel: string; stock: number }[];
+  variants: {
+    id: string;
+    sku: string | null;
+    volume: string | null;
+    priceLabel: string;
+    stock: number;
+  }[];
 }
 
 /** Entrée de sitemap : slug + dernière modification, pour `lastModified`. */
@@ -235,6 +243,7 @@ export async function getProductDetail(slug: string): Promise<ProductDetailVM | 
       : null,
     options: product.options.map((o) => ({ name: o.name, values: o.values.map((v) => v.value) })),
     variants: product.variants.map((v) => ({
+      id: v.id,
       sku: v.sku,
       volume: v.volume,
       priceLabel: formatPrice(
