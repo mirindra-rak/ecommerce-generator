@@ -608,6 +608,33 @@
       "signOut": "Se déconnecter",
       "signingOut": "Déconnexion…",
       "signIn": "Se connecter"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Inscrivez-vous pour accéder à votre espace personnel.",
+      "name": "Nom complet",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "passwordHint": "8 caractères minimum",
+      "submit": "Créer mon compte",
+      "pending": "Création…",
+      "error": "Impossible de créer le compte.",
+      "signInHint": "Déjà un compte ?",
+      "signInLink": "Se connecter"
+    },
+    "verifyEmail": {
+      "title": "Vérification de votre e-mail",
+      "loading": "Vérification en cours…",
+      "success": "Votre adresse e-mail a été vérifiée avec succès.",
+      "successCta": "Accéder à mon compte",
+      "expired": "Ce lien est expiré ou invalide.",
+      "resend": "Renvoyer l'e-mail de vérification",
+      "resent": "E-mail renvoyé."
+    },
+    "emailBanner": {
+      "text": "Veuillez vérifier votre adresse e-mail.",
+      "resend": "Renvoyer",
+      "resent": "E-mail renvoyé !"
     }
   }
 }

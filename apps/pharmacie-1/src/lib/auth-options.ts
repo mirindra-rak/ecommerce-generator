@@ -1,13 +1,51 @@
 import { prisma } from "@pharmacie/core";
+import {
+  sendEmail,
+  setEmailTransport,
+  smtpTransport,
+  renderEmailVerification,
+  renderPasswordReset,
+} from "@pharmacie/core/modules/email";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
-// Options Better Auth PARTAGÉES (sans plugin Next). Réutilisées par l'instance Next
-// (lib/auth.ts, + nextCookies) et par le script de seed headless (scripts/seed-admin.ts).
-// Secret/URL lus depuis l'env (BETTER_AUTH_SECRET, BETTER_AUTH_URL).
+if (process.env.SMTP_HOST) {
+  setEmailTransport(smtpTransport);
+}
+
 export const authOptions = {
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({
+      user,
+      url,
+    }: {
+      user: { email: string; name: string };
+      url: string;
+    }) => {
+      const { subject, html } = renderPasswordReset({
+        url,
+        name: user.name,
+      });
+      await sendEmail({ to: user.email, subject, html });
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    expiresIn: 86400,
+    sendVerificationEmail: async ({
+      user,
+      url,
+    }: {
+      user: { email: string; name: string };
+      url: string;
+    }) => {
+      const { subject, html } = renderEmailVerification({
+        url,
+        name: user.name,
+      });
+      await sendEmail({ to: user.email, subject, html });
+    },
   },
   user: {
     additionalFields: {
@@ -15,16 +53,15 @@ export const authOptions = {
         type: ["CUSTOMER", "STAFF", "ADMIN"],
         required: false,
         defaultValue: "CUSTOMER",
-        input: false, // non modifiable par l'utilisateur lui-même
+        input: false,
       },
     },
   },
-  // Durcissement : anti-bruteforce sur la connexion. Les appels serveur (auth.api,
-  // ex. le seed) contournent le rate-limit. Actif en prod par défaut ; activé aussi en dev.
   rateLimit: {
     enabled: true,
     customRules: {
       "/sign-in/email": { window: 60, max: 5 },
+      "/sign-up/email": { window: 60, max: 3 },
     },
   },
   advanced: {

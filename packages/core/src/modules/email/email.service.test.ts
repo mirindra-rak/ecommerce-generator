@@ -95,5 +95,39 @@ describe("email.service", () => {
       expect(mock.sent).toHaveLength(1);
       expect(mock.sent[0]!.html).toContain("sans référence");
     });
+
+    it("resolves email-verification template", async () => {
+      await sendTemplatedEmail({
+        to: "client@test.com",
+        template: "email-verification",
+        data: {
+          url: "https://pharmacie.local/api/auth/verify-email?token=abc",
+          name: "Jean",
+        },
+      });
+
+      expect(mock.sent).toHaveLength(1);
+      const msg = mock.sent[0]!;
+      expect(msg.subject).toContain("Vérif");
+      expect(msg.html).toContain("https://pharmacie.local/api/auth/verify-email?token=abc");
+      expect(msg.html).toContain("Jean");
+    });
+
+    it("resolves password-reset template", async () => {
+      await sendTemplatedEmail({
+        to: "client@test.com",
+        template: "password-reset",
+        data: {
+          url: "https://pharmacie.local/reset-password?token=xyz",
+          name: "Marie",
+        },
+      });
+
+      expect(mock.sent).toHaveLength(1);
+      const msg = mock.sent[0]!;
+      expect(msg.subject).toContain("mot de passe");
+      expect(msg.html).toContain("https://pharmacie.local/reset-password?token=xyz");
+      expect(msg.html).toContain("Marie");
+    });
   });
 });
