@@ -132,6 +132,8 @@ model Product {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  searchVector Unsupported("tsvector")? @map("search_vector")
+
   @@index([primaryCategoryId])
   @@index([brandId])
   @@index([taxRateId])

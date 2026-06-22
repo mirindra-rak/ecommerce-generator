@@ -6,6 +6,7 @@
 
 import { Prisma } from "@prisma/client";
 import { taxRateRepository, TaxRateNotFoundError } from "../pricing";
+import { searchRepository } from "../search";
 import { buildUniqueSlug } from "../../utils/slugify";
 import { productRepository, type ProductWithRelations } from "./product.repository";
 import { validateAttributes } from "./product-attributes";
@@ -172,6 +173,7 @@ export async function createProduct(input: CreateProductInput): Promise<ProductW
       variants: input.variants,
     });
     await productRepository.setFacetValues(product.id, input.facetValueIds ?? []);
+    await searchRepository.refreshSearchVector(product.id);
     return product;
   } catch (error) {
     translateDuplicate(error);
@@ -202,6 +204,7 @@ export async function updateProduct(id: string, input: UpdateProductInput): Prom
       ...categoryWrite(input.categoryIds ?? [], input.primaryCategoryId ?? null, "set"),
     });
     await productRepository.setFacetValues(id, input.facetValueIds ?? []);
+    await searchRepository.refreshSearchVector(id);
   } catch (error) {
     translateDuplicate(error);
   }
