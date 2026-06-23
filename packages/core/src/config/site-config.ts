@@ -11,6 +11,43 @@ export interface FeatureFlags {
   loyalty: boolean;
 }
 
+export type SearchEntityKind =
+  | "brand"
+  | "category"
+  | "model"
+  | "attribute"
+  | "attributeValue"
+  | "query";
+
+export interface SearchDictionaryEntityConfig {
+  kind: SearchEntityKind;
+  code: string;
+}
+
+export interface SearchDictionaryEntryConfig {
+  canonicalTerm: string;
+  aliases: string[];
+  entity?: SearchDictionaryEntityConfig;
+}
+
+export interface SearchDictionaryConfig {
+  entries: SearchDictionaryEntryConfig[];
+}
+
+export interface SearchRankingWeightsConfig {
+  textRank?: number;
+  fuzzyRank?: number;
+  exactNameMatch?: number;
+  exactBrandMatch?: number;
+  tokenCoverage?: number;
+  dictionaryMatch?: number;
+}
+
+export interface SearchConfig {
+  dictionary: SearchDictionaryConfig;
+  ranking?: SearchRankingWeightsConfig;
+}
+
 /** Identité de marque (le theming visuel détaillé vit dans `themes/`). */
 export interface BrandConfig {
   name: string;
@@ -43,6 +80,7 @@ export interface SiteConfig {
   brand: BrandConfig;
   locale: LocaleConfig;
   features: FeatureFlags;
+  search?: SearchConfig;
 }
 
 /**

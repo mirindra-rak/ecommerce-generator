@@ -5,6 +5,8 @@ import { TAX_RATE_REFERENCES } from "../modules/pricing";
 export async function resetDb(): Promise<void> {
   await prisma.$executeRawUnsafe(
     `TRUNCATE TABLE
+      "CatalogPriceRuleTarget",
+      "CatalogPriceRule",
       "TaxRate",
       "ProductFacetValue",
       "FacetValue",

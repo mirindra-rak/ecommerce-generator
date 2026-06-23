@@ -1,10 +1,8 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { ProductCardVM } from "@/lib/catalog";
-import { CartIcon } from "./icons";
+import { AddToCartButton } from "./add-to-cart-button";
 
-// Vignette produit partagée (home + listing catégorie). Présentational : reçoit un
-// view-model déjà calculé. Placeholder visuel CSS (pas d'asset image à ce stade).
 export function ProductCard({ product }: { product: ProductCardVM }) {
   const t = useTranslations();
 
@@ -38,13 +36,13 @@ export function ProductCard({ product }: { product: ProductCardVM }) {
             )}
             <span className="text-lg font-bold text-foreground">{product.priceLabel}</span>
           </div>
-          <button
-            type="button"
-            aria-label={t("productCard.addToCart", { name: product.name })}
-            className="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-white transition-colors hover:bg-brand-700"
-          >
-            <CartIcon className="h-4 w-4" />
-          </button>
+          {product.defaultVariantId && (
+            <AddToCartButton
+              variantId={product.defaultVariantId}
+              variant="icon"
+              productName={product.name}
+            />
+          )}
         </div>
       </div>
     </article>

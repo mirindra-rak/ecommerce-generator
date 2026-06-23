@@ -13,7 +13,15 @@ import {
 } from "@pharmacie/ui";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useActionState, useCallback, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useActionState,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type ReactNode,
+} from "react";
 import type { FormState } from "../_lib/form-state";
 import { useUnsavedChanges } from "../_lib/use-unsaved-changes";
 import { VariantsEditor, type VariantRow } from "./variants-editor";
@@ -42,6 +50,8 @@ export interface ProductFormValue {
   primaryCategoryId: string | null;
   inci: string | null;
   precautions: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
   variants: VariantRow[];
   media: MediaItem[];
 }
@@ -75,6 +85,47 @@ function FormSection({
       </header>
       {children}
     </Card>
+  );
+}
+
+function CountedField({
+  label,
+  htmlFor,
+  hint,
+  max,
+  defaultValue,
+  multiline,
+  name,
+}: {
+  label: string;
+  htmlFor: string;
+  hint?: string;
+  max: number;
+  defaultValue: string;
+  multiline?: boolean;
+  name: string;
+}) {
+  const [count, setCount] = useState(defaultValue.length);
+  const onChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setCount(e.target.value.length);
+  }, []);
+  return (
+    <Field label={label} htmlFor={htmlFor} hint={hint}>
+      {multiline ? (
+        <Textarea
+          id={htmlFor}
+          name={name}
+          rows={2}
+          defaultValue={defaultValue}
+          onChange={onChange}
+        />
+      ) : (
+        <Input id={htmlFor} name={name} defaultValue={defaultValue} onChange={onChange} />
+      )}
+      <p className={`text-right text-xs ${count > max ? "text-danger-text" : "text-muted"}`}>
+        {count}/{max}
+      </p>
+    </Field>
   );
 }
 
@@ -286,6 +337,28 @@ export function ProductForm({
           </div>
         </FormSection>
       )}
+
+      <FormSection title={t("form.sectionSeo")} description={t("form.sectionSeoDesc")}>
+        <div className="space-y-5">
+          <CountedField
+            label={t("form.metaTitle")}
+            htmlFor="metaTitle"
+            name="metaTitle"
+            max={70}
+            hint={t("form.metaTitleHint")}
+            defaultValue={product?.metaTitle ?? ""}
+          />
+          <CountedField
+            label={t("form.metaDescription")}
+            htmlFor="metaDescription"
+            name="metaDescription"
+            max={160}
+            hint={t("form.metaDescriptionHint")}
+            defaultValue={product?.metaDescription ?? ""}
+            multiline
+          />
+        </div>
+      </FormSection>
 
       {state.error && (
         <p className="rounded-sm border border-danger-border bg-danger-bg px-3 py-2 text-sm text-danger-text">

@@ -14,6 +14,54 @@
     "favorites": "Mes favoris",
     "cart": "Mon panier"
   },
+  "searchBox": {
+    "submit": "Rechercher",
+    "seeAllResults": "Voir tous les résultats pour « {query} »",
+    "productFallback": "Produit"
+  },
+  "searchOverlay": {
+    "placeholder": "Rechercher un produit, une marque…",
+    "close": "Fermer la recherche",
+    "historyTitle": "Dernières recherches :",
+    "historyClearAll": "Supprimer tout",
+    "resultCount": "{count, plural, one {# résultat trouvé} other {# résultats trouvés}}",
+    "emptyTitle": "Aucun produit trouvé",
+    "emptyBody": "Essayez un autre terme, une marque ou une catégorie plus large.",
+    "sortLabel": "Trié par :",
+    "sortRelevance": "Pertinence",
+    "sortPriceAsc": "Prix croissant",
+    "sortPriceDesc": "Prix décroissant",
+    "sortName": "Nom (A-Z)",
+    "filtersTitle": "Filtres",
+    "filtersReset": "Réinitialiser les filtres",
+    "pagPrevious": "Précédent",
+    "pagNext": "Suivant",
+    "pagPage": "Page {page} sur {total}",
+    "featuredTitle": "Produits recommandés"
+  },
+  "searchPage": {
+    "eyebrow": "Recherche",
+    "title": "Rechercher un produit",
+    "titleWithQuery": "Résultats pour « {query} »",
+    "resultCount": "{count, plural, =0 {Aucun résultat} one {# résultat} other {# résultats}}",
+    "productCount": "{count, plural, one {# produit} other {# produits}}",
+    "emptyQueryHint": "Saisissez un terme de recherche pour explorer le catalogue.",
+    "emptyTitle": "Aucun produit trouvé",
+    "emptyBody": "Essayez un autre terme, une marque ou une catégorie plus large.",
+    "productFallback": "Produit",
+    "sortLabel": "Trier par",
+    "sortRelevance": "Pertinence",
+    "sortPriceAsc": "Prix croissant",
+    "sortPriceDesc": "Prix décroissant",
+    "sortName": "Nom (A-Z)",
+    "pagPrevious": "Précédent",
+    "pagNext": "Suivant",
+    "pagPage": "Page {page} sur {total}"
+  },
+  "searchFilters": {
+    "title": "Filtres",
+    "reset": "Réinitialiser les filtres"
+  },
   "reassurance": {
     "adviceTitle": "Conseil pharmacien",
     "adviceSubtitle": "Équipe diplômée, 6j/7",
@@ -140,6 +188,7 @@
   },
   "categoryPage": {
     "breadcrumbHome": "Accueil",
+    "childCategoriesLabel": "Sous-catégories",
     "productCount": "{count, plural, one {# produit} other {# produits}}",
     "empty": "Aucun produit ne correspond à ces filtres.",
     "notFound": "Catégorie introuvable",
@@ -165,6 +214,36 @@
     "precautions": "Précautions d'emploi",
     "notFound": "Produit introuvable"
   },
+  "cart": {
+    "addToCart": "Ajouter {name} au panier",
+    "addToCartButton": "Ajouter au panier",
+    "added": "Ajouté au panier",
+    "addedNotice": "Article ajouté au panier",
+    "outOfStock": "Produit indisponible",
+    "error": "Une erreur est survenue",
+    "pageTitle": "Mon panier",
+    "drawerTitle": "Panier",
+    "closeDrawer": "Fermer le panier",
+    "drawerEmptyHint": "Ajoutez un produit pour retrouver ici un récapitulatif rapide de votre commande.",
+    "empty": "Votre panier est vide",
+    "emptyLink": "Continuer mes achats",
+    "continueShopping": "Continuer mes achats",
+    "product": "Produit",
+    "unitPrice": "Prix unitaire",
+    "quantity": "Quantité",
+    "decreaseQuantity": "Diminuer la quantité",
+    "increaseQuantity": "Augmenter la quantité",
+    "subtotal": "Sous-total",
+    "drawerSubtotal": "Sous-total du panier",
+    "remove": "Supprimer",
+    "totalExclTax": "Total HT",
+    "totalTax": "TVA",
+    "totalInclTax": "Total TTC",
+    "itemCount": "{count, plural, =0 {Aucun article} =1 {1 article} other {# articles}}",
+    "freeShippingRemaining": "Plus que {amount} avant la livraison offerte en point relais",
+    "freeShippingReached": "La livraison offerte en point relais est débloquée",
+    "viewCart": "Voir le panier"
+  },
   "admin": {
     "nav": {
       "backOffice": "Back-office",
@@ -175,6 +254,7 @@
       "categories": "Catégories",
       "brands": "Marques",
       "facets": "Facettes",
+      "promotions": "Promotions",
       "settings": "Paramètres"
     },
     "topbar": {
@@ -497,6 +577,12 @@
         "sectionAttributesDesc": "Informations libres, non utilisées pour le filtrage.",
         "inci": "INCI",
         "precautions": "Précautions",
+        "sectionSeo": "SEO",
+        "sectionSeoDesc": "Métadonnées pour les moteurs de recherche.",
+        "metaTitle": "Balise titre",
+        "metaTitleHint": "Idéalement 50–60 caractères.",
+        "metaDescription": "Meta description",
+        "metaDescriptionHint": "Idéalement 150–160 caractères.",
         "sectionFacets": "Filtres / Caractéristiques",
         "sectionFacetsDesc": "Critères de filtrage proposés sur la boutique."
       },
@@ -574,6 +660,81 @@
         "taxRateInvalid": "Le taux de TVA sélectionné est invalide."
       }
     },
+    "promotions": {
+      "pageTitle": "Promotions",
+      "total": "{count} au total",
+      "new": {
+        "title": "Nouvelle règle",
+        "heading": "Créer une règle de prix"
+      },
+      "edit": {
+        "title": "Éditer « {name} »"
+      },
+      "table": {
+        "search": "Rechercher une règle…",
+        "colName": "Nom",
+        "colStatus": "Statut",
+        "colDiscount": "Réduction",
+        "colTarget": "Ciblage",
+        "colPriority": "Priorité",
+        "colDates": "Période",
+        "emptyTitle": "Aucune règle de prix",
+        "emptyHint": "Créez votre première promotion.",
+        "confirmDelete": "Supprimer cette règle de prix ?"
+      },
+      "form": {
+        "sectionIdentity": "Identité",
+        "sectionIdentityDesc": "Nom et visibilité de la règle.",
+        "name": "Nom de la règle",
+        "active": "Active",
+        "customerLabel": "Label client",
+        "customerLabelHint": "Texte affiché sur le storefront (ex : « Promo été »).",
+        "sectionDiscount": "Réduction",
+        "sectionDiscountDesc": "Type, valeur et plancher de la réduction.",
+        "discountType": "Type de réduction",
+        "discountTypePercentage": "Pourcentage",
+        "discountTypeFixed": "Montant fixe (€)",
+        "discountValue": "Valeur",
+        "discountValueHintPercent": "En basis points (ex : 2000 = 20 %).",
+        "discountValueHintFixed": "En centimes HT (ex : 300 = 3,00 €).",
+        "floorPrice": "Prix plancher HT",
+        "floorPriceHint": "En centimes. Le prix ne descendra pas en dessous.",
+        "showStrikethrough": "Afficher le prix barré",
+        "sectionTarget": "Ciblage",
+        "sectionTargetDesc": "À quels produits la règle s'applique.",
+        "targetType": "Type de ciblage",
+        "targetTypeAll": "Tout le catalogue",
+        "targetTypeCategory": "Par catégorie(s)",
+        "targetTypeProduct": "Par produit(s)",
+        "targetTypeBrand": "Par marque(s)",
+        "targetIds": "Cibles",
+        "targetIdsPlaceholder": "Sélectionner…",
+        "sectionSchedule": "Planification",
+        "sectionScheduleDesc": "Dates de validité et priorité.",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "priority": "Priorité",
+        "priorityHint": "Plus élevé = prioritaire. Défaut : 0."
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "scheduled": "Planifiée",
+        "expired": "Expirée"
+      },
+      "target": {
+        "all": "Tout",
+        "categories": "{count, plural, one {# catégorie} other {# catégories}}",
+        "products": "{count, plural, one {# produit} other {# produits}}",
+        "brands": "{count, plural, one {# marque} other {# marques}}"
+      },
+      "errors": {
+        "nameRequired": "Le nom est requis.",
+        "idMissing": "Identifiant manquant.",
+        "invalidDiscountValue": "La valeur de réduction est invalide.",
+        "missingTargets": "Sélectionnez au moins une cible."
+      }
+    },
     "login": {
       "title": "Connexion",
       "subtitle": "Accès réservé au personnel.",
@@ -588,6 +749,116 @@
       "title": "Accès refusé",
       "message": "Votre compte n'a pas les droits nécessaires pour accéder au back-office.",
       "backToShop": "Retour à la boutique"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Connectez-vous à votre compte.",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "pending": "Connexion…",
+      "invalid": "Identifiants invalides.",
+      "signUpLink": "Créer un compte",
+      "signUpHint": "Pas encore de compte ?",
+      "forgotPassword": "Mot de passe oublié ?"
+    },
+    "userMenu": {
+      "myAccount": "Mon compte",
+      "signOut": "Se déconnecter",
+      "signingOut": "Déconnexion…",
+      "signIn": "Se connecter"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Inscrivez-vous pour accéder à votre espace personnel.",
+      "name": "Nom complet",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "passwordHint": "8 caractères minimum",
+      "submit": "Créer mon compte",
+      "pending": "Création…",
+      "error": "Impossible de créer le compte.",
+      "signInHint": "Déjà un compte ?",
+      "signInLink": "Se connecter"
+    },
+    "verifyEmail": {
+      "title": "Vérification de votre e-mail",
+      "loading": "Vérification en cours…",
+      "success": "Votre adresse e-mail a été vérifiée avec succès.",
+      "successCta": "Accéder à mon compte",
+      "expired": "Ce lien est expiré ou invalide.",
+      "resend": "Renvoyer l'e-mail de vérification",
+      "resent": "E-mail renvoyé."
+    },
+    "emailBanner": {
+      "text": "Veuillez vérifier votre adresse e-mail.",
+      "resend": "Renvoyer",
+      "resent": "E-mail renvoyé !"
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Saisissez votre adresse e-mail pour recevoir un lien de réinitialisation.",
+      "email": "Adresse e-mail",
+      "submit": "Envoyer le lien",
+      "pending": "Envoi…",
+      "success": "Si un compte existe avec cette adresse, un e-mail a été envoyé.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "passwordHint": "8 caractères minimum",
+      "submit": "Réinitialiser",
+      "pending": "Réinitialisation…",
+      "success": "Votre mot de passe a été réinitialisé.",
+      "successCta": "Se connecter",
+      "expired": "Ce lien est expiré ou invalide.",
+      "expiredCta": "Refaire une demande",
+      "mismatch": "Les mots de passe ne correspondent pas."
+    },
+    "account": {
+      "title": "Mon compte",
+      "nav": {
+        "dashboard": "Tableau de bord",
+        "profile": "Profil",
+        "password": "Mot de passe",
+        "signOut": "Se déconnecter",
+        "orders": "Commandes",
+        "addresses": "Adresses",
+        "wishlist": "Favoris",
+        "comingSoon": "Bientôt"
+      },
+      "dashboard": {
+        "welcome": "Bonjour, {name}",
+        "email": "E-mail",
+        "emailVerified": "Vérifié",
+        "emailNotVerified": "Non vérifié",
+        "quickLinks": "Accès rapides",
+        "editProfile": "Modifier mon profil",
+        "changePassword": "Changer mon mot de passe"
+      },
+      "profile": {
+        "title": "Mon profil",
+        "name": "Nom complet",
+        "submit": "Enregistrer",
+        "pending": "Enregistrement…",
+        "success": "Profil mis à jour."
+      },
+      "password": {
+        "title": "Changer le mot de passe",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmer le nouveau mot de passe",
+        "passwordHint": "8 caractères minimum",
+        "submit": "Changer le mot de passe",
+        "pending": "Modification…",
+        "success": "Mot de passe modifié.",
+        "wrongCurrent": "Mot de passe actuel incorrect.",
+        "mismatch": "Les mots de passe ne correspondent pas."
+      }
     }
   }
 }

@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { PrismaClient } from "@prisma/client";
 import { TAX_RATE_REFERENCES } from "../src/modules/pricing";
+import { inferFacetValueCodes } from "./seed-facets";
 
 // Seed du catalogue. Idempotent : on vide les tables du catalogue puis on recrée. Le
 // catalogue (catégories, marques, produits) provient d'un dataset curé committé
@@ -42,6 +43,48 @@ interface Catalog {
 const catalog = JSON.parse(
   readFileSync(new URL("./seed-data/catalog.json", import.meta.url), "utf8"),
 ) as Catalog;
+
+interface CategorySeedContent {
+  description: string;
+  shortDescription: string;
+  additionalInfo: string;
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string[];
+}
+
+function buildCategorySeedContent(
+  category: CatalogCategory,
+  parent: CatalogCategory | null,
+): CategorySeedContent {
+  const categoryLabel = category.name.trim();
+  const parentLabel = parent?.name.trim() ?? null;
+  const contextLabel = parentLabel
+    ? `${categoryLabel.toLowerCase()} de ${parentLabel.toLowerCase()}`
+    : categoryLabel.toLowerCase();
+  return {
+    description: parentLabel
+      ? `Explorez notre sélection ${contextLabel}, pensée pour répondre aux besoins du quotidien avec une offre lisible, des références reconnues et un parcours d'achat clair.`
+      : `Découvrez notre univers ${contextLabel}, structuré pour faciliter la navigation entre les familles de produits les plus recherchées en parapharmacie.`,
+    shortDescription: parentLabel
+      ? `Sélection ${contextLabel} : navigation rapide vers les produits les plus pertinents.`
+      : `Univers ${categoryLabel.toLowerCase()} : repères clairs pour explorer le catalogue.`,
+    additionalInfo:
+      "Sélection seedée pour le storefront de démonstration. Le contenu éditorial final pourra être enrichi depuis le back-office.",
+    metaTitle: parentLabel
+      ? `${categoryLabel} | ${parentLabel} | Parapharmacie`
+      : `${categoryLabel} | Parapharmacie`,
+    metaDescription: parentLabel
+      ? `Retrouvez notre sélection ${contextLabel}, avec une navigation claire entre les sous-catégories et les produits associés.`
+      : `Parcourez la catégorie ${categoryLabel.toLowerCase()} et accédez rapidement aux sous-catégories et produits associés.`,
+    metaKeywords: [
+      category.slug,
+      categoryLabel.toLowerCase(),
+      ...(parent ? [parent.slug, parent.name.toLowerCase()] : []),
+      "parapharmacie",
+    ],
+  };
+}
 
 // Taxonomie de facettes (filtres produit) — domaine pharma + parapharma. Les `code` de
 // valeur sont uniques sur tout le seed (lookup simplifié à l'assignation).
@@ -157,37 +200,56 @@ async function main(): Promise<void> {
 
   // Catégories — univers (racines) d'abord, puis sous-catégories (rattachées par externalId).
   const categoryIdByExternal = new Map<number, string>();
+  const categoryByExternal = new Map(
+    catalog.categories.map((category) => [category.externalId, category]),
+  );
   const roots = catalog.categories.filter((c) => c.parentExternalId === null);
   const children = catalog.categories.filter((c) => c.parentExternalId !== null);
   for (const category of roots) {
+    const content = buildCategorySeedContent(category, null);
     const created = await prisma.category.create({
       data: {
         name: category.name,
         slug: category.slug,
         position: category.position,
         externalId: category.externalId,
+        description: content.description,
+        shortDescription: content.shortDescription,
+        additionalInfo: content.additionalInfo,
+        metaTitle: content.metaTitle,
+        metaDescription: content.metaDescription,
+        metaKeywords: content.metaKeywords,
       },
     });
     categoryIdByExternal.set(category.externalId, created.id);
   }
   for (const category of children) {
     const parentId = categoryIdByExternal.get(category.parentExternalId as number);
+    const parentCategory = categoryByExternal.get(category.parentExternalId as number) ?? null;
+    const content = buildCategorySeedContent(category, parentCategory);
     const created = await prisma.category.create({
       data: {
         name: category.name,
         slug: category.slug,
         position: category.position,
         externalId: category.externalId,
+        description: content.description,
+        shortDescription: content.shortDescription,
+        additionalInfo: content.additionalInfo,
+        metaTitle: content.metaTitle,
+        metaDescription: content.metaDescription,
+        metaKeywords: content.metaKeywords,
         parent: parentId ? { connect: { id: parentId } } : undefined,
       },
     });
     categoryIdByExternal.set(category.externalId, created.id);
   }
 
-  // Facettes (filtres) + valeurs. Taxonomie seedée ; les produits importés ne portent
-  // pas encore de liaison facette (cf. non-objectif de la story).
+  // Facettes (filtres) + valeurs. On seed la taxonomie puis on relie chaque produit à un
+  // sous-ensemble inféré depuis son libellé et ses textes marketing.
+  const facetValueIdByCode = new Map<string, string>();
   for (const [position, facet] of FACETS.entries()) {
-    await prisma.facet.create({
+    const createdFacet = await prisma.facet.create({
       data: {
         code: facet.code,
         name: facet.name,
@@ -200,15 +262,28 @@ async function main(): Promise<void> {
           })),
         },
       },
+      include: { values: true },
     });
+    for (const value of createdFacet.values) facetValueIdByCode.set(value.code, value.id);
   }
 
   // Produits — 1 variante chacune (catalogue source plat). Connexions par externalId.
   for (const product of catalog.products) {
     const brandId = brandIdByExternal.get(product.brandExternalId);
     const categoryId = categoryIdByExternal.get(product.categoryExternalId);
+    const category = categoryByExternal.get(product.categoryExternalId) ?? null;
     const taxRateId = taxRateIdByRateBps.get(product.vatRate);
     if (!taxRateId) throw new Error(`Tax rate not seeded for rate ${product.vatRate}`);
+    const facetValueIds = inferFacetValueCodes({
+      name: product.name,
+      description: product.description,
+      shortDescription: product.shortDescription,
+      metaTitle: product.metaTitle,
+      metaDescription: product.metaDescription,
+      categorySlug: category?.slug ?? null,
+    })
+      .map((code) => facetValueIdByCode.get(code))
+      .filter((id): id is string => Boolean(id));
     await prisma.product.create({
       data: {
         externalId: product.externalId,
@@ -224,6 +299,10 @@ async function main(): Promise<void> {
         // La source ne fournit qu'une catégorie : on la pose en M2M ET comme principale.
         categories: categoryId ? { connect: [{ id: categoryId }] } : undefined,
         primaryCategory: categoryId ? { connect: { id: categoryId } } : undefined,
+        facetValues:
+          facetValueIds.length > 0
+            ? { create: facetValueIds.map((facetValueId) => ({ facetValueId })) }
+            : undefined,
         variants: {
           create: [
             {
@@ -246,6 +325,7 @@ async function main(): Promise<void> {
     taxRates: await prisma.taxRate.count(),
     facets: await prisma.facet.count(),
     facetValues: await prisma.facetValue.count(),
+    productFacetValues: await prisma.productFacetValue.count(),
   };
   console.warn("Seed terminé :", counts);
 }

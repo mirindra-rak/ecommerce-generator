@@ -8,6 +8,7 @@ import {
   GearIcon,
   HouseIcon,
   PackageIcon,
+  PercentIcon,
   StorefrontIcon,
   TagIcon,
   cx,
@@ -30,6 +31,7 @@ const NAV = [
   { href: "/admin/categories", labelKey: "nav.categories", Icon: TagIcon, exact: false },
   { href: "/admin/marques", labelKey: "nav.brands", Icon: StorefrontIcon, exact: false },
   { href: "/admin/facettes", labelKey: "nav.facets", Icon: FadersIcon, exact: false },
+  { href: "/admin/promotions", labelKey: "nav.promotions", Icon: PercentIcon, exact: false },
 ] as const;
 
 function isActive(pathname: string, href: string, exact?: boolean) {
@@ -42,6 +44,7 @@ function getPageTitleKey(pathname: string) {
   if (pathname.startsWith("/admin/categories")) return "nav.categories" as const;
   if (pathname.startsWith("/admin/marques")) return "nav.brands" as const;
   if (pathname.startsWith("/admin/facettes")) return "nav.facets" as const;
+  if (pathname.startsWith("/admin/promotions")) return "nav.promotions" as const;
   return "topbar.fallbackTitle" as const;
 }
 

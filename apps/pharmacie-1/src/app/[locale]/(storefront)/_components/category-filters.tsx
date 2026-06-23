@@ -49,7 +49,7 @@ export function CategoryFilters({ facets }: CategoryFiltersProps) {
                 <li key={value.code}>
                   <label
                     className={`flex items-center gap-2 text-sm ${
-                      disabled ? "text-muted/50" : "text-muted"
+                      disabled ? "cursor-not-allowed text-muted/50" : "cursor-pointer text-muted"
                     }`}
                   >
                     <input
@@ -57,7 +57,7 @@ export function CategoryFilters({ facets }: CategoryFiltersProps) {
                       checked={checked}
                       disabled={disabled}
                       onChange={() => toggle(facet.code, value.code)}
-                      className="h-4 w-4"
+                      className="h-4 w-4 cursor-pointer disabled:cursor-not-allowed"
                     />
                     <span className="flex-1">{value.label}</span>
                     <span className="text-xs tabular-nums text-muted/70">{value.count}</span>
@@ -72,7 +72,7 @@ export function CategoryFilters({ facets }: CategoryFiltersProps) {
         <button
           type="button"
           onClick={() => router.push(pathname, { scroll: false })}
-          className="text-sm font-medium text-brand-700 hover:underline"
+          className="cursor-pointer text-sm font-medium text-brand-700 hover:underline"
         >
           {t("reset")}
         </button>

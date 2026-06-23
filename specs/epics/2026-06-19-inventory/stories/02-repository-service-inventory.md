@@ -2,7 +2,7 @@
 
 **Epic parent** : [Inventory — Stock & disponibilité](../epic.md)
 
-**Date** : 2026-06-19 · **Statut** 🟡 · **Estimation** : M
+**Date** : 2026-06-19 · **Statut** 🟢 · **Estimation** : M
 
 ## Contexte
 

@@ -94,6 +94,8 @@ export default async function EditProductPage({ params }: PageProps) {
         primaryCategoryId: product.primaryCategoryId,
         inci: attributes.inci ?? null,
         precautions: attributes.precautions ?? null,
+        metaTitle: product.metaTitle ?? null,
+        metaDescription: product.metaDescription ?? null,
         variants: product.variants.map((v) => ({
           id: v.id,
           volume: v.volume ?? "",

@@ -6,6 +6,7 @@
 
 import { Prisma } from "@prisma/client";
 import { taxRateRepository, TaxRateNotFoundError } from "../pricing";
+import { searchRepository } from "../search";
 import { buildUniqueSlug } from "../../utils/slugify";
 import { productRepository, type ProductWithRelations } from "./product.repository";
 import { validateAttributes } from "./product-attributes";
@@ -98,6 +99,8 @@ export interface CreateProductInput {
   name: string;
   productType: string;
   description?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   active?: boolean;
   taxRateId?: string;
   brandId?: string | null;
@@ -163,6 +166,8 @@ export async function createProduct(input: CreateProductInput): Promise<ProductW
         slug,
         productType: input.productType,
         description: input.description ?? null,
+        metaTitle: input.metaTitle ?? null,
+        metaDescription: input.metaDescription ?? null,
         active: input.active ?? true,
         attributes: attributes as Prisma.InputJsonValue,
         taxRate: { connect: { id: taxRateId } },
@@ -172,6 +177,7 @@ export async function createProduct(input: CreateProductInput): Promise<ProductW
       variants: input.variants,
     });
     await productRepository.setFacetValues(product.id, input.facetValueIds ?? []);
+    await searchRepository.refreshSearchVector(product.id);
     return product;
   } catch (error) {
     translateDuplicate(error);
@@ -195,6 +201,8 @@ export async function updateProduct(id: string, input: UpdateProductInput): Prom
       name: input.name,
       productType: input.productType,
       description: input.description ?? null,
+      metaTitle: input.metaTitle ?? null,
+      metaDescription: input.metaDescription ?? null,
       active: input.active ?? true,
       attributes: attributes as Prisma.InputJsonValue,
       taxRate: { connect: { id: taxRateId } },
@@ -202,6 +210,7 @@ export async function updateProduct(id: string, input: UpdateProductInput): Prom
       ...categoryWrite(input.categoryIds ?? [], input.primaryCategoryId ?? null, "set"),
     });
     await productRepository.setFacetValues(id, input.facetValueIds ?? []);
+    await searchRepository.refreshSearchVector(id);
   } catch (error) {
     translateDuplicate(error);
   }

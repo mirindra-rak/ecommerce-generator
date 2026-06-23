@@ -38,6 +38,7 @@ export interface ProductCardVM {
   priceValue: number | null;
   /** true si le produit a plusieurs prix (afficher « à partir de »). */
   from: boolean;
+  defaultVariantId: string | null;
 }
 
 function getProductPriceRange(product: ProductCard): PriceBreakdownRange | null {
@@ -53,6 +54,7 @@ function toCardVM(product: ProductCard): ProductCardVM {
     priceLabel: range ? formatPrice(range.min.priceInclTax) : null,
     priceValue: range?.min.priceInclTax ?? null,
     from: range ? range.min.priceInclTax !== range.max.priceInclTax : false,
+    defaultVariantId: product.variants[0]?.id ?? null,
   };
 }
 
@@ -114,6 +116,8 @@ export interface CategoryPageVM {
   metaTitle: string | null;
   metaDescription: string | null;
   coverImageKey: string | null;
+  breadcrumbs: NavCategoryVM[];
+  childCategories: NavCategoryVM[];
   /** Produits de la page courante (déjà triés + paginés). */
   products: ProductCardVM[];
   /** Page effective (clampée), pour piloter la pagination. */
@@ -136,6 +140,15 @@ export async function getCategoryWithProducts(
   const category = await categoryRepository.findBySlug(slug);
   // Catégorie inexistante OU masquée côté boutique → 404 storefront.
   if (!category || !category.active) return null;
+  const breadcrumbs: NavCategoryVM[] = [];
+  let currentParentId = category.parentId;
+  while (currentParentId) {
+    const parent = await categoryRepository.findById(currentParentId);
+    if (!parent) break;
+    if (parent.active) breadcrumbs.unshift({ slug: parent.slug, label: parent.name });
+    currentParentId = parent.parentId;
+  }
+  const childCategories = await categoryRepository.findActiveChildren(category.id);
   // Jeu complet de la catégorie (réutilisé par les facettes) : on trie puis pagine en mémoire.
   const cards = await productRepository.findCardsByCategorySlug(slug, filters);
   const sorted = sortCards(cards, sort, siteConfig.locale.locale);
@@ -146,6 +159,8 @@ export async function getCategoryWithProducts(
     metaTitle: category.metaTitle,
     metaDescription: category.metaDescription,
     coverImageKey: category.coverImageKey,
+    breadcrumbs,
+    childCategories: childCategories.map((child) => ({ slug: child.slug, label: child.name })),
     products: pageResult.items.map(toCardVM),
     page: pageResult.page,
     pageSize: pageResult.pageSize,
@@ -194,7 +209,13 @@ export interface ProductDetailVM {
   categories: NavCategoryVM[];
   primaryCategory: NavCategoryVM | null;
   options: { name: string; values: string[] }[];
-  variants: { sku: string | null; volume: string | null; priceLabel: string; stock: number }[];
+  variants: {
+    id: string;
+    sku: string | null;
+    volume: string | null;
+    priceLabel: string;
+    stock: number;
+  }[];
 }
 
 /** Entrée de sitemap : slug + dernière modification, pour `lastModified`. */
@@ -235,6 +256,7 @@ export async function getProductDetail(slug: string): Promise<ProductDetailVM | 
       : null,
     options: product.options.map((o) => ({ name: o.name, values: o.values.map((v) => v.value) })),
     variants: product.variants.map((v) => ({
+      id: v.id,
       sku: v.sku,
       volume: v.volume,
       priceLabel: formatPrice(
