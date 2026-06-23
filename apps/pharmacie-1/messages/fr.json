@@ -19,15 +19,48 @@
     "seeAllResults": "Voir tous les résultats pour « {query} »",
     "productFallback": "Produit"
   },
+  "searchOverlay": {
+    "placeholder": "Rechercher un produit, une marque…",
+    "close": "Fermer la recherche",
+    "historyTitle": "Dernières recherches :",
+    "historyClearAll": "Supprimer tout",
+    "resultCount": "{count, plural, one {# résultat trouvé} other {# résultats trouvés}}",
+    "emptyTitle": "Aucun produit trouvé",
+    "emptyBody": "Essayez un autre terme, une marque ou une catégorie plus large.",
+    "sortLabel": "Trié par :",
+    "sortRelevance": "Pertinence",
+    "sortPriceAsc": "Prix croissant",
+    "sortPriceDesc": "Prix décroissant",
+    "sortName": "Nom (A-Z)",
+    "filtersTitle": "Filtres",
+    "filtersReset": "Réinitialiser les filtres",
+    "pagPrevious": "Précédent",
+    "pagNext": "Suivant",
+    "pagPage": "Page {page} sur {total}",
+    "featuredTitle": "Produits recommandés"
+  },
   "searchPage": {
     "eyebrow": "Recherche",
     "title": "Rechercher un produit",
     "titleWithQuery": "Résultats pour « {query} »",
     "resultCount": "{count, plural, =0 {Aucun résultat} one {# résultat} other {# résultats}}",
+    "productCount": "{count, plural, one {# produit} other {# produits}}",
     "emptyQueryHint": "Saisissez un terme de recherche pour explorer le catalogue.",
     "emptyTitle": "Aucun produit trouvé",
     "emptyBody": "Essayez un autre terme, une marque ou une catégorie plus large.",
-    "productFallback": "Produit"
+    "productFallback": "Produit",
+    "sortLabel": "Trier par",
+    "sortRelevance": "Pertinence",
+    "sortPriceAsc": "Prix croissant",
+    "sortPriceDesc": "Prix décroissant",
+    "sortName": "Nom (A-Z)",
+    "pagPrevious": "Précédent",
+    "pagNext": "Suivant",
+    "pagPage": "Page {page} sur {total}"
+  },
+  "searchFilters": {
+    "title": "Filtres",
+    "reset": "Réinitialiser les filtres"
   },
   "reassurance": {
     "adviceTitle": "Conseil pharmacien",
@@ -221,6 +254,7 @@
       "categories": "Catégories",
       "brands": "Marques",
       "facets": "Facettes",
+      "promotions": "Promotions",
       "settings": "Paramètres"
     },
     "topbar": {
@@ -624,6 +658,81 @@
         "requiresVariant": "Un produit doit avoir au moins une déclinaison.",
         "primaryCategoryNotAssigned": "La catégorie principale doit faire partie des catégories du produit.",
         "taxRateInvalid": "Le taux de TVA sélectionné est invalide."
+      }
+    },
+    "promotions": {
+      "pageTitle": "Promotions",
+      "total": "{count} au total",
+      "new": {
+        "title": "Nouvelle règle",
+        "heading": "Créer une règle de prix"
+      },
+      "edit": {
+        "title": "Éditer « {name} »"
+      },
+      "table": {
+        "search": "Rechercher une règle…",
+        "colName": "Nom",
+        "colStatus": "Statut",
+        "colDiscount": "Réduction",
+        "colTarget": "Ciblage",
+        "colPriority": "Priorité",
+        "colDates": "Période",
+        "emptyTitle": "Aucune règle de prix",
+        "emptyHint": "Créez votre première promotion.",
+        "confirmDelete": "Supprimer cette règle de prix ?"
+      },
+      "form": {
+        "sectionIdentity": "Identité",
+        "sectionIdentityDesc": "Nom et visibilité de la règle.",
+        "name": "Nom de la règle",
+        "active": "Active",
+        "customerLabel": "Label client",
+        "customerLabelHint": "Texte affiché sur le storefront (ex : « Promo été »).",
+        "sectionDiscount": "Réduction",
+        "sectionDiscountDesc": "Type, valeur et plancher de la réduction.",
+        "discountType": "Type de réduction",
+        "discountTypePercentage": "Pourcentage",
+        "discountTypeFixed": "Montant fixe (€)",
+        "discountValue": "Valeur",
+        "discountValueHintPercent": "En basis points (ex : 2000 = 20 %).",
+        "discountValueHintFixed": "En centimes HT (ex : 300 = 3,00 €).",
+        "floorPrice": "Prix plancher HT",
+        "floorPriceHint": "En centimes. Le prix ne descendra pas en dessous.",
+        "showStrikethrough": "Afficher le prix barré",
+        "sectionTarget": "Ciblage",
+        "sectionTargetDesc": "À quels produits la règle s'applique.",
+        "targetType": "Type de ciblage",
+        "targetTypeAll": "Tout le catalogue",
+        "targetTypeCategory": "Par catégorie(s)",
+        "targetTypeProduct": "Par produit(s)",
+        "targetTypeBrand": "Par marque(s)",
+        "targetIds": "Cibles",
+        "targetIdsPlaceholder": "Sélectionner…",
+        "sectionSchedule": "Planification",
+        "sectionScheduleDesc": "Dates de validité et priorité.",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "priority": "Priorité",
+        "priorityHint": "Plus élevé = prioritaire. Défaut : 0."
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "scheduled": "Planifiée",
+        "expired": "Expirée"
+      },
+      "target": {
+        "all": "Tout",
+        "categories": "{count, plural, one {# catégorie} other {# catégories}}",
+        "products": "{count, plural, one {# produit} other {# produits}}",
+        "brands": "{count, plural, one {# marque} other {# marques}}"
+      },
+      "errors": {
+        "nameRequired": "Le nom est requis.",
+        "idMissing": "Identifiant manquant.",
+        "invalidDiscountValue": "La valeur de réduction est invalide.",
+        "missingTargets": "Sélectionnez au moins une cible."
       }
     },
     "login": {

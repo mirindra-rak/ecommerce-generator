@@ -19,15 +19,48 @@
     "seeAllResults": "See all results for \"{query}\"",
     "productFallback": "Product"
   },
+  "searchOverlay": {
+    "placeholder": "Search for a product, a brand…",
+    "close": "Close search",
+    "historyTitle": "Recent searches:",
+    "historyClearAll": "Clear all",
+    "resultCount": "{count, plural, one {# result found} other {# results found}}",
+    "emptyTitle": "No products found",
+    "emptyBody": "Try another term, a brand, or a broader category.",
+    "sortLabel": "Sort by:",
+    "sortRelevance": "Relevance",
+    "sortPriceAsc": "Price: low to high",
+    "sortPriceDesc": "Price: high to low",
+    "sortName": "Name (A-Z)",
+    "filtersTitle": "Filters",
+    "filtersReset": "Reset filters",
+    "pagPrevious": "Previous",
+    "pagNext": "Next",
+    "pagPage": "Page {page} of {total}",
+    "featuredTitle": "Recommended products"
+  },
   "searchPage": {
     "eyebrow": "Search",
     "title": "Search for a product",
     "titleWithQuery": "Results for \"{query}\"",
     "resultCount": "{count, plural, =0 {No results} one {# result} other {# results}}",
+    "productCount": "{count, plural, one {# product} other {# products}}",
     "emptyQueryHint": "Enter a search term to explore the catalog.",
     "emptyTitle": "No products found",
     "emptyBody": "Try another term, a brand, or a broader category.",
-    "productFallback": "Product"
+    "productFallback": "Product",
+    "sortLabel": "Sort by",
+    "sortRelevance": "Relevance",
+    "sortPriceAsc": "Price: low to high",
+    "sortPriceDesc": "Price: high to low",
+    "sortName": "Name (A-Z)",
+    "pagPrevious": "Previous",
+    "pagNext": "Next",
+    "pagPage": "Page {page} of {total}"
+  },
+  "searchFilters": {
+    "title": "Filters",
+    "reset": "Reset filters"
   },
   "reassurance": {
     "adviceTitle": "Pharmacist advice",
@@ -221,6 +254,7 @@
       "categories": "Categories",
       "brands": "Brands",
       "facets": "Facets",
+      "promotions": "Promotions",
       "settings": "Settings"
     },
     "topbar": {
@@ -624,6 +658,81 @@
         "requiresVariant": "A product must have at least one variant.",
         "primaryCategoryNotAssigned": "The primary category must be one of the product's categories.",
         "taxRateInvalid": "The selected VAT rate is invalid."
+      }
+    },
+    "promotions": {
+      "pageTitle": "Promotions",
+      "total": "{count} total",
+      "new": {
+        "title": "New rule",
+        "heading": "Create a price rule"
+      },
+      "edit": {
+        "title": "Edit \"{name}\""
+      },
+      "table": {
+        "search": "Search a rule…",
+        "colName": "Name",
+        "colStatus": "Status",
+        "colDiscount": "Discount",
+        "colTarget": "Target",
+        "colPriority": "Priority",
+        "colDates": "Period",
+        "emptyTitle": "No price rules",
+        "emptyHint": "Create your first promotion.",
+        "confirmDelete": "Delete this price rule?"
+      },
+      "form": {
+        "sectionIdentity": "Identity",
+        "sectionIdentityDesc": "Rule name and visibility.",
+        "name": "Rule name",
+        "active": "Active",
+        "customerLabel": "Customer label",
+        "customerLabelHint": "Text displayed on the storefront (e.g. \"Summer sale\").",
+        "sectionDiscount": "Discount",
+        "sectionDiscountDesc": "Discount type, value and floor price.",
+        "discountType": "Discount type",
+        "discountTypePercentage": "Percentage",
+        "discountTypeFixed": "Fixed amount (€)",
+        "discountValue": "Value",
+        "discountValueHintPercent": "In basis points (e.g. 2000 = 20%).",
+        "discountValueHintFixed": "In cents excl. tax (e.g. 300 = €3.00).",
+        "floorPrice": "Floor price excl. tax",
+        "floorPriceHint": "In cents. Price will not go below this.",
+        "showStrikethrough": "Show strikethrough price",
+        "sectionTarget": "Target",
+        "sectionTargetDesc": "Which products the rule applies to.",
+        "targetType": "Target type",
+        "targetTypeAll": "Entire catalogue",
+        "targetTypeCategory": "By category(ies)",
+        "targetTypeProduct": "By product(s)",
+        "targetTypeBrand": "By brand(s)",
+        "targetIds": "Targets",
+        "targetIdsPlaceholder": "Select…",
+        "sectionSchedule": "Scheduling",
+        "sectionScheduleDesc": "Validity dates and priority.",
+        "startDate": "Start date",
+        "endDate": "End date",
+        "priority": "Priority",
+        "priorityHint": "Higher = takes precedence. Default: 0."
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "scheduled": "Scheduled",
+        "expired": "Expired"
+      },
+      "target": {
+        "all": "All",
+        "categories": "{count, plural, one {# category} other {# categories}}",
+        "products": "{count, plural, one {# product} other {# products}}",
+        "brands": "{count, plural, one {# brand} other {# brands}}"
+      },
+      "errors": {
+        "nameRequired": "Name is required.",
+        "idMissing": "Missing identifier.",
+        "invalidDiscountValue": "Invalid discount value.",
+        "missingTargets": "Select at least one target."
       }
     },
     "login": {
